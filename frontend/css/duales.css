@@ -1,16 +1,20 @@
 /* ============================================
-     ARCHIVO: duales.css
-     Estilos para la gestión de Duales
-     ============================================ */
+   ARCHIVO: duales.css
+   Estilos para la gestión de Duales (VERSIÓN COMPLETA)
+   ============================================ */
 
-/* Contenedor principal */
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
 .duales-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
 }
 
-/* Cabecera */
+/* ============================================
+   CABECERA
+   ============================================ */
 .header-duales {
     display: flex;
     justify-content: space-between;
@@ -22,9 +26,18 @@
 
 .header-duales h2 {
     margin: 0;
+    font-size: 1.5rem;
+    color: #1e293b;
 }
 
-/* Grid de duales */
+.header-duales h2 i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+/* ============================================
+   GRID DE DUALES
+   ============================================ */
 .duales-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -32,9 +45,11 @@
     margin-top: 1rem;
 }
 
-/* Tarjeta de dual */
+/* ============================================
+   TARJETA DE DUAL
+   ============================================ */
 .dual-card {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
     padding: 1.5rem;
     border: 1px solid #e2e8f0;
@@ -44,7 +59,7 @@
 
 .dual-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .dual-card.activo {
@@ -56,6 +71,9 @@
     opacity: 0.8;
 }
 
+/* ============================================
+   CONTENIDO DE LA TARJETA
+   ============================================ */
 .dual-titulo {
     font-size: 1.2rem;
     font-weight: 600;
@@ -63,10 +81,20 @@
     margin-bottom: 0.5rem;
 }
 
+.dual-titulo i {
+    color: #2563eb;
+    margin-right: 0.5rem;
+}
+
 .dual-empresa {
     color: #64748b;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
+}
+
+.dual-empresa i {
+    color: #64748b;
+    margin-right: 0.5rem;
 }
 
 .dual-fechas {
@@ -78,13 +106,39 @@
     flex-wrap: wrap;
 }
 
+.dual-fechas i {
+    color: #10b981;
+    margin-right: 0.3rem;
+}
+
+.dual-firmas-resumen {
+    font-size: 0.85rem;
+    color: #475569;
+    margin: 0.5rem 0;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.dual-firmas-resumen i {
+    color: #8b5cf6;
+    margin-right: 0.3rem;
+}
+
+/* ============================================
+   ESTADO DEL DUAL
+   ============================================ */
 .dual-estado {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 20px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     margin-top: 0.5rem;
+}
+
+.dual-estado i {
+    margin-right: 0.3rem;
 }
 
 .estado-activo {
@@ -92,9 +146,17 @@
     color: #059669;
 }
 
+.estado-activo i {
+    color: #10b981;
+}
+
 .estado-pendiente {
     background: #fef3c7;
     color: #d97706;
+}
+
+.estado-pendiente i {
+    color: #f59e0b;
 }
 
 .estado-finalizado {
@@ -102,14 +164,23 @@
     color: #475569;
 }
 
+.estado-finalizado i {
+    color: #64748b;
+}
+
+/* ============================================
+   ACCIONES DE LA TARJETA
+   ============================================ */
 .dual-acciones {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
-.btn-ver-dual {
+.dual-acciones .btn-detalle-dual,
+.dual-acciones .btn-ver-dual {
     background: #2563eb;
     color: white;
     padding: 6px 12px;
@@ -117,9 +188,18 @@
     border-radius: 8px;
     border: none;
     cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
-.btn-editar-dual {
+.dual-acciones .btn-detalle-dual:hover,
+.dual-acciones .btn-ver-dual:hover {
+    background: #1d4ed8;
+}
+
+.dual-acciones .btn-editar-dual {
     background: #f59e0b;
     color: white;
     padding: 6px 12px;
@@ -127,9 +207,73 @@
     border-radius: 8px;
     border: none;
     cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
-/* Formulario de dual */
+.dual-acciones .btn-editar-dual:hover {
+    background: #d97706;
+}
+
+.dual-acciones .btn-eliminar-dual {
+    background: #dc2626;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.dual-acciones .btn-eliminar-dual:hover {
+    background: #b91c1c;
+}
+
+.dual-acciones .btn-pdf {
+    background: #dc2626;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.dual-acciones .btn-pdf:hover {
+    background: #b91c1c;
+}
+
+/* ============================================
+   SIN DUALES
+   ============================================ */
+.sin-duales {
+    text-align: center;
+    padding: 3rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    color: #64748b;
+}
+
+.sin-duales i {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* ============================================
+   FORMULARIO DE DUAL
+   ============================================ */
 .form-dual {
     background: white;
     border-radius: 20px;
@@ -149,15 +293,22 @@
     margin-bottom: 0.5rem;
 }
 
+.form-grupo label i {
+    margin-right: 0.3rem;
+    color: #667eea;
+}
+
 .form-grupo input,
 .form-grupo select,
 .form-grupo textarea {
     width: 100%;
-    padding: 12px;
+    padding: 12px 14px;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
     font-size: 1rem;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+    color: #1e293b;
 }
 
 .form-grupo input:focus,
@@ -165,76 +316,41 @@
 .form-grupo textarea:focus {
     outline: none;
     border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
 }
 
-/* Sin duales */
-.sin-duales {
-    text-align: center;
-    padding: 3rem;
-    background: #f8fafc;
-    border-radius: 16px;
-    color: #64748b;
+.form-grupo textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
-.btn-eliminar-dual {
-    background: #dc2626;
-    color: white;
-    padding: 6px 12px;
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-help {
     font-size: 0.8rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
+    color: #94a3b8;
+    margin-top: 0.25rem;
 }
 
-.btn-eliminar-dual:hover {
-    background: #b91c1c;
+.botones-form {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
 }
 
-/* ============================================
-     ICONOS PROFESIONALES PARA DUALES
-     ============================================ */
-
-.dual-card .dual-titulo i {
-    color: #2563eb;
-    margin-right: 0.5rem;
-}
-
-.dual-card .dual-empresa i {
-    color: #64748b;
-    margin-right: 0.5rem;
-}
-
-.dual-card .dual-fechas i {
-    color: #10b981;
-    margin-right: 0.3rem;
-}
-
-.dual-card .btn-ver-dual i,
-.dual-card .btn-editar-dual i,
-.dual-card .btn-eliminar-dual i {
-    margin-right: 0.3rem;
-}
-
-/* Estado con iconos */
-.dual-estado i {
-    margin-right: 0.3rem;
-}
-
-.estado-activo i {
-    color: #10b981;
-}
-
-.estado-pendiente i {
-    color: #f59e0b;
-}
-
-.estado-finalizado i {
-    color: #64748b;
+.botones-form .btn {
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
 }
 
 /* ============================================
-     MODAL DE CONFIRMACIÓN
-     ============================================ */
+   MODAL DE CONFIRMACIÓN
+   ============================================ */
 .modal-confirmar {
     position: fixed;
     top: 0;
@@ -258,17 +374,6 @@
     animation: modalFadeIn 0.3s ease-out;
 }
 
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 .modal-confirmar-header {
     background: #fef3c7;
     padding: 1.25rem;
@@ -280,6 +385,7 @@
     font-size: 2.5rem;
     color: #d97706;
     margin-bottom: 0.5rem;
+    display: block;
 }
 
 .modal-confirmar-header h3 {
@@ -332,4 +438,1014 @@
 
 .btn-danger:hover {
     background: #b91c1c;
+}
+
+/* ============================================
+   MODAL DE DETALLE
+   ============================================ */
+.modal-detalle-dual {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modal-detalle-dual.active {
+    display: flex;
+}
+
+.modal-detalle-contenido {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 750px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    animation: modalFadeIn 0.3s ease-out;
+    position: relative;
+}
+
+.modal-detalle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.modal-detalle-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.4rem;
+}
+
+.modal-detalle-header h3 i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+.modal-detalle-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+    padding: 0 8px;
+}
+
+.modal-detalle-header .close-btn:hover {
+    color: #1e293b;
+}
+
+/* Grid de detalles */
+.detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.detalle-field {
+    background: #f8fafc;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.detalle-field label {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.detalle-field .detalle-valor {
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 500;
+    word-wrap: break-word;
+}
+
+.detalle-field.full-width {
+    grid-column: 1 / -1;
+}
+
+/* ============================================
+   ASIGNACIONES EN DETALLE
+   ============================================ */
+.asignaciones-detalle {
+    margin-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+    padding-top: 1rem;
+}
+
+.asignaciones-detalle h4 {
+    margin: 0 0 0.75rem 0;
+    color: #1e293b;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.asignaciones-detalle h4 i {
+    color: #8b5cf6;
+}
+
+.asignacion-detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.asignacion-detalle-item .asignacion-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.asignacion-detalle-item .asignacion-info .materia {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.asignacion-detalle-item .asignacion-info .maestro {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.asignacion-detalle-item .firma-status {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.firma-status.firmado {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.firma-status.pendiente {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.firma-status .btn-firmar {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.firma-status .btn-firmar:hover {
+    background: #5a67d8;
+}
+
+/* ============================================
+   ACCIONES DEL MODAL
+   ============================================ */
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.modal-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.modal-actions .btn-editar {
+    background: #f59e0b;
+    color: white;
+}
+
+.modal-actions .btn-editar:hover {
+    background: #d97706;
+}
+
+.modal-actions .btn-pdf {
+    background: #dc2626;
+    color: white;
+}
+
+.modal-actions .btn-pdf:hover {
+    background: #b91c1c;
+}
+
+.modal-actions .btn-cerrar {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.modal-actions .btn-cerrar:hover {
+    background: #cbd5e1;
+}
+
+/* ============================================
+   MODAL DE FIRMA (Canvas)
+   ============================================ */
+.modal-firma {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+.modal-firma.active {
+    display: flex;
+}
+
+.modal-firma-contenido {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    padding: 1.5rem;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-firma-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-firma-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.2rem;
+}
+
+.modal-firma-header h3 i {
+    color: #8b5cf6;
+    margin-right: 0.5rem;
+}
+
+.modal-firma-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.modal-firma-header .close-btn:hover {
+    color: #1e293b;
+}
+
+.modal-firma-body p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.modal-firma-body p i {
+    color: #8b5cf6;
+    margin-right: 0.3rem;
+}
+
+.canvas-container {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    cursor: crosshair;
+    touch-action: none;
+    margin-bottom: 1rem;
+    width: 100%;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: block;
+    touch-action: none;
+}
+
+.canvas-container .firma-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    pointer-events: none;
+    user-select: none;
+}
+
+.firma-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.firma-buttons .btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.firma-buttons .btn-limpiar {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.firma-buttons .btn-limpiar:hover {
+    background: #e2e8f0;
+}
+
+.firma-buttons .btn-guardar-firma {
+    background: #10b981;
+    color: white;
+}
+
+.firma-buttons .btn-guardar-firma:hover {
+    background: #059669;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .duales-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-duales {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-duales .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .botones-form {
+        flex-direction: column;
+    }
+
+    .botones-form .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-detalle-contenido {
+        padding: 1.25rem;
+        max-height: 95vh;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions .btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .asignacion-detalle-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .asignacion-detalle-item .firma-status {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .modal-firma-contenido {
+        max-width: 100%;
+        margin: 10px;
+    }
+
+    .canvas-container {
+        height: 150px;
+    }
+
+    .dual-acciones {
+        flex-direction: column;
+    }
+
+    .dual-acciones .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+body.dark-mode .dual-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .dual-card .dual-titulo {
+    color: #e2e8f0;
+}
+
+body.dark-mode .dual-card .dual-empresa {
+    color: #94a3b8;
+}
+
+body.dark-mode .dual-card .dual-fechas {
+    color: #94a3b8;
+}
+
+body.dark-mode .dual-card .dual-firmas-resumen {
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-detalle-contenido {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-detalle-contenido .detalle-field {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+body.dark-mode .modal-detalle-contenido .detalle-field .detalle-valor {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-detalle-contenido .detalle-field label {
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-detalle-contenido .asignacion-detalle-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+body.dark-mode .modal-detalle-contenido .asignacion-detalle-item .asignacion-info .materia {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-detalle-contenido .asignacion-detalle-item .asignacion-info .maestro {
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-detalle-header {
+    border-color: #334155;
+}
+
+body.dark-mode .modal-detalle-header h3 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-detalle-header .close-btn {
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-detalle-header .close-btn:hover {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-firma-contenido {
+    background: #1e293b;
+}
+
+body.dark-mode .modal-firma-header h3 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-firma-header .close-btn {
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-firma-header .close-btn:hover {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-firma-body p {
+    color: #94a3b8;
+}
+
+body.dark-mode .canvas-container {
+    border-color: #334155;
+    background: #0f172a;
+}
+
+body.dark-mode .canvas-container .firma-placeholder {
+    color: #475569;
+}
+
+body.dark-mode .modal-confirmar-contenido {
+    background: #1e293b;
+}
+
+body.dark-mode .modal-confirmar-body p {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-confirmar-footer {
+    background: #0f172a;
+}
+
+body.dark-mode .form-dual {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .form-dual .form-grupo label {
+    color: #e2e8f0;
+}
+
+body.dark-mode .form-dual .form-grupo input,
+body.dark-mode .form-dual .form-grupo select,
+body.dark-mode .form-dual .form-grupo textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+body.dark-mode .form-dual .form-grupo input:focus,
+body.dark-mode .form-dual .form-grupo select:focus,
+body.dark-mode .form-dual .form-grupo textarea:focus {
+    border-color: #667eea;
+}
+
+body.dark-mode .sin-duales {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+body.dark-mode .sin-duales i {
+    color: #475569;
+}
+
+body.dark-mode .modal-detalle-contenido .asignaciones-detalle {
+    border-color: #334155;
+}
+
+body.dark-mode .modal-detalle-contenido .asignaciones-detalle h4 {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-actions {
+    border-color: #334155;
+}
+
+body.dark-mode .modal-actions .btn-cerrar {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .modal-actions .btn-cerrar:hover {
+    background: #475569;
+}
+
+/* ============================================
+   ESTILOS ADICIONALES PARA ASIGNACIONES EN FORMULARIO
+   ============================================ */
+.asignaciones-container {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 2px dashed #e2e8f0;
+}
+
+body.dark-mode .asignaciones-container {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+.asignaciones-container h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.dark-mode .asignaciones-container h4 {
+    color: #e2e8f0;
+}
+
+.asignacion-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+body.dark-mode .asignacion-item {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.asignacion-item .form-grupo {
+    margin: 0;
+    flex: 1;
+}
+
+.asignacion-item .form-grupo input {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.btn-remover-asignacion {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+}
+
+.btn-remover-asignacion:hover {
+    background: #fecaca;
+}
+
+body.dark-mode .btn-remover-asignacion {
+    background: #450a0a;
+    color: #f87171;
+}
+
+body.dark-mode .btn-remover-asignacion:hover {
+    background: #7f1d1d;
+}
+
+.btn-agregar-asignacion {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-agregar-asignacion:hover {
+    background: #c7d2fe;
+}
+
+body.dark-mode .btn-agregar-asignacion {
+    background: #1e1b4b;
+    color: #818cf8;
+}
+
+body.dark-mode .btn-agregar-asignacion:hover {
+    background: #312e81;
+}
+
+.alumno-info {
+    background: #ecfdf5;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #a7f3d0;
+}
+
+body.dark-mode .alumno-info {
+    background: #064e3b;
+    border-color: #065f46;
+}
+
+.alumno-info label {
+    font-weight: 600;
+    color: #065f46;
+}
+
+body.dark-mode .alumno-info label {
+    color: #6ee7b7;
+}
+
+.alumno-info input {
+    border-color: #a7f3d0 !important;
+}
+
+body.dark-mode .alumno-info input {
+    border-color: #065f46 !important;
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+}
+
+.alert-info {
+    background: #e0f2fe;
+    border: 1px solid #7dd3fc;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #0369a1;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+body.dark-mode .alert-info {
+    background: #0c4a6e;
+    border-color: #0ea5e9;
+    color: #7dd3fc;
+}
+
+.alert-info i {
+    font-size: 1.2rem;
+}
+/* ============================================
+   MODO OSCURO - SELECT Y DATE INPUT (CREAR DUAL)
+   ============================================ */
+
+/* Estilos para select en modo oscuro */
+body.dark-mode .form-dual .form-grupo select {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .form-dual .form-grupo select option {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .form-dual .form-grupo select:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+/* Estilos para date input en modo oscuro */
+body.dark-mode .form-dual .form-grupo input[type="date"] {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+    color-scheme: dark !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[type="date"]:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[type="date"]::-webkit-datetime-edit-text,
+body.dark-mode .form-dual .form-grupo input[type="date"]::-webkit-datetime-edit-month-field,
+body.dark-mode .form-dual .form-grupo input[type="date"]::-webkit-datetime-edit-day-field,
+body.dark-mode .form-dual .form-grupo input[type="date"]::-webkit-datetime-edit-year-field {
+    color: #e2e8f0 !important;
+}
+
+/* Estilos para input number en modo oscuro */
+body.dark-mode .form-dual .form-grupo input[type="number"] {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[type="number"]:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[type="number"]::-webkit-inner-spin-button,
+body.dark-mode .form-dual .form-grupo input[type="number"]::-webkit-outer-spin-button {
+    filter: invert(1) !important;
+}
+
+/* Estilos para los inputs en el formulario de asignaciones en modo oscuro */
+body.dark-mode .asignacion-item .form-grupo input {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .asignacion-item .form-grupo input:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+body.dark-mode .asignacion-item .form-grupo input::placeholder {
+    color: #475569 !important;
+}
+
+/* Estilos para el input de estado (disabled) en modo oscuro */
+body.dark-mode .form-dual .form-grupo input:disabled {
+    background: #1e293b !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+}
+
+/* Estilos para el input de alumno (readonly) en modo oscuro */
+body.dark-mode .form-dual .form-grupo input[readonly] {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+}
+
+body.dark-mode .form-dual .form-grupo input[readonly]:focus {
+    border-color: #334155 !important;
+    box-shadow: none !important;
+}
+/* ============================================
+   MODO OSCURO - CANVAS DE FIRMA
+   ============================================ */
+
+/* Fondo del canvas en modo oscuro */
+body.dark-mode .canvas-container {
+    background: #1a1a2e !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .canvas-container canvas {
+    background: #1a1a2e !important;
+}
+
+/* Placeholder en modo oscuro */
+body.dark-mode .canvas-container .firma-placeholder {
+    color: #475569 !important;
+}
+
+/* Estilos para la firma en el canvas (la tinta) */
+body.dark-mode #firmaCanvas {
+    background: #1a1a2e !important;
+}
+
+/* Asegurar que el contexto del canvas tenga el color correcto */
+body.dark-mode .canvas-container canvas {
+    filter: brightness(1) !important;
+}
+
+/* Estilos para el modal de firma en modo oscuro */
+body.dark-mode .modal-firma-contenido {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .modal-firma-header h3 {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .modal-firma-header h3 i {
+    color: #8b5cf6 !important;
+}
+
+body.dark-mode .modal-firma-header .close-btn {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .modal-firma-header .close-btn:hover {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .modal-firma-body p {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .modal-firma-body p i {
+    color: #8b5cf6 !important;
+}
+
+/* Botones de firma en modo oscuro */
+body.dark-mode .firma-buttons .btn-limpiar {
+    background: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .firma-buttons .btn-limpiar:hover {
+    background: #475569 !important;
+}
+
+body.dark-mode .firma-buttons .btn-guardar-firma {
+    background: #10b981 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .firma-buttons .btn-guardar-firma:hover {
+    background: #059669 !important;
+}
+
+/* Estilos para cuando la firma está dibujada y se muestra en el detalle */
+body.dark-mode .firma-detalle {
+    background: #1a1a2e !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    padding: 0.5rem !important;
+}
+
+body.dark-mode .firma-detalle img {
+    filter: brightness(0.9) !important;
+}
+
+/* Estilos para la firma en el PDF preview (modo oscuro) */
+body.dark-mode .firma-preview {
+    background: #1a1a2e !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    padding: 0.5rem !important;
+}
+
+/* Asegurar que el canvas de firma use colores invertidos en modo oscuro */
+body.dark-mode .modal-firma .canvas-container {
+    background: #1a1a2e !important;
+}
+
+body.dark-mode .modal-firma .canvas-container canvas {
+    background: #1a1a2e !important;
+}
+
+/* El placeholder de la firma */
+body.dark-mode .modal-firma .firma-placeholder {
+    color: #475569 !important;
 }

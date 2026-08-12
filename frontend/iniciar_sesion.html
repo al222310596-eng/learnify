@@ -1,56 +1,144 @@
-<!DOCTYPE html> <!-- Indica el lenguaje a HTML5 ultima version en los navegadores.-->
-<html lang="es"> <!--lang = "es" = pagina en español.-->
-<head> <!-- Son configuraciones q no saldran en la pagina, es como tener algo dentro de datos sin q se vean de configuraciones. -->
-    <meta charset="UTF-8"> <!-- Para usar ñ y tildes. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Para moviles-->
-    <title> Learnify | Iniciar Sesión </title> <!-- Titulo de la pestaña. -->
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Iniciar Sesión</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/animaciones_login_registro.css"> <!-- Estilos de animación -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Iconos Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos adicionales para seguridad */
+        .intentos-info {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .intentos-info i {
+            color: #667eea;
+        }
+
+        .bloqueo-activo {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: #dc2626 !important;
+        }
+    </style>
 </head>
 
-<body> <!-- Todo lo q se coloque dentro, se mostrara en el navegador o pagina. -->
-    <div class="contenedor"> <!-- "división", es como una caja que agrupa contenido
-         class="contenedor" = le aplicamos la clase "contenedor" del CSS
-         Esta clase del CSS hace que la caja tenga:
-         - Fondo blanco
-         - Bordes redondeados
-         - Sombra
-         - Ancho máximo de 400px-->
+<body>
 
-        <h2><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h2> <!-- Encabezado nivel 2 -->
+    <div class="login-wrapper">
 
-        <div id="mensaje" class="mensaje"></div> <!-- Mensajes de éxito/error -->
-
-        <form id="formulario-login"> <!-- Formulario de login -->
-
-            <!-- Campo de correo con icono -->
-            <div class="campo-animado input-icon">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="email" placeholder="Correo electrónico" required>
-            </div>
-
-            <!-- Campo de contraseña con icono -->
-            <div class="campo-animado input-icon">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" placeholder="Contraseña" required>
-            </div>
-
-            <button type="submit" class="btn primario btn-block">
-                <i class="fas fa-sign-in-alt"></i> Entrar
-            </button>
-        </form>
-
-        <div class="enlace-rapido">
-            ¿No tienes cuenta? <a href="registrarse.html">Regístrate</a>
+        <!-- Brand / Logo -->
+        <div class="brand">
+            <a href="bienvenida.html" class="brand-logo">
+                <div class="brand-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="brand-text">
+                    <span>Learnify</span>
+                </div>
+            </a>
+            <div class="brand-subtitle">Plataforma educativa inteligente</div>
         </div>
 
-        <div class="volver">
-            <a href="bienvenida.html"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
+        <!-- Tarjeta de Login -->
+        <div class="login-card">
+
+            <div class="login-header">
+                <h2>Iniciar Sesión</h2>
+                <p>Bienvenido de vuelta. Ingresa tus credenciales.</p>
+            </div>
+
+            <!-- Mensaje de éxito/error -->
+            <div id="mensaje" class="mensaje">
+                <i class="fas fa-check-circle"></i>
+                <span id="mensaje-texto"></span>
+            </div>
+
+            <!-- Formulario -->
+            <form id="formulario-login">
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="email" placeholder="ejemplo@correo.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="password" placeholder="••••••••">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Iniciar Sesión</span>
+                </button>
+
+                <!-- Información de seguridad -->
+                <div class="intentos-info" id="intentosInfo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Máximo 3 intentos fallidos antes del bloqueo</span>
+                </div>
+
+                <!-- ✅ Contenedor para mostrar intentos restantes -->
+                <div id="estadoIntentos"
+                    style="text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8; display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="estadoIntentosTexto"></span>
+                </div>
+            </form>
+
+            <div class="login-footer">
+                <p>
+                    ¿No tienes cuenta?
+                    <a href="registrarse.html">Regístrate</a>
+                </p>
+                <a href="bienvenida.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                </a>
+            </div>
+
         </div>
     </div>
 
+    <!-- ✅ SCRIPT DE AUTENTICACIÓN -->
     <script src="js/autenticacion.js"></script>
+
+    <script>
+        // Función para mostrar/ocultar contraseña
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.toggle-password i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+    </script>
+
 </body>
+
 </html>

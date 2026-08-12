@@ -1,6 +1,6 @@
 <!-- ============================================
-     ARCHIVO 27/30: DETALLE DE TAREA
-     Muestra información completa de una tarea
+     ARCHIVO: detalle-tarea.html
+     Detalle de tarea - Diseño profesional
      ============================================ -->
 
 <!DOCTYPE html>
@@ -9,14 +9,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learnify | Detalle de Tarea</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/detalle-tarea.css">
     <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
+        
         <!-- ============================================ -->
         <!-- MENÚ LATERAL                                 -->
         <!-- ============================================ -->
@@ -28,11 +38,17 @@
                 <a href="../dashboard.html" class="menu-item">
                     <i class="fas fa-chart-line"></i><span> Dashboard</span>
                 </a>
-                <a href="../pages/mis_equipos.html" class="menu-item">
+                <a href="mis_equipos.html" class="menu-item">
                     <i class="fas fa-users"></i><span> Mis Equipos</span>
                 </a>
-                <a href="#" class="menu-item" id="menuCrearEquipo" style="display: none;">
-                    <i class="fas fa-plus-circle"></i><span> Crear Equipo</span>
+                <a href="analisis/analisis_alumnos.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="estadias/mis_estadias.html" class="menu-item">
+                    <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -47,28 +63,40 @@
         <!-- CONTENIDO PRINCIPAL                          -->
         <!-- ============================================ -->
         <main class="main-content">
-            <div class="contenedor contenedor-grande">
-                <!-- Contenido principal -->
-                <div id="tareaContent">
-                    <div class="sin-entregas">
-                        <i class="fas fa-spinner fa-pulse"></i> Cargando información de la tarea...
-                    </div>
-                </div>
-            </div>
+            <div class="page-container">
 
-            <!-- Modal para ver entrega -->
-            <div id="modalVerEntrega" class="modal" style="display: none;">
-                <div class="modal-contenido">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-file-alt"></i> Detalle de entrega</h3>
-                        <button class="modal-cerrar" onclick="cerrarModalEntrega()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div id="modalEntregaContent"></div>
+                <!-- Botón volver -->
+                <div class="back-button-wrapper">
+                    <a href="javascript:history.back()" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
                 </div>
+
+                <!-- Contenido de la tarea -->
+                <div id="tareaContent">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Cargando información de la tarea...</p>
+                    </div>
+                </div>
+
             </div>
         </main>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODAL PARA VER ENTREGA                       -->
+    <!-- ============================================ -->
+    <div id="modalVerEntrega" class="modal" style="display: none;">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Detalle de entrega</h3>
+                <button class="modal-cerrar" onclick="cerrarModalEntrega()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalEntregaContent"></div>
+        </div>
     </div>
 
     <!-- ============================================ -->

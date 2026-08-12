@@ -1,65 +1,134 @@
 /* ============================================
      ARCHIVO: crear-equipo.css
+     Estilos para crear equipo - Diseño profesional
      ============================================ */
 
-.form-equipo {
-    margin-top: 1rem;
-}
+/* ============================================
+     NOTA: Los estilos principales están en base.css
+     Este archivo solo contiene estilos específicos
+     que no están en base.css
+     ============================================ */
 
-.form-grupo {
-    margin-bottom: 1.5rem;
-}
-
-.form-grupo label {
-    display: block;
-    font-weight: 500;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-}
-
-.form-grupo input,
-.form-grupo textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.form-grupo input:focus,
-.form-grupo textarea:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.form-grupo textarea {
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-}
-
-.ayuda {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-top: 0.3rem;
-}
-
-.botones-form {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.botones-form button {
-    flex: 1;
-}
-
-.btn-cancelar {
+/* ============================================
+     EXCEPCIÓN: PÁGINA DE CREAR EQUIPO
+     ============================================ */
+body.page-crear-equipo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh;
     background: #f1f5f9;
-    color: #475569;
+    padding: 20px;
 }
 
-.btn-cancelar:hover {
-    background: #e2e8f0;
+/* ============================================
+     RESPONSIVE EXTRA
+     ============================================ */
+@media (max-width: 480px) {
+    body.page-crear-equipo {
+        padding: 12px;
+    }
+}
+/* ============================================
+     MODO OSCURO - CREAR EQUIPO
+     ============================================ */
+
+/* Crear equipo en modo oscuro */
+body.dark-mode.page-crear-equipo {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode.page-crear-equipo .create-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .create-header {
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .create-header h1 {
+    color: #ececf0;
+}
+
+body.dark-mode.page-crear-equipo .create-subtitle {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .form-group label {
+    color: #a8a8c0;
+}
+
+body.dark-mode.page-crear-equipo .form-group input,
+body.dark-mode.page-crear-equipo .form-group textarea {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode.page-crear-equipo .form-group input:focus,
+body.dark-mode.page-crear-equipo .form-group textarea:focus {
+    border-color: #7c6df0;
+    box-shadow: 0 0 0 4px rgba(124, 109, 240, 0.15);
+}
+
+body.dark-mode.page-crear-equipo .form-help {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .form-help i {
+    color: #4a4a5a;
+}
+
+body.dark-mode.page-crear-equipo .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: #a8a8c0;
+}
+
+body.dark-mode.page-crear-equipo .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+body.dark-mode.page-crear-equipo .back-link {
+    border-top-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .back-link a {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .back-link a:hover {
+    color: #7c6df0;
+}
+
+body.dark-mode.page-crear-equipo .create-header-icon {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%);
+}
+
+body.dark-mode.page-crear-equipo .message-container.success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode.page-crear-equipo .message-container.error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+body.dark-mode.page-crear-equipo .message-container.success i {
+    color: #34d399;
+}
+
+body.dark-mode.page-crear-equipo .message-container.error i {
+    color: #f87171;
+}
+
+body.dark-mode.page-crear-equipo .btn-primary {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%);
+}
+
+body.dark-mode.page-crear-equipo .btn-primary:hover {
+    box-shadow: 0 6px 25px rgba(124, 109, 240, 0.4);
 }

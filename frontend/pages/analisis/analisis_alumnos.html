@@ -4,120 +4,198 @@
      ============================================ -->
 
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    ```
     <title>Learnify | Análisis de Alumnos</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="../../css/base.css">
     <link rel="stylesheet" href="../../css/menu.css">
     <link rel="stylesheet" href="../../css/analisis.css">
+    <link rel="stylesheet" href="../../css/vizualizacion.css">
     <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="{{ asset('js/vizualizacion.js') }}"></script>
+
+    <!-- Exportación -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
-    /* Ocultar el flash inicial */
-    body:not(.dark-mode) {
-        background: #f1f5f9;
-    }
-    body.dark-mode {
-        background: #0a0a0a;
-    }
+        body {
+            background: #f1f5f9;
+        }
     </style>
+    ```
+
 </head>
+
 <body class="menu-lateral">
+
+    ```
     <div class="app-container">
-        <!-- Menú lateral -->
+
+        <!-- ============================================
+         MENÚ LATERAL
+         ============================================ -->
         <aside class="sidebar">
+
             <div class="sidebar-header">
-                <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
+                <h2>
+                    <i class="fas fa-graduation-cap"></i>
+                    <span> Learnify</span>
+                </h2>
             </div>
+
             <nav class="sidebar-nav">
+
                 <a href="../../dashboard.html" class="menu-item">
-                    <i class="fas fa-chart-line"></i><span> Dashboard</span>
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
                 </a>
+
                 <a href="../../pages/mis_equipos.html" class="menu-item">
-                    <i class="fas fa-users"></i><span> Mis Equipos</span>
+                    <i class="fas fa-users"></i>
+                    <span>Mis Equipos</span>
                 </a>
+
                 <a href="../../pages/analisis/analisis_alumnos.html" class="menu-item active">
-                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Análisis</span>
                 </a>
+
                 <a href="../../pages/duales/mis_duales.html" class="menu-item">
-                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                    <i class="fas fa-briefcase"></i>
+                    <span>Duales</span>
                 </a>
+
                 <a href="../../pages/estadias/mis_estadias.html" class="menu-item">
-                    <i class="fas fa-building"></i><span> Estadías</span>
+                    <i class="fas fa-building"></i>
+                    <span>Estadías</span>
                 </a>
+
             </nav>
+
             <div class="sidebar-footer">
+
                 <div class="user-info-sidebar" id="userInfoSidebar"></div>
+
                 <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
-                    <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar sesión</span>
                 </button>
+
             </div>
+
         </aside>
 
-        <!-- Contenido principal -->
+
+        <!-- ============================================
+         CONTENIDO PRINCIPAL
+         ============================================ -->
         <main class="main-content">
+
             <div class="analisis-container">
-                <!-- Selector de equipo -->
+
+                <!-- ============================================
+                 SELECTOR DE EQUIPO
+                 ============================================ -->
                 <div class="selector-equipo">
-                    <label><i class="fas fa-users"></i> Seleccionar equipo:</label>
+
+                    <label>
+                        <i class="fas fa-users"></i>
+                        Seleccionar equipo:
+                    </label>
+
                     <select id="selectorEquipo">
                         <option value="">Cargando equipos...</option>
                     </select>
+
                 </div>
 
-                <!-- Tarjetas de resumen -->
+
+                <!-- ============================================
+                 TARJETAS DE RESUMEN
+                 ============================================ -->
                 <div class="stats-grid">
+
                     <div class="stat-card">
-                        <div class="stat-icon blue"><i class="fas fa-user-graduate"></i></div>
+                        <div class="stat-icon blue">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+
                         <div class="stat-info">
                             <span class="stat-value" id="totalAlumnos">0</span>
-                            <span class="stat-label">Total Alumnos</span>
+                            <span class="stat-label">Total de Alumnos</span>
                         </div>
                     </div>
+
+
                     <div class="stat-card">
-                        <div class="stat-icon orange"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-icon orange">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+
                         <div class="stat-info">
                             <span class="stat-value" id="promedioGeneral">0</span>
                             <span class="stat-label">Promedio General</span>
                         </div>
                     </div>
+
+
                     <div class="stat-card">
-                        <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-icon red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+
                         <div class="stat-info">
                             <span class="stat-value" id="alumnosRiesgo">0</span>
-                            <span class="stat-label">En Riesgo</span>
+                            <span class="stat-label">Alumnos en Riesgo</span>
                         </div>
                     </div>
+
+
                     <div class="stat-card">
-                        <div class="stat-icon green"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-icon green">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+
                         <div class="stat-info">
                             <span class="stat-value" id="asistenciaPromedio">0</span>
-                            <span class="stat-label">Asistencia</span>
+                            <span class="stat-label">Asistencia Promedio</span>
                         </div>
                     </div>
+
                 </div>
 
-                <!-- Gráficas -->
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3><i class="fas fa-chart-bar"></i> Calificaciones por Tarea</h3>
-                        <canvas id="graficaTareas" height="250"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3><i class="fas fa-chart-pie"></i> Distribución de Calificaciones</h3>
-                        <canvas id="graficaDistribucion" height="250"></canvas>
-                    </div>
-                </div>
 
-                <!-- Tabla de alumnos -->
+                <!-- ============================================
+                 TABLA DE ALUMNOS
+                 ============================================ -->
                 <div class="alumnos-section">
-                    <h3><i class="fas fa-list-alt"></i> Detalle de Alumnos</h3>
+
+                    <h3>
+                        <i class="fas fa-list-alt"></i>
+                        Detalle de Alumnos
+                    </h3>
+
                     <div class="table-container">
+
                         <table id="tablaAlumnos">
+
                             <thead>
                                 <tr>
                                     <th>Alumno</th>
@@ -128,178 +206,934 @@
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
+
                             <tbody id="alumnosTableBody">
-                                <tr><td colspan="6">Selecciona un equipo</td></tr>
+
+                                <tr>
+                                    <td colspan="6">
+                                        Selecciona un equipo
+                                    </td>
+                                </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
 
-                <!-- ============================================ -->
-                <!-- SEGMENTACIÓN DE ESTUDIANTES                    -->
-                <!-- ============================================ -->
+
+                <!-- ============================================
+                 SEGMENTACIÓN DE ESTUDIANTES
+                 ============================================ -->
                 <div class="segmentacion-section">
-                    <h3><i class="fas fa-chart-pie"></i> Segmentación de Estudiantes</h3>
+
+                    <h3>
+                        <i class="fas fa-chart-pie"></i>
+                        Segmentación de Estudiantes
+                    </h3>
+
                     <div class="segmentacion-grid">
+
                         <!-- Desempeño -->
                         <div class="segmentacion-card">
-                            <h4><i class="fas fa-star"></i> Desempeño Académico</h4>
+
+                            <h4>
+                                <i class="fas fa-star"></i>
+                                Desempeño Académico
+                            </h4>
+
                             <div class="segmentacion-barras">
+
                                 <div class="barra-item">
                                     <span class="barra-label">Alto (≥85%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraAlto" class="barra-progreso" style="width: 0%; background: #10b981;"></div>
+                                        <div id="barraAlto" class="barra-progreso"
+                                            style="width: 0%; background: #16a34a;">
+                                        </div>
                                     </div>
+
                                     <span id="altoCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
-                                    <span class="barra-label">Regular (70-84%)</span>
+                                    <span class="barra-label">Regular (70–84%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraRegular" class="barra-progreso" style="width: 0%; background: #f59e0b;"></div>
+                                        <div id="barraRegular" class="barra-progreso"
+                                            style="width: 0%; background: #eab308;">
+                                        </div>
                                     </div>
+
                                     <span id="regularCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
                                     <span class="barra-label">Bajo (&lt;70%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraBajo" class="barra-progreso" style="width: 0%; background: #ef4444;"></div>
+                                        <div id="barraBajo" class="barra-progreso"
+                                            style="width: 0%; background: #dc2626;">
+                                        </div>
                                     </div>
+
                                     <span id="bajoCount" class="barra-count">0</span>
                                 </div>
+
                             </div>
+
                         </div>
+
 
                         <!-- Participación -->
                         <div class="segmentacion-card">
-                            <h4><i class="fas fa-tasks"></i> Participación</h4>
+
+                            <h4>
+                                <i class="fas fa-tasks"></i>
+                                Participación
+                            </h4>
+
                             <div class="segmentacion-barras">
+
                                 <div class="barra-item">
                                     <span class="barra-label">Alta (&gt;80%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraPartAlta" class="barra-progreso" style="width: 0%; background: #10b981;"></div>
+                                        <div id="barraPartAlta" class="barra-progreso"
+                                            style="width: 0%; background: #16a34a;">
+                                        </div>
                                     </div>
+
                                     <span id="partAltaCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
-                                    <span class="barra-label">Media (50-80%)</span>
+                                    <span class="barra-label">Media (50–80%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraPartMedia" class="barra-progreso" style="width: 0%; background: #f59e0b;"></div>
+                                        <div id="barraPartMedia" class="barra-progreso"
+                                            style="width: 0%; background: #eab308;">
+                                        </div>
                                     </div>
+
                                     <span id="partMediaCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
                                     <span class="barra-label">Baja (&lt;50%)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraPartBaja" class="barra-progreso" style="width: 0%; background: #ef4444;"></div>
+                                        <div id="barraPartBaja" class="barra-progreso"
+                                            style="width: 0%; background: #dc2626;">
+                                        </div>
                                     </div>
+
                                     <span id="partBajaCount" class="barra-count">0</span>
                                 </div>
+
                             </div>
+
                         </div>
+
 
                         <!-- Comportamiento -->
                         <div class="segmentacion-card">
-                            <h4><i class="fas fa-clock"></i> Entregas a Tiempo</h4>
+
+                            <h4>
+                                <i class="fas fa-clock"></i>
+                                Entregas a Tiempo
+                            </h4>
+
                             <div class="segmentacion-barras">
+
                                 <div class="barra-item">
                                     <span class="barra-label">Positivo (0 tardías)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraCompPositivo" class="barra-progreso" style="width: 0%; background: #10b981;"></div>
+                                        <div id="barraCompPositivo" class="barra-progreso"
+                                            style="width: 0%; background: #16a34a;">
+                                        </div>
                                     </div>
+
                                     <span id="compPositivoCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
-                                    <span class="barra-label">Neutro (1-2 tardías)</span>
+                                    <span class="barra-label">Neutro (1–2 tardías)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraCompNeutro" class="barra-progreso" style="width: 0%; background: #f59e0b;"></div>
+                                        <div id="barraCompNeutro" class="barra-progreso"
+                                            style="width: 0%; background: #eab308;">
+                                        </div>
                                     </div>
+
                                     <span id="compNeutroCount" class="barra-count">0</span>
                                 </div>
+
+
                                 <div class="barra-item">
                                     <span class="barra-label">Negativo (&gt;2 tardías)</span>
+
                                     <div class="barra-contenedor">
-                                        <div id="barraCompNegativo" class="barra-progreso" style="width: 0%; background: #ef4444;"></div>
+                                        <div id="barraCompNegativo" class="barra-progreso"
+                                            style="width: 0%; background: #dc2626;">
+                                        </div>
                                     </div>
+
                                     <span id="compNegativoCount" class="barra-count">0</span>
                                 </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
 
-                <!-- ============================================ -->
-                <!-- MÉTRICAS DE DETECCIÓN                         -->
-                <!-- ============================================ -->
+
+                <!-- ============================================
+                 MÉTRICAS DE DETECCIÓN
+                 ============================================ -->
                 <div class="metricas-section">
-                    <h3><i class="fas fa-chart-simple"></i> Métricas de Detección</h3>
+
+                    <h3>
+                        <i class="fas fa-chart-simple"></i>
+                        Métricas de Detección
+                    </h3>
+
                     <div class="metricas-grid">
+
                         <div class="metrica-card">
                             <i class="fas fa-chart-line"></i>
                             <h4>Bajo Rendimiento</h4>
-                            <p>Promedio &lt; 70</p>
+                            <p>Promedio &lt;70</p>
                         </div>
+
                         <div class="metrica-card">
                             <i class="fas fa-comments"></i>
                             <h4>Poca Participación</h4>
-                            <p>&lt; 50% de tareas</p>
+                            <p>&lt;50% de tareas</p>
                         </div>
+
                         <div class="metrica-card">
                             <i class="fas fa-clock"></i>
                             <h4>Entregas Tardías</h4>
-                            <p>&gt; 2 entregas tardías</p>
+                            <p>&gt;2 entregas tardías</p>
                         </div>
+
                         <div class="metrica-card">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <h4>Riesgo Reprobación</h4>
-                            <p>Promedio &lt; 60</p>
+                            <h4>Riesgo de Reprobación</h4>
+                            <p>Promedio &lt;60</p>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- ============================================ -->
-            <!-- DETECCIÓN DE ABANDONO ESCOLAR                -->
-            <!-- ============================================ -->
-            <div class="abandono-section">
-                <h3><i class="fas fa-exclamation-triangle"></i> Riesgo de Abandono Escolar</h3>
-                
-                <div class="abandono-resumen">
-                    <div class="abandono-stat">
-                        <span class="stat-label">Alto Riesgo</span>
-                        <span class="stat-value" id="altoRiesgoCount">0</span>
                     </div>
-                    <div class="abandono-stat">
-                        <span class="stat-label">Medio Riesgo</span>
-                        <span class="stat-value" id="medioRiesgoCount">0</span>
-                    </div>
-                    <div class="abandono-stat">
-                        <span class="stat-label">Bajo Riesgo</span>
-                        <span class="stat-value" id="bajoRiesgoCount">0</span>
-                    </div>
+
                 </div>
 
-                <div class="table-container">
-                    <table id="tablaAbandono">
-                        <thead>
-                            <tr>
-                                <th>Alumno</th>
-                                <th>Días Inactivo</th>
-                                <th>Tareas Pendientes</th>
-                                <th>Mensajes (30 días)</th>
-                                <th>Riesgo</th>
-                                <th>Alertas</th>
-                            </tr>
-                        </thead>
-                        <tbody id="abandonoTableBody">
-                            <tr><td colspan="6">Selecciona un equipo...</td></tr>
-                        </tbody>
-                    </table>
+
+                <!-- ============================================
+                 RIESGO DE ABANDONO ESCOLAR
+                 ============================================ -->
+                <div class="abandono-section">
+
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Riesgo de Abandono Escolar
+                    </h3>
+
+                    <div class="abandono-resumen">
+
+                        <div class="abandono-stat">
+                            <span class="stat-label">Alto Riesgo</span>
+                            <span class="stat-value" id="altoRiesgoCount">0</span>
+                        </div>
+
+                        <div class="abandono-stat">
+                            <span class="stat-label">Medio Riesgo</span>
+                            <span class="stat-value" id="medioRiesgoCount">0</span>
+                        </div>
+
+                        <div class="abandono-stat">
+                            <span class="stat-label">Bajo Riesgo</span>
+                            <span class="stat-value" id="bajoRiesgoCount">0</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table id="tablaAbandono">
+
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Días Inactivo</th>
+                                    <th>Tareas Pendientes</th>
+                                    <th>Mensajes (30 días)</th>
+                                    <th>Riesgo</th>
+                                    <th>Alertas</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="abandonoTableBody">
+
+                                <tr>
+                                    <td colspan="6">
+                                        Selecciona un equipo...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
                 </div>
+
+
+                <!-- ==================================================
+                 VISUALIZACIÓN GENERAL
+                 ================================================== -->
+                <div class="viz-section" id="vizSection">
+
+                    <div class="viz-header">
+
+                        <div class="viz-header-left">
+
+                            <h3>
+                                <i class="fas fa-chart-pie"></i>
+                                Visualización General de Datos
+                            </h3>
+
+                            <p class="viz-subtitle">
+                                Análisis integral del rendimiento académico, participación,
+                                distribución de calificaciones y niveles de riesgo del equipo seleccionado durante el
+                                año 2026.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INFORMACIÓN DEL EQUIPO -->
+                    <div id="infoEquipoContainer" style="display: none;"></div>
+
+
+                    <!-- RESUMEN GENERAL -->
+                    <div id="conclusionGeneralContainer" style="display: none;"></div>
+
+
+                    <!-- ============================================
+                     OUTLIERS
+                     ============================================ -->
+                    <div class="viz-outliers-section">
+
+                        <div class="viz-outliers-header">
+
+                            <h4>
+                                <i class="fas fa-bullseye"></i>
+                                Detección de Valores Atípicos (Outliers)
+                            </h4>
+
+                            <span class="viz-badge" id="outliersBadge">
+                                Cargando...
+                            </span>
+
+                        </div>
+
+                        <div class="viz-outliers-grid" id="outliersContainer">
+
+                            <div class="viz-loading">
+                                Cargando análisis de valores atípicos...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 1 - BARRAS
+                     ================================================== -->
+                    <div class="viz-row viz-row-full">
+
+                        <div class="viz-card viz-card-full">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Barras
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-bar"></i>
+                                        Distribución de Calificaciones del equipo
+                                        <span id="nombreEquipoBarras">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Comparación del promedio de calificaciones obtenido por cada estudiante
+                                        del equipo durante el año 2026, permitiendo identificar estudiantes
+                                        con rendimiento alto, bajo o en situación de riesgo.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaBarras', 'Grafica_Barras')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaBarras" height="380"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionBarras"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Eje X: Estudiantes
+                                </span>
+
+                                <span class="viz-label">
+                                    Eje Y: Calificación (%)
+                                </span>
+
+                                <span class="viz-label">
+                                    Escala: 0–100
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 2 - LÍNEAS
+                     ================================================== -->
+                    <div class="viz-row viz-row-full">
+
+                        <div class="viz-card viz-card-full">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Líneas
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-line"></i>
+                                        Tendencia de Rendimiento del equipo
+                                        <span id="nombreEquipoLineas">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Evolución de las calificaciones obtenidas en las diferentes tareas,
+                                        mostrando cómo cambia el rendimiento académico de los estudiantes
+                                        y permitiendo detectar tendencias positivas o situaciones de riesgo.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaLineas', 'Grafica_Lineas')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaLineas" height="380"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionLineas"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Eje X: Tareas
+                                </span>
+
+                                <span class="viz-label">
+                                    Eje Y: Calificación (%)
+                                </span>
+
+                                <span class="viz-label">
+                                    Escala: 0–100
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 3 - DONA
+                     ================================================== -->
+                    <div class="viz-row">
+
+                        <div class="viz-card viz-card-half">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Dona
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-pie"></i>
+                                        Distribución de Riesgo del equipo
+                                        <span id="nombreEquipoDona">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Distribución porcentual de los estudiantes según su nivel de riesgo
+                                        académico, permitiendo observar la proporción del equipo que se encuentra
+                                        sin riesgo, con riesgo bajo, medio o alto.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaDona', 'Grafica_Dona')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaDona" height="350"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionDona"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Rojo: Alto riesgo
+                                </span>
+
+                                <span class="viz-label">
+                                    Amarillo: Bajo/medio riesgo
+                                </span>
+
+                                <span class="viz-label">
+                                    Verde: Sin riesgo
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ==================================================
+                         GRÁFICA 4 - PASTEL
+                         ================================================== -->
+                        <div class="viz-card viz-card-half">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Pastel
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-pie"></i>
+                                        Distribución de Calificaciones del equipo
+                                        <span id="nombreEquipoPastel">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Distribución porcentual de las calificaciones obtenidas por los estudiantes
+                                        en los diferentes rangos de desempeño académico durante el año 2026.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaPastel', 'Grafica_Pastel')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaPastel" height="350"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionPastel"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Rojo: Bajo rendimiento
+                                </span>
+
+                                <span class="viz-label">
+                                    Amarillo: Riesgo medio
+                                </span>
+
+                                <span class="viz-label">
+                                    Verde: Rendimiento satisfactorio
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 5 - DISPERSIÓN
+                     ================================================== -->
+                    <div class="viz-row viz-row-full">
+
+                        <div class="viz-card viz-card-full">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Dispersión
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-braille"></i>
+                                        Relación entre Participación y Calificación del equipo
+                                        <span id="nombreEquipoDispersion">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Relación entre el porcentaje de participación de los estudiantes y
+                                        su calificación promedio, con el objetivo de identificar si una mayor
+                                        participación se relaciona con un mejor rendimiento académico.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaDispersion', 'Grafica_Dispersion')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaDispersion" height="380"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionDispersion"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Eje X: Participación (%)
+                                </span>
+
+                                <span class="viz-label">
+                                    Eje Y: Calificación promedio (%)
+                                </span>
+
+                                <span class="viz-label">
+                                    Escala: 0–100
+                                </span>
+
+                                <span class="viz-label">
+                                    Correlación:
+                                    <span id="correlacionValor">-</span>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 6 - HISTOGRAMA
+                     ================================================== -->
+                    <div class="viz-row">
+
+                        <div class="viz-card viz-card-half">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Histograma
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-column"></i>
+                                        Distribución de Calificaciones del equipo
+                                        <span id="nombreEquipoHistograma">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Frecuencia con la que aparecen las calificaciones dentro de cada rango,
+                                        permitiendo identificar dónde se concentra el rendimiento académico
+                                        del equipo.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaHistograma', 'Histograma')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaHistograma" height="350"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionHistograma"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Escala: 0–100
+                                </span>
+
+                                <span class="viz-label">
+                                    Rangos de calificación
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ==================================================
+                         GRÁFICA 7 - BARRAS AGRUPADAS
+                         ================================================== -->
+                        <div class="viz-card viz-card-half">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Barras Agrupadas
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-bar"></i>
+                                        Distribución por Nivel de Riesgo del equipo
+                                        <span id="nombreEquipoAgrupadas">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Comparación de la cantidad de estudiantes que se encuentran en cada
+                                        nivel de riesgo académico, facilitando la identificación de los grupos
+                                        que requieren mayor atención.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaAgrupadas', 'Barras_Agrupadas')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaAgrupadas" height="350"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionAgrupadas"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Rojo: Alto riesgo
+                                </span>
+
+                                <span class="viz-label">
+                                    Amarillo: Bajo/medio riesgo
+                                </span>
+
+                                <span class="viz-label">
+                                    Verde: Sin riesgo
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     GRÁFICA 8 - ÁREA
+                     ================================================== -->
+                    <div class="viz-row viz-row-full">
+
+                        <div class="viz-card viz-card-full">
+
+                            <div class="viz-card-header">
+
+                                <div class="viz-card-header-left">
+
+                                    <span class="viz-card-tag">
+                                        Gráfica de Área
+                                    </span>
+
+                                    <h4>
+                                        <i class="fas fa-chart-area"></i>
+                                        Rendimiento Académico del equipo
+                                        <span id="nombreEquipoArea">seleccionado</span>, año 2026
+                                    </h4>
+
+                                    <p class="viz-card-subtitle">
+                                        Representación acumulada del rendimiento académico de los estudiantes,
+                                        permitiendo visualizar las diferencias entre calificaciones y detectar
+                                        tendencias generales dentro del equipo.
+                                    </p>
+
+                                </div>
+
+                                <button class="viz-btn-export"
+                                    onclick="exportarGrafica('vizGraficaArea', 'Grafica_Area')">
+
+                                    <i class="fas fa-download"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="viz-card-body">
+
+                                <canvas id="vizGraficaArea" height="380"></canvas>
+
+                            </div>
+
+
+                            <div id="conclusionArea"></div>
+
+
+                            <div class="viz-card-footer">
+
+                                <span class="viz-label">
+                                    Eje X: Estudiantes
+                                </span>
+
+                                <span class="viz-label">
+                                    Eje Y: Calificación (%)
+                                </span>
+
+                                <span class="viz-label">
+                                    Escala: 0–100
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
+
         </main>
+
     </div>
+
+
+    <!-- ============================================
+     SCRIPTS
+     ============================================ -->
 
     <script src="../../js/menu.js"></script>
     <script src="../../js/analisis.js"></script>
+    <script src="../../js/analisis-cluster.js"></script>
+    <script src="../../js/vizualizacion.js"></script>
+    ```
+
 </body>
+
 </html>

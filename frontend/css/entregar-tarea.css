@@ -1,99 +1,613 @@
 /* ============================================
      ARCHIVO: entregar-tarea.css
-     Estilos para el formulario de entrega de tarea
+     Estilos para entregar tarea - Diseño profesional
      ============================================ */
 
-.form-entrega {
+/* ============================================
+     RESET LOCAL - Aislar de base.css
+     ============================================ */
+body {
+    min-height: 100vh;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f1f5f9 !important; /* ✅ Fondo claro por defecto */
+    padding: 20px !important;
+    margin: 0 !important;
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Ocultar fondos decorativos de base.css */
+body::before,
+body::after {
+    display: none !important;
+}
+
+/* ============================================
+     WRAPPER Y CONTENEDOR
+     ============================================ */
+.entregar-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+    display: block !important;
+}
+
+.entregar-container {
+    width: 100%;
+}
+
+/* ============================================
+     BRAND / LOGO (MODO CLARO)
+     ============================================ */
+.brand {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.brand-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.brand-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b !important; /* ✅ Texto oscuro en modo claro */
+    letter-spacing: -0.5px;
+}
+
+.brand-text span {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    font-size: 13px;
+    color: #94a3b8 !important; /* ✅ Gris en modo claro */
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* ============================================
+     TARJETA PRINCIPAL (MODO CLARO)
+     ============================================ */
+.entregar-card {
+    background: #ffffff !important; /* ✅ Fondo blanco en modo claro */
+    border-radius: 24px;
+    padding: 32px 32px 28px;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08) !important;
+}
+
+/* ============================================
+     HEADER DE LA TARJETA (MODO CLARO)
+     ============================================ */
+.entregar-header {
+    margin-bottom: 24px;
+}
+
+.entregar-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1e293b !important; /* ✅ Texto oscuro en modo claro */
+    margin-bottom: 4px;
+}
+
+.entregar-header h2 i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+.entregar-header p {
+    color: #94a3b8 !important; /* ✅ Gris en modo claro */
+    font-size: 14px;
+}
+
+/* ============================================
+     INFORMACIÓN DE LA TAREA (MODO CLARO)
+     ============================================ */
+.info-tarea {
+    background: #f8fafc !important; /* ✅ Fondo claro */
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.info-tarea h3 {
+    color: #1e293b !important; /* ✅ Texto oscuro */
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.info-tarea p {
+    color: #475569 !important; /* ✅ Texto gris oscuro */
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    line-height: 1.5;
+}
+
+.info-tarea .fecha-limite {
+    font-size: 0.85rem;
+    color: #f59e0b !important;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.info-tarea .fecha-limite.vencida {
+    color: #dc2626 !important; /* ✅ Rojo para vencida en modo claro */
+}
+
+/* ============================================
+     ENTREGA EXISTENTE (MODO CLARO)
+     ============================================ */
+.entrega-existente {
+    background: #ecfdf5 !important; /* ✅ Fondo verde claro */
+    border: 1px solid #d1fae5 !important;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
     margin-top: 1rem;
+    text-align: center;
+}
+
+.entrega-existente p {
+    color: #065f46 !important; /* ✅ Texto verde oscuro */
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.entrega-existente .fecha-entrega {
+    font-size: 0.85rem;
+    color: #64748b !important;
+}
+
+.entrega-existente.vencida {
+    background: #fef2f2 !important;
+    border-color: #fecaca !important;
+}
+
+.entrega-existente.vencida p:first-child {
+    color: #dc2626 !important;
+}
+
+/* ============================================
+     FORMULARIO (MODO CLARO)
+     ============================================ */
+.form-entrega {
+    display: block !important;
+    margin-top: 0.5rem;
 }
 
 .form-grupo {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .form-grupo label {
     display: block;
     font-weight: 500;
-    color: #1e293b;
+    color: #1e293b !important; /* ✅ Texto oscuro */
     margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-grupo label i {
+    color: #667eea;
+    margin-right: 0.3rem;
 }
 
 .form-grupo textarea {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
+    padding: 12px 14px;
+    background: #ffffff !important; /* ✅ Fondo blanco */
+    border: 2px solid #e2e8f0 !important;
     border-radius: 12px;
-    font-size: 1rem;
-    font-family: inherit;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b !important; /* ✅ Texto oscuro */
     resize: vertical;
-    min-height: 120px;
-    transition: border-color 0.2s;
+    min-height: 100px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .form-grupo textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
 }
 
-.info-tarea {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+.form-grupo textarea::placeholder {
+    color: #94a3b8 !important; /* ✅ Gris claro */
 }
 
-.info-tarea h3 {
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
+/* ============================================
+     FILE INPUT (MODO CLARO)
+     ============================================ */
+.file-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.info-tarea p {
-    color: #475569;
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+    pointer-events: auto !important;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 12px 16px;
+    background: #f8fafc !important; /* ✅ Fondo claro */
+    border: 2px dashed #e2e8f0 !important;
+    border-radius: 12px;
+    color: #64748b !important; /* ✅ Texto gris */
     font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
 }
 
-.info-tarea .fecha-limite {
+.file-input-label i {
+    font-size: 1.2rem;
+    color: #667eea;
+}
+
+.file-input-wrapper:hover .file-input-label {
+    border-color: #667eea !important;
+    background: #f1f5f9 !important;
+}
+
+.file-input-filename {
     font-size: 0.8rem;
-    color: #f59e0b;
-    margin-top: 0.5rem;
+    color: #94a3b8 !important;
+    padding: 0 4px;
+    transition: color 0.3s ease;
 }
 
+.ayuda {
+    font-size: 0.8rem;
+    color: #94a3b8 !important;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ayuda i {
+    color: #94a3b8;
+}
+
+/* ============================================
+     BOTONES DEL FORMULARIO (MODO CLARO)
+     ============================================ */
 .botones-form {
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
 }
 
-.botones-form button {
+.botones-form .btn {
     flex: 1;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.btn-cancelar {
-    background: #f1f5f9;
-    color: #475569;
+.btn-primario {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.btn-cancelar:hover {
-    background: #e2e8f0;
+.btn-primario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
 }
 
-.entrega-existente {
-    background: #d1fae5;
-    border: 1px solid #a7f3d0;
-    border-radius: 16px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+.btn-primario:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secundario {
+    background: #f1f5f9 !important; /* ✅ Fondo gris claro */
+    color: #475569 !important; /* ✅ Texto gris oscuro */
+    border: 1px solid #e2e8f0 !important;
+}
+
+.btn-secundario:hover {
+    background: #e2e8f0 !important;
+}
+
+/* ============================================
+     VOLVER (MODO CLARO)
+     ============================================ */
+.volver {
     text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e2e8f0 !important;
 }
 
-.entrega-existente p {
-    color: #065f46;
-    margin-bottom: 0.5rem;
+.volver a {
+    color: #94a3b8 !important;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.entrega-existente .fecha-entrega {
-    font-size: 0.8rem;
-    color: #047857;
+.volver a:hover {
+    color: #667eea !important;
+}
+
+/* ============================================
+     SIN TAREAS (loading/error) - MODO CLARO
+     ============================================ */
+.sin-tareas {
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8 !important;
+}
+
+.sin-tareas i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1 !important;
+}
+
+/* ============================================
+     MENSAJES (MODO CLARO)
+     ============================================ */
+.mensaje {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 10px;
+}
+
+.mensaje.exito {
+    background: #ecfdf5 !important;
+    border: 1px solid #d1fae5 !important;
+    color: #065f46 !important;
+    display: flex;
+}
+
+.mensaje.error {
+    background: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    color: #991b1b !important;
+    display: flex;
+}
+
+.mensaje i {
+    font-size: 16px;
+}
+
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 480px) {
+    .entregar-card {
+        padding: 24px 18px 20px;
+    }
+
+    .entregar-header h2 {
+        font-size: 19px;
+    }
+
+    .botones-form {
+        flex-direction: column;
+    }
+
+    .botones-form .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .file-input-label {
+        font-size: 0.8rem;
+        padding: 10px 14px;
+    }
+
+    .form-grupo textarea {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+}
+
+/* ============================================
+     MODO OSCURO - SOBRESCRITURAS
+     ============================================ */
+body.dark-mode {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .entregar-card {
+    background: rgba(18, 18, 30, 0.95) !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode .brand-text {
+    color: #ececf0 !important;
+}
+
+body.dark-mode .brand-subtitle {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .entregar-header h2 {
+    color: #ececf0 !important;
+}
+
+body.dark-mode .entregar-header p {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .info-tarea {
+    background: rgba(255,255,255,0.03) !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode .info-tarea h3 {
+    color: #ececf0 !important;
+}
+
+body.dark-mode .info-tarea p {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode .info-tarea .fecha-limite {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode .info-tarea .fecha-limite.vencida {
+    color: #f87171 !important;
+}
+
+body.dark-mode .form-grupo label {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode .form-grupo textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: #2a2a3e !important;
+    color: #ececf0 !important;
+}
+
+body.dark-mode .form-grupo textarea:focus {
+    border-color: #7c6df0 !important;
+}
+
+body.dark-mode .form-grupo textarea::placeholder {
+    color: #4a4a5a !important;
+}
+
+body.dark-mode .file-input-label {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: #2a2a3e !important;
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .file-input-label i {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode .file-input-wrapper:hover .file-input-label {
+    border-color: #3a3a52 !important;
+}
+
+body.dark-mode .file-input-filename {
+    color: #4a4a5a !important;
+}
+
+body.dark-mode .ayuda {
+    color: #4a4a5a !important;
+}
+
+body.dark-mode .btn-secundario {
+    background: rgba(255,255,255,0.06) !important;
+    color: #a8a8c0 !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode .btn-secundario:hover {
+    background: rgba(255,255,255,0.12) !important;
+}
+
+body.dark-mode .btn-primario {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%) !important;
+}
+
+body.dark-mode .volver {
+    border-top-color: #2a2a3e !important;
+}
+
+body.dark-mode .volver a {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .volver a:hover {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode .entrega-existente {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+body.dark-mode .entrega-existente p {
+    color: #34d399 !important;
+}
+
+body.dark-mode .entrega-existente .fecha-entrega {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .sin-tareas {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode .sin-tareas i {
+    color: #2a2a3e !important;
+}
+
+body.dark-mode .mensaje.exito {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+body.dark-mode .mensaje.error {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
 }

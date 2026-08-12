@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Learnify · Videollamada</title>
+
+    <!-- Font Awesome (iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/videollamada.css" />
+    <!-- Socket.IO para WebSocket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- BARRA SUPERIOR                             -->
+    <!-- ========================================== -->
+    <header id="sala-info">
+        <div class="sala-info-left">
+            <h3><i class="fas fa-video"></i> Videollamada · <span id="salaIdDisplay">Cargando...</span></h3>
+        </div>
+        <div class="sala-info-right">
+            <span id="participantes"><i class="fas fa-users"></i> <span id="participantesCount">0</span></span>
+            <button id="btnSalir" class="btn-icon btn-danger">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- CONTENEDOR DE VIDEOS                       -->
+    <!-- ========================================== -->
+    <main id="video-container">
+
+        <!-- VIDEO LOCAL -->
+        <div class="video-box" id="localVideoBox">
+            <video id="video-local" autoplay playsinline muted></video>
+            <div class="video-label"><i class="fas fa-user"></i> Tú</div>
+            <div class="video-status" id="localStatus"><i class="fas fa-circle" style="color:#10b981;"></i> Conectado</div>
+        </div>
+
+        <!-- VIDEO REMOTO -->
+        <div class="video-box" id="remoteVideoBox">
+            <video id="video-remoto" autoplay playsinline></video>
+            <div class="video-remoto-placeholder" id="remotePlaceholder">
+                <i class="fas fa-user-plus"></i>
+                <span>Esperando participante...</span>
+                <small>Comparte el enlace para unirse</small>
+            </div>
+            <div class="video-label" id="remoteLabel"><i class="fas fa-user"></i> Participante</div>
+            <div class="video-status" id="remoteStatus"><i class="fas fa-circle" style="color:#f59e0b;"></i> Conectando...</div>
+        </div>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- CONTROLES INFERIORES                       -->
+    <!-- ========================================== -->
+    <footer class="controls">
+        <button id="btnAudio" class="btn-control active">
+            <i class="fas fa-microphone"></i>
+            <span>Mic</span>
+        </button>
+
+        <button id="btnVideo" class="btn-control active">
+            <i class="fas fa-video"></i>
+            <span>Cámara</span>
+        </button>
+
+        <button id="btnScreen" class="btn-control">
+            <i class="fas fa-desktop"></i>
+            <span>Pantalla</span>
+        </button>
+
+        <button id="btnEndCall" class="btn-control btn-end-call">
+            <i class="fas fa-phone-slash"></i>
+            <span>Terminar</span>
+        </button>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- TOAST (notificaciones)                     -->
+    <!-- ========================================== -->
+    <div id="toast-container"></div>
+
+    <!-- ========================================== -->
+    <!-- SCRIPT PRINCIPAL                           -->
+    <!-- ========================================== -->
+    <script src="js/videollamada.js"></script>
+
+</body>
+</html>

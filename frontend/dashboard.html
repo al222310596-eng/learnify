@@ -1,29 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learnify | Dashboard</title>
+
+    <!-- CSS BASE -->
     <link rel="stylesheet" href="css/base.css">
+
+    <!-- CSS DEL DASHBOARD -->
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="css/modal_editar_perfil.css">
+
+    <!-- ✅ TEMA OSCURO (TODOS LOS ESTILOS OSCUROS ESTÁN AQUÍ) -->
     <link rel="stylesheet" href="css/temas_oscuro.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+
     <style>
-    /* Ocultar el flash inicial */
-    body:not(.dark-mode) {
-        background: #f1f5f9;
-    }
-    body.dark-mode {
-        background: #0a0a0a;
-    }
+        /* ✅ Botón de tema en el sidebar */
+        .theme-toggle-sidebar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .theme-toggle-sidebar:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .theme-toggle-sidebar i {
+            font-size: 18px;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-sidebar span {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .theme-toggle-sidebar {
+            background: rgba(255,255,255,0.03);
+            border-color: rgba(255,255,255,0.06);
+        }
+
+        body.dark-mode .theme-toggle-sidebar:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        body.dark-mode .theme-toggle-sidebar i {
+            color: #7c6df0;
+        }
+
+        body.dark-mode .theme-toggle-sidebar span {
+            color: #a8a8c0;
+        }
     </style>
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
-        <!-- Menú lateral (estructura HTML) -->
+        <!-- Menú lateral -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
@@ -35,7 +92,6 @@
                 <a href="pages/mis_equipos.html" class="menu-item">
                     <i class="fas fa-users"></i><span> Mis Equipos</span>
                 </a>
-                <!-- En el menú lateral, después de "Mis Equipos" -->
                 <a href="pages/analisis/analisis_alumnos.html" class="menu-item">
                     <i class="fas fa-chart-pie"></i><span> Análisis</span>
                 </a>
@@ -45,12 +101,10 @@
                 <a href="pages/estadias/mis_estadias.html" class="menu-item">
                     <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
-                <a href="#" class="menu-item" id="menuCrearEquipo" style="display: none;">
-                    <i class="fas fa-plus-circle"></i><span> Crear Equipo</span>
-                </a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info-sidebar" id="userInfoSidebar"></div>
+
                 <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
                     <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
                 </button>
@@ -60,13 +114,16 @@
         <!-- Contenido principal -->
         <main class="main-content">
             <div class="dashboard-container">
+                <!-- Header -->
                 <div class="dashboard-header">
-                    <h1><i class="fas fa-graduation-cap"></i> Learnify </h1>
+                    <h1><i class="fas fa-graduation-cap"></i> Learnify</h1>
                     <p>Bienvenido/a, <strong id="usuarioNombre">Cargando...</strong></p>
                     <div class="user-badge" id="usuarioRol"></div>
                 </div>
 
+                <!-- Grid de secciones -->
                 <div class="dashboard-grid">
+
                     <!-- Card: Mis Equipos -->
                     <div class="card">
                         <h3><i class="fas fa-users"></i> Mis Equipos</h3>
@@ -82,7 +139,7 @@
                         <div id="tareasPendientesLista">Cargando tareas...</div>
                     </div>
 
-                    <!-- Card: Estadísticas del Equipo -->
+                    <!-- Card: Estadísticas -->
                     <div class="card">
                         <h3><i class="fas fa-chart-bar"></i> Estadísticas de Tareas</h3>
                         <div class="estadisticas-container">
@@ -121,27 +178,78 @@
                         </div>
                     </div>
 
-                    <!-- Card: Gráfica de Tareas -->
+                    <!-- Card: Videollamada con Jitsi -->
+                    <div class="card" id="videoCallCard">
+                        <h3><i class="fas fa-video" style="color: #2b7a4b;"></i> Videollamada con Jitsi</h3>
+                        <div id="videoCallContent">
+                            <p class="video-descripcion">
+                                <i class="fas fa-info-circle"></i>
+                                Crea una sala de videollamada y comparte el link con tus alumnos.
+                                <br><small style="color:#10b981;">✅ Completamente gratuito · Sin límite de minutos</small>
+                            </p>
+
+                            <div id="maestroVideoSection" style="display: none;">
+                                <button id="btnCrearSalaJitsi" class="btn-video-crear" style="background: #2b7a4b;">
+                                    <i class="fas fa-video"></i> Crear sala con Jitsi (Gratis)
+                                </button>
+                                <div id="salaLinkContainer" style="display: none; margin-top: 15px;">
+                                    <div class="link-generado">
+                                        <label><i class="fas fa-link"></i> Link de la sala:</label>
+                                        <div class="input-group-link">
+                                            <input type="text" id="salaLink" class="form-control" readonly>
+                                            <button id="btnCopiarLink" class="btn-copiar">
+                                                <i class="fas fa-copy"></i> Copiar
+                                            </button>
+                                            <button id="btnUnirseSala" class="btn-unirse">
+                                                <i class="fas fa-door-open"></i> Unirse
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="video-info">
+                                        <i class="fas fa-share-alt"></i>
+                                        Comparte este link con tus alumnos.
+                                    </p>
+                                    <p class="video-info" style="color: #10b981; font-size: 12px;">
+                                        <i class="fas fa-check-circle"></i>
+                                        Jitsi Meet es gratuito y no requiere registro
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div id="alumnoVideoSection" style="display: none;">
+                                <p class="video-descripcion">
+                                    <i class="fas fa-info-circle"></i> Ingresa el link que te compartió tu maestro.
+                                </p>
+                                <div class="input-group-link">
+                                    <input type="text" id="inputLinkSala" class="form-control" placeholder="Pega el link de la videollamada">
+                                    <button id="btnUnirseLink" class="btn-unirse">
+                                        <i class="fas fa-door-open"></i> Unirse
+                                    </button>
+                                </div>
+                                <p class="video-info" style="color: #64748b; font-size: 12px; margin-top: 8px;">
+                                    <i class="fas fa-info-circle"></i>
+                                    Jitsi funciona en navegadores sin instalar nada
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Gráfica -->
                     <div class="card">
                         <h3><i class="fas fa-chart-line"></i> Progreso de Tareas</h3>
                         <canvas id="graficaTareas" width="400" height="200" style="max-width: 100%; height: auto;"></canvas>
                         <div class="acciones-grafica">
-                            <button onclick="exportarGrafica()" class="btn-accion"><i class="fas fa-download"></i> Exportar como PNG</button>
+                            <button onclick="exportarGrafica()" class="btn-accion"><i class="fas fa-download"></i> Exportar PNG</button>
                             <button onclick="generarReporte()" class="btn-accion btn-reporte"><i class="fas fa-file-alt"></i> Generar Reporte</button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- JavaScript separado -->
-    <script src="js/menu.js"></script>
-    <script src="js/dashboard.js"></script>
-
-    <!-- ============================================ -->
-    <!-- MODAL DE EDICIÓN DE PERFIL (fuera del main-content) -->
-    <!-- ============================================ -->
+    <!-- Modal Editar Perfil -->
     <div id="modalEditarPerfil" class="modal-overlay" style="display: none;">
         <div class="modal-container">
             <div class="modal-header">
@@ -151,7 +259,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Foto de perfil -->
                 <div class="perfil-foto">
                     <div id="avatarPreview" class="perfil-avatar">
                         <i class="fas fa-user"></i>
@@ -162,23 +269,19 @@
                     <input type="file" id="inputFoto" accept="image/*" style="display: none;">
                 </div>
 
-                <!-- Campos del formulario -->
                 <div class="form-grupo">
                     <label><i class="fas fa-user"></i> Nombre completo</label>
                     <input type="text" id="editNombre" class="form-control" placeholder="Tu nombre">
                 </div>
-
                 <div class="form-grupo">
                     <label><i class="fas fa-envelope"></i> Correo electrónico</label>
                     <input type="email" id="editEmail" class="form-control" placeholder="tu@email.com">
                 </div>
-
                 <div class="form-grupo">
                     <label><i class="fas fa-lock"></i> Nueva contraseña</label>
                     <input type="password" id="editPassword" class="form-control" placeholder="Dejar en blanco para no cambiar">
                     <small class="form-help">Mínimo 6 caracteres</small>
                 </div>
-
                 <div class="form-grupo">
                     <label><i class="fas fa-check-circle"></i> Confirmar contraseña</label>
                     <input type="password" id="confirmPassword" class="form-control" placeholder="Repite la nueva contraseña">
@@ -194,5 +297,7 @@
             </div>
         </div>
     </div>
-</body>
+
+    <script src="js/menu.js"></script>
+    <script src="js/dashboard.js"></script>
 </html>

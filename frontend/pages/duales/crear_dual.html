@@ -1,6 +1,6 @@
 <!-- ============================================
      ARCHIVO: crear_dual.html
-     Formulario para registrar/editar un dual
+     Formulario para registrar/editar un dual (VERSIÓN MEJORADA)
      ============================================ -->
 
 <!DOCTYPE html>
@@ -14,6 +14,133 @@
     <link rel="stylesheet" href="../../css/duales.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos para la sección de materias y maestros */
+        .asignaciones-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px dashed #e2e8f0;
+        }
+
+        .asignaciones-container h4 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .asignacion-item {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .asignacion-item .form-grupo {
+            margin: 0;
+            flex: 1;
+        }
+
+        .asignacion-item .form-grupo input {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-remover-asignacion {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .btn-remover-asignacion:hover {
+            background: #fecaca;
+        }
+
+        .btn-agregar-asignacion {
+            background: #e0e7ff;
+            color: #4338ca;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-agregar-asignacion:hover {
+            background: #c7d2fe;
+        }
+
+        .alumno-info {
+            background: #ecfdf5;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alumno-info label {
+            font-weight: 600;
+            color: #065f46;
+        }
+
+        .alumno-info input {
+            border-color: #a7f3d0 !important;
+        }
+
+        .form-help {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #0369a1;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-info i {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .asignacion-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .asignacion-item .btn-remover-asignacion {
+                align-self: flex-end;
+            }
+            .header-duales {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body class="menu-lateral">
     <div class="app-container">
@@ -31,7 +158,7 @@
                 <a href="../analisis/analisis_alumnos.html" class="menu-item">
                     <i class="fas fa-chart-pie"></i><span> Análisis</span>
                 </a>
-                <a href="mis_duales.html" class="menu-item">
+                <a href="mis_duales.html" class="menu-item active">
                     <i class="fas fa-briefcase"></i><span> Duales</span>
                 </a>
                 <a href="../estadias/mis_estadias.html" class="menu-item">
@@ -49,19 +176,43 @@
         <main class="main-content">
             <div class="duales-container">
                 <div class="header-duales">
-                    <h2><i class="fas fa-plus-circle"></i> Registrar Dual</h2>
+                    <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Registrar Dual</span></h2>
+                    <a href="mis_duales.html" class="btn secundario">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
                 </div>
 
                 <div id="mensaje" class="mensaje"></div>
 
                 <form id="formCrearDual" class="form-dual">
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN: ALUMNO -->
+                    <!-- ============================================ -->
+                    <div class="alumno-info">
+                        <h4><i class="fas fa-user-graduate"></i> Alumno</h4>
+                        <div class="form-grupo">
+                            <label for="alumno_email">Correo del Alumno *</label>
+                            <input type="email" id="alumno_email" placeholder="alumno@ejemplo.com" required>
+                            <div class="form-help">El alumno recibirá una notificación cuando sea registrado.</div>
+                        </div>
+                        <div class="form-grupo" style="margin-top: 0.5rem;">
+                            <label for="alumno_nombre">Nombre del Alumno</label>
+                            <input type="text" id="alumno_nombre" placeholder="Se llenará automáticamente" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN: INFORMACIÓN DEL DUAL -->
+                    <!-- ============================================ -->
+                    <h4><i class="fas fa-info-circle"></i> Información del Dual</h4>
+
                     <div class="form-grupo">
                         <label for="titulo"><i class="fas fa-tag"></i> Título del Dual *</label>
                         <input type="text" id="titulo" placeholder="Ej: Desarrollo Frontend, Analista de Datos" required>
                     </div>
 
                     <div class="form-grupo">
-                        <label for="empresa"><i class="fas fa-building"></i> Empresa *</label>
+                        <label for="empresa"><i class="fas fa-building"></i> Empresa / Institución *</label>
                         <input type="text" id="empresa" placeholder="Nombre de la empresa" required>
                     </div>
 
@@ -70,6 +221,48 @@
                         <textarea id="descripcion" rows="3" placeholder="Describe las actividades a realizar..."></textarea>
                     </div>
 
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN: ACADÉMICO -->
+                    <!-- ============================================ -->
+                    <h4><i class="fas fa-university"></i> Información Académica</h4>
+
+                    <div class="form-row">
+                        <div class="form-grupo">
+                            <label for="cuatrimestre"><i class="fas fa-calendar-alt"></i> Cuatrimestre</label>
+                            <select id="cuatrimestre">
+                                <option value="">Selecciona...</option>
+                                <option value="1">1er Cuatrimestre</option>
+                                <option value="2">2do Cuatrimestre</option>
+                                <option value="3">3er Cuatrimestre</option>
+                                <option value="4">4to Cuatrimestre</option>
+                                <option value="5">5to Cuatrimestre</option>
+                                <option value="6">6to Cuatrimestre</option>
+                                <option value="7">7mo Cuatrimestre</option>
+                                <option value="8">8vo Cuatrimestre</option>
+                                <option value="9">9no Cuatrimestre</option>
+                                <option value="10">10mo Cuatrimestre</option>
+                            </select>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="curso"><i class="fas fa-book"></i> Curso</label>
+                            <input type="text" id="curso" placeholder="Ej: Desarrollo Web, Base de Datos">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-grupo">
+                            <label for="carrera"><i class="fas fa-graduation-cap"></i> Carrera</label>
+                            <input type="text" id="carrera" placeholder="Ej: Ingeniería en Sistemas">
+                        </div>
+                        <div class="form-grupo">
+                            <label for="tutor"><i class="fas fa-chalkboard-user"></i> Tutor</label>
+                            <input type="text" id="tutor" placeholder="Nombre del tutor en la empresa">
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN: FECHAS Y ESTADO -->
+                    <!-- ============================================ -->
                     <div class="form-row">
                         <div class="form-grupo">
                             <label for="fecha_inicio"><i class="fas fa-calendar-alt"></i> Fecha de inicio</label>
@@ -80,33 +273,49 @@
                             <input type="date" id="fecha_fin">
                         </div>
                     </div>
+                    
+<div class="form-row">
+    <div class="form-grupo">
+        <label for="horas"><i class="fas fa-clock"></i> Horas totales</label>
+        <input type="number" id="horas" placeholder="Ej: 480" min="0">
+    </div>
+    <div class="form-grupo">
+        <label for="estado"><i class="fas fa-flag-checkered"></i> Estado</label>
+        <input type="text" id="estado" value="Automático" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+        <div class="form-help">El estado se calcula automáticamente según las firmas y la fecha de fin.</div>
+    </div>
+</div>
 
-                    <div class="form-row">
-                        <div class="form-grupo">
-                            <label for="horas"><i class="fas fa-clock"></i> Horas totales</label>
-                            <input type="number" id="horas" placeholder="Ej: 480" min="0">
-                        </div>
-                        <div class="form-grupo">
-                            <label for="tutor"><i class="fas fa-chalkboard-user"></i> Tutor</label>
-                            <input type="text" id="tutor" placeholder="Nombre del tutor">
-                        </div>
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN: ASIGNACIÓN DE MATERIAS Y MAESTROS -->
+                    <!-- ============================================ -->
+                    <h4><i class="fas fa-chalkboard-teacher"></i> Asignación de Materias y Maestros</h4>
+                    <div class="alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Agrega las materias y asigna un maestro responsable. El maestro debe estar registrado en la plataforma con el correo que ingreses.</span>
                     </div>
 
-                    <div class="form-grupo">
-                        <label for="estado"><i class="fas fa-flag-checkered"></i> Estado</label>
-                        <select id="estado">
-                            <option value="pendiente">Pendiente</option>
-                            <option value="activo">Activo</option>
-                            <option value="finalizado">Finalizado</option>
-                        </select>
+                    <div id="asignacionesContainer" class="asignaciones-container">
+                        <div id="asignacionesLista">
+                            <!-- Las asignaciones se agregarán aquí dinámicamente -->
+                            <div class="sin-duales" style="padding: 1rem;">
+                                <i class="fas fa-plus-circle"></i> No hay materias asignadas. Haz clic en "Agregar Materia" para empezar.
+                            </div>
+                        </div>
+                        <button type="button" id="btnAgregarAsignacion" class="btn-agregar-asignacion">
+                            <i class="fas fa-plus-circle"></i> Agregar Materia
+                        </button>
                     </div>
 
+                    <!-- ============================================ -->
+                    <!-- BOTONES -->
+                    <!-- ============================================ -->
                     <div class="botones-form">
                         <button type="button" class="btn secundario" onclick="cancelar()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
                         <button type="submit" class="btn primario">
-                            <i class="fas fa-save"></i> Guardar Dual
+                            <i class="fas fa-save"></i> <span id="btnSubmitText">Guardar Dual</span>
                         </button>
                     </div>
                 </form>
@@ -124,21 +333,137 @@
         if (!usuario) {
             window.location.href = '../../iniciar_sesion.html';
         }
-        
+
+        // Solo maestros pueden gestionar duales
+        if (usuario.rol !== 'maestro') {
+            alert('Solo los maestros pueden gestionar duales');
+            window.location.href = 'mis_duales.html';
+        }
+
         // ============================================
-        // DETECTAR SI ES EDICIÓN
+        // VARIABLES GLOBALES
         // ============================================
         const urlParams = new URLSearchParams(window.location.search);
         const dualId = urlParams.get('id');
-        
         let modoEdicion = false;
-        
+        let asignaciones = [];
+
+        // ============================================
+        // DETECTAR SI ES EDICIÓN
+        // ============================================
         if (dualId) {
             modoEdicion = true;
-            document.querySelector('h2').innerHTML = '<i class="fas fa-edit"></i> Editar Dual';
+            document.getElementById('formTitle').textContent = 'Editar Dual';
+            document.getElementById('btnSubmitText').textContent = 'Actualizar Dual';
             cargarDatosDual(dualId);
         }
-        
+
+        // ============================================
+        // FUNCIÓN PARA BUSCAR ALUMNO POR CORREO
+        // ============================================
+        document.getElementById('alumno_email').addEventListener('blur', async function() {
+            const email = this.value.trim();
+            if (email) {
+                try {
+                    const respuesta = await fetch(`/api/usuarios/buscar?email=${encodeURIComponent(email)}`);
+                    const resultado = await respuesta.json();
+                    if (resultado.exito && resultado.usuario) {
+                        document.getElementById('alumno_nombre').value = resultado.usuario.nombre || 'Usuario encontrado';
+                        document.getElementById('alumno_nombre').style.background = '#d1fae5';
+                    } else {
+                        document.getElementById('alumno_nombre').value = '⚠️ Usuario no encontrado';
+                        document.getElementById('alumno_nombre').style.background = '#fef3c7';
+                    }
+                } catch (error) {
+                    console.error('Error al buscar usuario:', error);
+                }
+            }
+        });
+
+        // ============================================
+        // GESTIÓN DE ASIGNACIONES (Materias + Maestros)
+        // ============================================
+
+        function renderizarAsignaciones() {
+            const container = document.getElementById('asignacionesLista');
+            
+            if (asignaciones.length === 0) {
+                container.innerHTML = `
+                    <div class="sin-duales" style="padding: 1rem;">
+                        <i class="fas fa-plus-circle"></i> No hay materias asignadas. Haz clic en "Agregar Materia" para empezar.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = asignaciones.map((asignacion, index) => `
+                <div class="asignacion-item" data-index="${index}">
+                    <div class="form-grupo">
+                        <label>Materia</label>
+                        <input type="text" class="input-materia" value="${escapeHtml(asignacion.materia || '')}" placeholder="Ej: Matemáticas">
+                    </div>
+                    <div class="form-grupo">
+                        <label>Maestro</label>
+                        <input type="text" class="input-maestro-nombre" value="${escapeHtml(asignacion.maestro_nombre || '')}" placeholder="Nombre del maestro">
+                    </div>
+                    <div class="form-grupo">
+                        <label>Correo del Maestro</label>
+                        <input type="email" class="input-maestro-email" value="${escapeHtml(asignacion.maestro_email || '')}" placeholder="maestro@ejemplo.com">
+                        <div class="form-help" style="font-size: 0.7rem;">Debe coincidir con un usuario registrado</div>
+                    </div>
+                    <button type="button" class="btn-remover-asignacion" onclick="removerAsignacion(${index})">
+                        <i class="fas fa-trash-alt"></i> Quitar
+                    </button>
+                </div>
+            `).join('');
+
+            // Actualizar eventos de los inputs para guardar cambios
+            document.querySelectorAll('.asignacion-item').forEach((item) => {
+                const index = parseInt(item.dataset.index);
+                const materiaInput = item.querySelector('.input-materia');
+                const maestroNombreInput = item.querySelector('.input-maestro-nombre');
+                const maestroEmailInput = item.querySelector('.input-maestro-email');
+
+                materiaInput.addEventListener('input', function() {
+                    asignaciones[index].materia = this.value;
+                });
+                maestroNombreInput.addEventListener('input', function() {
+                    asignaciones[index].maestro_nombre = this.value;
+                });
+                maestroEmailInput.addEventListener('input', function() {
+                    asignaciones[index].maestro_email = this.value;
+                });
+            });
+        }
+
+        function agregarAsignacion(materia = '', maestro_nombre = '', maestro_email = '') {
+            asignaciones.push({
+                materia: materia,
+                maestro_nombre: maestro_nombre,
+                maestro_email: maestro_email
+            });
+            renderizarAsignaciones();
+        }
+
+        function removerAsignacion(index) {
+            asignaciones.splice(index, 1);
+            renderizarAsignaciones();
+        }
+
+        document.getElementById('btnAgregarAsignacion').addEventListener('click', function() {
+            agregarAsignacion();
+        });
+
+        // ============================================
+        // ESCAPAR HTML
+        // ============================================
+        function escapeHtml(texto) {
+            if (!texto) return '';
+            const div = document.createElement('div');
+            div.textContent = texto;
+            return div.innerHTML;
+        }
+
         // ============================================
         // CARGAR DATOS DEL DUAL PARA EDITAR
         // ============================================
@@ -149,6 +474,8 @@
                 
                 if (resultado.exito) {
                     const dual = resultado.dual;
+                    
+                    // Campos básicos
                     document.getElementById('titulo').value = dual.titulo || '';
                     document.getElementById('empresa').value = dual.empresa || '';
                     document.getElementById('descripcion').value = dual.descripcion || '';
@@ -157,46 +484,126 @@
                     document.getElementById('horas').value = dual.horas || '';
                     document.getElementById('tutor').value = dual.tutor || '';
                     document.getElementById('estado').value = dual.estado || 'pendiente';
+                    document.getElementById('cuatrimestre').value = dual.cuatrimestre || '';
+                    document.getElementById('curso').value = dual.curso || '';
+                    document.getElementById('carrera').value = dual.carrera || '';
+                    
+                    // Alumno
+                    if (dual.alumno) {
+                        document.getElementById('alumno_email').value = dual.alumno.email || '';
+                        document.getElementById('alumno_nombre').value = dual.alumno.nombre || '';
+                    }
+                    
+                    // Asignaciones
+                    if (dual.asignaciones && dual.asignaciones.length > 0) {
+                        asignaciones = dual.asignaciones.map(a => ({
+                            materia: a.materia || '',
+                            maestro_nombre: a.maestro_nombre || '',
+                            maestro_email: a.maestro_email || ''
+                        }));
+                        renderizarAsignaciones();
+                    }
                 }
             } catch (error) {
                 console.error('Error al cargar datos:', error);
+                mostrarMensaje('error', 'Error al cargar los datos del dual');
             }
         }
-        
+
+        // ============================================
+        // MOSTRAR MENSAJE
+        // ============================================
+        function mostrarMensaje(tipo, texto) {
+            const mensajeDiv = document.getElementById('mensaje');
+            const icono = tipo === 'exito' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+            mensajeDiv.className = `mensaje ${tipo}`;
+            mensajeDiv.innerHTML = `${icono} ${texto}`;
+            mensajeDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                mensajeDiv.style.display = 'none';
+            }, 5000);
+        }
+
         // ============================================
         // CANCELAR
         // ============================================
         function cancelar() {
             window.location.href = 'mis_duales.html';
         }
-        
+
         // ============================================
         // ENVIAR FORMULARIO (CREAR O ACTUALIZAR)
         // ============================================
         document.getElementById('formCrearDual').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Guardando...';
+            btnSubmit.disabled = true;
+
             const mensajeDiv = document.getElementById('mensaje');
             
+            // Validar campos obligatorios
+            const alumnoEmail = document.getElementById('alumno_email').value.trim();
+            const titulo = document.getElementById('titulo').value.trim();
+            const empresa = document.getElementById('empresa').value.trim();
+
+            if (!alumnoEmail) {
+                mostrarMensaje('error', 'El correo del alumno es obligatorio');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            if (!titulo) {
+                mostrarMensaje('error', 'El título del dual es obligatorio');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            if (!empresa) {
+                mostrarMensaje('error', 'La empresa es obligatoria');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            // Validar que las asignaciones tengan datos completos
+            const asignacionesInvalidas = asignaciones.some(a => 
+                (a.materia && !a.maestro_email) || (!a.materia && a.maestro_email)
+            );
+
+            if (asignacionesInvalidas) {
+                mostrarMensaje('error', 'Cada materia debe tener un maestro asignado con correo válido');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            // Construir datos
             const datos = {
                 usuario_id: usuario._id,
-                titulo: document.getElementById('titulo').value,
-                empresa: document.getElementById('empresa').value,
+                alumno_email: alumnoEmail,
+                titulo: titulo,
+                empresa: empresa,
                 descripcion: document.getElementById('descripcion').value,
+                cuatrimestre: document.getElementById('cuatrimestre').value,
+                curso: document.getElementById('curso').value,
+                carrera: document.getElementById('carrera').value,
                 fecha_inicio: document.getElementById('fecha_inicio').value,
                 fecha_fin: document.getElementById('fecha_fin').value,
-                horas: document.getElementById('horas').value,
+                horas: parseInt(document.getElementById('horas').value) || 0,
                 tutor: document.getElementById('tutor').value,
-                estado: document.getElementById('estado').value
+                estado: document.getElementById('estado').value,
+                asignaciones: asignaciones.filter(a => a.materia || a.maestro_email)
             };
-            
+
             const url = modoEdicion ? `/api/duales/actualizar/${dualId}` : '/api/duales/crear';
             const metodo = modoEdicion ? 'PUT' : 'POST';
-            
-            mensajeDiv.className = 'mensaje';
-            mensajeDiv.textContent = 'Guardando...';
-            mensajeDiv.style.display = 'block';
-            
+
             try {
                 const respuesta = await fetch(url, {
                     method: metodo,
@@ -206,21 +613,30 @@
                 
                 const resultado = await respuesta.json();
                 
-            if (resultado.exito) {
-                mensajeDiv.className = 'mensaje exito';
-                mensajeDiv.innerHTML = '<i class="fas fa-check-circle"></i> ' + (modoEdicion ? 'Dual actualizado correctamente' : 'Dual registrado correctamente');
-                setTimeout(() => {
-                    window.location.href = 'mis_duales.html';
-                }, 1500);
-            } else {
-                mensajeDiv.className = 'mensaje error';
-                mensajeDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + resultado.mensaje;
-            }
+                if (resultado.exito) {
+                    mostrarMensaje('exito', modoEdicion ? 'Dual actualizado correctamente' : 'Dual registrado correctamente');
+                    setTimeout(() => {
+                        window.location.href = 'mis_duales.html';
+                    }, 1500);
+                } else {
+                    mostrarMensaje('error', resultado.mensaje || 'Error al guardar');
+                    btnSubmit.innerHTML = textoOriginal;
+                    btnSubmit.disabled = false;
+                }
             } catch (error) {
                 console.error('Error:', error);
-                mensajeDiv.className = 'mensaje error';
-                mensajeDiv.innerHTML = '<i class="fas fa-wifi"></i> Error de conexión';
-            }        
+                mostrarMensaje('error', 'Error de conexión con el servidor');
+                btnSubmit.innerHTML = textoOriginal;
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // ============================================
+        // INICIALIZAR
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si no hay asignaciones, renderizar vacío
+            renderizarAsignaciones();
         });
     </script>
 </body>

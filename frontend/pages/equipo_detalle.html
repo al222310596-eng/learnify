@@ -1,5 +1,6 @@
 <!-- ============================================
-     ARCHIVO 14/20: DETALLE DE EQUIPO
+     ARCHIVO: equipo_detalle.html
+     Vista detallada de un equipo - Diseño profesional
      ============================================ -->
 
 <!DOCTYPE html>
@@ -7,15 +8,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learnify | Equipo</title>
+    <title>Learnify | Detalle de Equipo</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/equipo-detalle.css">
     <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
+        
         <!-- ============================================ -->
         <!-- MENÚ LATERAL                                 -->
         <!-- ============================================ -->
@@ -27,15 +38,23 @@
                 <a href="../dashboard.html" class="menu-item">
                     <i class="fas fa-chart-line"></i><span> Dashboard</span>
                 </a>
-                <a href="../pages/mis_equipos.html" class="menu-item">
+                <a href="mis_equipos.html" class="menu-item">
                     <i class="fas fa-users"></i><span> Mis Equipos</span>
                 </a>
-                <a href="#" class="menu-item" id="menuCrearEquipo" style="display: none;">
-                    <i class="fas fa-plus-circle"></i><span> Crear Equipo</span>
+                <a href="analisis/analisis_alumnos.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="estadias/mis_estadias.html" class="menu-item">
+                    <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info-sidebar" id="userInfoSidebar"></div>
+
+
                 <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
                     <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
                 </button>
@@ -46,66 +65,52 @@
         <!-- CONTENIDO PRINCIPAL                          -->
         <!-- ============================================ -->
         <main class="main-content">
-            <div class="contenedor contenedor-grande">
+            <div class="page-container">
+
+                <!-- Botón volver -->
+                <div class="back-button-wrapper">
+                    <a href="mis_equipos.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Volver a mis equipos
+                    </a>
+                </div>
+
                 <!-- Contenedor de contenido (se llena con JS) -->
                 <div id="equipoContent">
-                    <div class="sin-equipos">
-                        <i class="fas fa-spinner fa-pulse"></i> Cargando información del equipo...
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Cargando información del equipo...</p>
                     </div>
                 </div>
 
-                <!-- Modal para agregar miembros (solo líder) -->
-                <div id="modalAgregar" class="modal" style="display: none;">
-                    <div class="modal-contenido">
+                <!-- Modal para invitar miembros (solo líder) -->
+                <div id="modalAgregar" class="modal-overlay" style="display: none;">
+                    <div class="modal-container" style="max-width: 420px;">
                         <div class="modal-header">
-                            <h3><i class="fas fa-user-plus"></i> Agregar miembro</h3>
-                            <button class="modal-cerrar" onclick="cerrarModal()">
+                            <h3><i class="fas fa-user-plus"></i> Invitar miembros</h3>
+                            <button class="modal-close" onclick="cerrarModal()">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <p><i class="fas fa-share-alt"></i> Para que un alumno se una, comparte este código:</p>
-                        <div style="font-size: 2rem; font-weight: bold; text-align: center; background: #f1f5f9; padding: 1rem; border-radius: 12px;" id="equipoIdCodigo">
-                            <i class="fas fa-key"></i> 
+                        <div class="modal-body">
+                            <p style="color: #64748b; margin-bottom: 1rem;">
+                                <i class="fas fa-share-alt"></i> Comparte este código con los alumnos para que se unan:
+                            </p>
+                            <div class="invite-code-box">
+                                <i class="fas fa-key"></i>
+                                <span id="equipoIdCodigo">Cargando...</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Los alumnos deben ir a "Mis Equipos" → "Unirse a equipo" y pegar este código.
+                            </p>
                         </div>
-                        <p style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;">
-                            <i class="fas fa-info-circle"></i> El alumno debe ir a "Mis Equipos" → "Unirse a equipo" y escribir este código.
-                        </p>
-                        <button class="btn primario" style="margin-top: 1rem;" onclick="cerrarModal()">
-                            <i class="fas fa-check"></i> Entendido
-                        </button>
+                        <div class="modal-footer" style="justify-content: center;">
+                            <button class="btn btn-primary" onclick="cerrarModal()">
+                                <i class="fas fa-check"></i> Entendido
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ============================================ -->
-            <!-- MODAL IMPORTAR CSV/JSON (CORREGIDO)           -->
-            <!-- ============================================ -->
-            <div id="modalImportarCSV" class="modal-confirmar" style="display: none;">
-                <div class="modal-confirmar-contenido" style="max-width: 500px;">
-                    <div class="modal-confirmar-header">
-                        <i class="fas fa-upload"></i>
-                        <h3>Importar alumnos</h3>
-                    </div>
-                    <div class="modal-confirmar-body">
-                        <p>Selecciona un archivo CSV o JSON con las siguientes columnas:</p>
-                        <p class="modal-advertencia" style="background: #f1f5f9; padding: 8px; border-radius: 8px;">
-                            <strong>CSV:</strong> nombre,email<br>
-                            <strong>JSON:</strong> [{"nombre": "...", "email": "..."}]
-                        </p>
-                        <form id="formImportarCSV">
-                            <input type="hidden" id="equipoIdImport" name="equipo_id">
-                            <input type="file" id="csvFile" accept=".csv,.json" required style="width: 100%; margin-top: 10px;">
-                        </form>
-                    </div>
-                    <div class="modal-confirmar-footer">
-                        <button id="btnCancelarImportar" class="btn secundario">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button id="btnConfirmarImportar" class="btn primario">
-                            <i class="fas fa-upload"></i> Importar
-                        </button>
-                    </div>
-                </div>
             </div>
         </main>
     </div>

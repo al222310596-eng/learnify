@@ -1,66 +1,43 @@
 /* ============================================
      ARCHIVO: crear-tarea.css
-     Estilos para el formulario de crear tarea
+     Estilos para crear tarea - Diseño profesional
      ============================================ */
 
-.form-tarea {
-    margin-top: 1rem;
-}
-
-.form-grupo {
-    margin-bottom: 1.5rem;
-}
-
-.form-grupo label {
-    display: block;
-    font-weight: 500;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-}
-
-.form-grupo input,
-.form-grupo textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.form-grupo input:focus,
-.form-grupo textarea:focus {
-    outline: none;
-    border-color: #667eea;
-}
-
-.form-grupo textarea {
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-}
-
-.ayuda {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-top: 0.3rem;
-}
-
-.botones-form {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.botones-form button {
-    flex: 1;
-}
-
-.btn-cancelar {
+/* ============================================
+     EXCEPCIÓN: PÁGINA DE CREAR TAREA
+     ============================================ */
+body.page-crear-tarea {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh;
     background: #f1f5f9;
-    color: #475569;
+    padding: 20px;
+    margin: 0;
 }
 
-.btn-cancelar:hover {
-    background: #e2e8f0;
+/* ============================================
+     FORMULARIO - SIEMPRE VISIBLE
+     ============================================ */
+.form-tarea {
+    display: block !important;
+}
+
+/* ============================================
+     INPUTS - ASEGURAR QUE SEAN INTERACTIVOS
+     ============================================ */
+.form-tarea input,
+.form-tarea textarea {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ============================================
+     RESPONSIVE EXTRA
+     ============================================ */
+@media (max-width: 480px) {
+    body.page-crear-tarea {
+        padding: 12px;
+    }
 }

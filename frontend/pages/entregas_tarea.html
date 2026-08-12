@@ -1,6 +1,6 @@
 <!-- ============================================
-     ARCHIVO 26/30: VER ENTREGAS DE TAREA
-     Solo visible para líderes del equipo
+     ARCHIVO: entregas-tarea.html
+     Ver entregas de tarea - Diseño profesional
      ============================================ -->
 
 <!DOCTYPE html>
@@ -9,14 +9,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learnify | Entregas de Tarea</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/entregas-tarea.css">
     <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
+        
         <!-- ============================================ -->
         <!-- MENÚ LATERAL                                 -->
         <!-- ============================================ -->
@@ -28,11 +38,17 @@
                 <a href="../dashboard.html" class="menu-item">
                     <i class="fas fa-chart-line"></i><span> Dashboard</span>
                 </a>
-                <a href="../pages/mis_equipos.html" class="menu-item">
+                <a href="mis_equipos.html" class="menu-item">
                     <i class="fas fa-users"></i><span> Mis Equipos</span>
                 </a>
-                <a href="#" class="menu-item" id="menuCrearEquipo" style="display: none;">
-                    <i class="fas fa-plus-circle"></i><span> Crear Equipo</span>
+                <a href="analisis/analisis_alumnos.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="estadias/mis_estadias.html" class="menu-item">
+                    <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -48,24 +64,44 @@
         <!-- ============================================ -->
         <main class="main-content">
             <div class="contenedor contenedor-grande">
+
+                <!-- Botón volver -->
+                <div class="back-button-wrapper">
+                    <a href="javascript:history.back()" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+
                 <!-- Cabecera -->
-                <div class="header-entregas">
-                    <h2><i class="fas fa-inbox"></i> Entregas de Tarea</h2>
+                <div class="page-header-tareas">
+                    <div class="page-header-left">
+                        <h1><i class="fas fa-inbox"></i> Entregas de Tarea</h1>
+                        <p class="page-subtitle">Revisa y califica las entregas de los alumnos</p>
+                    </div>
                 </div>
 
                 <!-- Mensajes -->
-                <div id="mensaje" class="mensaje"></div>
+                <div id="mensaje" class="mensaje" style="display: none;"></div>
 
                 <!-- Información de la tarea -->
                 <div id="infoTarea" class="info-tarea-calificar">
-                    <div class="sin-entregas"><i class="fas fa-spinner fa-pulse"></i> Cargando información...</div>
+                    <div class="sin-entregas">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Cargando información...</p>
+                    </div>
                 </div>
 
                 <!-- Lista de entregas -->
-                <h3 style="margin-bottom: 1rem;"><i class="fas fa-users"></i> Entregas de alumnos</h3>
-                <div id="entregasContainer" class="entregas-lista">
-                    <div class="sin-entregas"><i class="fas fa-inbox"></i> Cargando entregas...</div>
+                <div class="entregas-section">
+                    <h3 class="entregas-section-title"><i class="fas fa-users"></i> Entregas de alumnos</h3>
+                    <div id="entregasContainer" class="entregas-lista">
+                        <div class="sin-entregas">
+                            <i class="fas fa-inbox"></i>
+                            <p>Cargando entregas...</p>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </main>
     </div>

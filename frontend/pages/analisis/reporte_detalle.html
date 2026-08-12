@@ -1,0 +1,183 @@
+<!-- ============================================
+     ARCHIVO: reporte_detalle.html
+     Reporte detallado de un alumno
+     ============================================ -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Reporte de Alumno</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/menu.css">
+    <link rel="stylesheet" href="../../css/reporte-detalle.css">
+    <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
+    <link rel="stylesheet" href="../../css/temas_oscuro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="menu-lateral">
+    <div class="app-container">
+        
+        <!-- ============================================ -->
+        <!-- MENÚ LATERAL                                 -->
+        <!-- ============================================ -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../../dashboard.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i><span> Dashboard</span>
+                </a>
+                <a href="../../pages/mis_equipos.html" class="menu-item">
+                    <i class="fas fa-users"></i><span> Mis Equipos</span>
+                </a>
+                <a href="../../pages/analisis/analisis_alumnos.html" class="menu-item active">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="../../pages/duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="../../pages/estadias/mis_estadias.html" class="menu-item">
+                    <i class="fas fa-building"></i><span> Estadías</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-sidebar" id="userInfoSidebar"></div>
+                <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ============================================ -->
+        <!-- CONTENIDO PRINCIPAL                          -->
+        <!-- ============================================ -->
+        <main class="main-content">
+            <div class="reporte-container">
+
+                <!-- Botón volver -->
+                <div class="back-button-wrapper">
+                    <a href="analisis_alumnos.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Volver a análisis
+                    </a>
+                </div>
+
+                <!-- Estado de carga -->
+                <div id="loadingState" class="loading-state">
+                    <i class="fas fa-spinner fa-pulse"></i>
+                    <p>Cargando información del alumno...</p>
+                </div>
+
+                <!-- Contenido (oculto hasta cargar) -->
+                <div id="reporteContent" style="display: none;">
+
+                    <!-- ============================================ -->
+                    <!-- PERFIL DEL ALUMNO                           -->
+                    <!-- ============================================ -->
+                    <div class="perfil-section">
+                        <div class="perfil-header">
+                            <div class="perfil-avatar" id="alumnoAvatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="perfil-info">
+                                <h1 id="alumnoNombre">Cargando...</h1>
+                                <p class="perfil-email" id="alumnoEmail">cargando@email.com</p>
+                                <div class="perfil-badges">
+                                    <span class="badge badge-rol" id="alumnoRol">Alumno</span>
+                                    <span class="badge badge-estado" id="alumnoEstado">Activo</span>
+                                </div>
+                            </div>
+                            <div class="perfil-stats">
+                                <div class="stat-mini">
+                                    <span class="stat-mini-value" id="promedioGeneralAlumno">0</span>
+                                    <span class="stat-mini-label">Promedio</span>
+                                </div>
+                                <div class="stat-mini">
+                                    <span class="stat-mini-value" id="totalTareasAlumno">0</span>
+                                    <span class="stat-mini-label">Tareas</span>
+                                </div>
+                                <div class="stat-mini">
+                                    <span class="stat-mini-value" id="entregasTardiasAlumno">0</span>
+                                    <span class="stat-mini-label">Tardías</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- EQUIPOS DEL ALUMNO                           -->
+                    <!-- ============================================ -->
+                    <div class="equipos-section">
+                        <h3><i class="fas fa-users"></i> Equipos en los que participa</h3>
+                        <div class="equipos-grid" id="equiposGrid">
+                            <div class="sin-datos">Cargando equipos...</div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- RENDIMIENTO POR EQUIPO                        -->
+                    <!-- ============================================ -->
+                    <div class="rendimiento-section">
+                        <h3><i class="fas fa-chart-line"></i> Rendimiento por Equipo</h3>
+                        <div class="rendimiento-grid" id="rendimientoGrid">
+                            <div class="sin-datos">Cargando rendimiento...</div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- GRÁFICA DE CALIFICACIONES                    -->
+                    <!-- ============================================ -->
+                    <div class="grafica-section">
+                        <h3><i class="fas fa-chart-bar"></i> Calificaciones por Tarea</h3>
+                        <div class="chart-card">
+                            <canvas id="graficaCalificaciones" height="250"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- DETALLE DE TAREAS                            -->
+                    <!-- ============================================ -->
+                    <div class="tareas-detalle-section">
+                        <h3><i class="fas fa-list-alt"></i> Detalle de Tareas</h3>
+                        <div class="table-container">
+                            <table id="tablaTareas">
+                                <thead>
+                                    <tr>
+                                        <th>Equipo</th>
+                                        <th>Tarea</th>
+                                        <th>Estado</th>
+                                        <th>Calificación</th>
+                                        <th>Entregada</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tareasTableBody">
+                                    <tr><td colspan="6">Cargando tareas...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                       -->
+    <!-- ============================================ -->
+    <script src="../../js/menu.js"></script>
+    <script src="../../js/reporte-detalle.js"></script>
+</body>
+</html>

@@ -1,94 +1,137 @@
 // ============================================
 // ARCHIVO: crear-equipo.js
-// AHORA: Cualquier usuario puede crear equipos (MongoDB)
+// Lógica para crear equipos
 // ============================================
 
 const usuario = JSON.parse(localStorage.getItem('usuario'));
 
 // Verificar sesión
 if (!usuario) {
-    window.location.href = 'iniciar_sesion.html';
+    window.location.href = '../iniciar_sesion.html';
 }
 
 // ============================================
-// EN SU LUGAR, podemos mostrar un mensaje diferente según el rol
+// MOSTRAR MENSAJE SEGÚN ROL
 // ============================================
 function mostrarMensajeBienvenida() {
-    const titulo = document.querySelector('h2');
+    const titulo = document.getElementById('tituloPrincipal');
+    const subtitulo = document.getElementById('subtituloPrincipal');
+    
     if (usuario.rol === 'alumno') {
-        titulo.innerHTML = ' Crear Equipo de Proyecto';
-        const ayuda = document.querySelector('.ayuda');
-        if (ayuda) {
-            ayuda.innerHTML = 'Crea un equipo para trabajar en proyectos con tus compañeros.';
-        }
+        if (titulo) titulo.textContent = 'Crear equipo de proyecto';
+        if (subtitulo) subtitulo.textContent = 'Forma un equipo para trabajar en proyectos con tus compañeros.';
+    } else {
+        if (titulo) titulo.textContent = 'Crear nuevo equipo';
+        if (subtitulo) subtitulo.textContent = 'Forma un equipo para colaborar en proyectos y actividades.';
     }
 }
 
 // ============================================
-// RESTO DEL CÓDIGO
+// MOSTRAR MENSAJE
 // ============================================
 function mostrarMensaje(tipo, texto) {
-    const mensajeDiv = document.getElementById('mensaje');
-    mensajeDiv.className = `mensaje ${tipo}`;
-    mensajeDiv.textContent = tipo === 'exito' ? `Correcto: ${texto}` : `Error: ${texto}`;
-    mensajeDiv.style.display = 'block';
+    const container = document.getElementById('mensaje');
+    const icon = document.getElementById('mensajeIcon');
+    const textElement = document.getElementById('mensajeTexto');
+    
+    container.className = `message-container ${tipo}`;
+    container.style.display = 'block';
+    
+    if (tipo === 'success') {
+        icon.className = 'fas fa-check-circle';
+    } else {
+        icon.className = 'fas fa-exclamation-circle';
+    }
+    
+    textElement.textContent = texto;
+    
     setTimeout(() => {
-        mensajeDiv.style.display = 'none';
-    }, 3000);
+        container.style.display = 'none';
+    }, 4000);
 }
 
+// ============================================
+// CANCELAR
+// ============================================
 function cancelar() {
     window.location.href = 'mis_equipos.html';
 }
 
-document.getElementById('formCrearEquipo').addEventListener('submit', async function(e) {
-    e.preventDefault();
+// ============================================
+// CERRAR SESIÓN
+// ============================================
+function cerrarSesion() {
+    localStorage.removeItem('usuario');
+    window.location.href = '../iniciar_sesion.html';
+}
+
+// ============================================
+// ENVIAR FORMULARIO
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar mensaje según rol
+    mostrarMensajeBienvenida();
     
-    const nombre = document.getElementById('nombre').value.trim();
-    const descripcion = document.getElementById('descripcion').value.trim();
-    
-    if (!nombre) {
-        mostrarMensaje('error', 'El nombre del equipo es obligatorio');
-        return;
+    // Cargar tema guardado
+    const savedTheme = localStorage.getItem('learnify-theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
     }
     
-    const btnSubmit = this.querySelector('button[type="submit"]');
-    const textoOriginal = btnSubmit.textContent;
-    btnSubmit.textContent = 'Creando...';
-    btnSubmit.disabled = true;
+    // Formulario
+    const form = document.getElementById('formCrearEquipo');
     
-    try {
-        const respuesta = await fetch('/api/equipos/crear', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nombre: nombre,
-                descripcion: descripcion,
-                // CAMBIO: usuario.id → usuario._id
-                lider_id: usuario._id
-            })
-        });
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        const resultado = await respuesta.json();
+        const nombre = document.getElementById('nombre').value.trim();
+        const descripcion = document.getElementById('descripcion').value.trim();
         
-        if (resultado.exito) {
-            mostrarMensaje('exito', 'Equipo creado correctamente');
-            setTimeout(() => {
-                window.location.href = 'mis_equipos.html';
-            }, 1500);
-        } else {
-            mostrarMensaje('error', resultado.mensaje);
-            btnSubmit.textContent = textoOriginal;
-            btnSubmit.disabled = false;
+        if (!nombre) {
+            mostrarMensaje('error', 'El nombre del equipo es obligatorio');
+            return;
         }
         
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarMensaje('error', 'Error de conexión');
-        btnSubmit.textContent = textoOriginal;
-        btnSubmit.disabled = false;
-    }
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnTexto = document.getElementById('btnTexto');
+        const icon = btnSubmit.querySelector('i');
+        const textoOriginal = btnTexto.textContent;
+        
+        btnTexto.textContent = 'Creando...';
+        btnSubmit.disabled = true;
+        icon.className = 'fas fa-spinner fa-pulse';
+        
+        try {
+            const respuesta = await fetch('/api/equipos/crear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    descripcion: descripcion,
+                    lider_id: usuario._id
+                })
+            });
+            
+            const resultado = await respuesta.json();
+            
+            if (resultado.exito) {
+                mostrarMensaje('success', '✅ Equipo creado correctamente');
+                setTimeout(() => {
+                    window.location.href = 'mis_equipos.html';
+                }, 1500);
+            } else {
+                mostrarMensaje('error', '❌ ' + (resultado.mensaje || 'Error al crear el equipo'));
+                btnTexto.textContent = textoOriginal;
+                btnSubmit.disabled = false;
+                icon.className = 'fas fa-save';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('error', '❌ Error de conexión');
+            btnTexto.textContent = textoOriginal;
+            btnSubmit.disabled = false;
+            icon.className = 'fas fa-save';
+        }
+    });
 });
-
-// Llamar al iniciar
-mostrarMensajeBienvenida();

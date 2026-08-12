@@ -1,0 +1,407 @@
+/* ============================================
+   VIDELLAMADA.CSS - Estilos para videollamada
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f1a;
+    color: #ffffff;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   BARRA SUPERIOR
+   ============================================ */
+#sala-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.sala-info-left h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.sala-info-left h3 i {
+    color: #8b5cf6;
+    margin-right: 10px;
+}
+
+.sala-info-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+#participantes {
+    font-size: 14px;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+#participantes i {
+    margin-right: 6px;
+    color: #8b5cf6;
+}
+
+.btn-icon {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.02);
+}
+
+.btn-icon.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   CONTENEDOR DE VIDEOS
+   ============================================ */
+#video-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    flex: 1;
+    min-height: 0;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.video-box {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+
+.video-box video {
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 220px);
+    border-radius: 12px;
+    background: #0a0a15;
+    object-fit: cover;
+}
+
+/* ============================================
+   ETIQUETAS Y ESTADOS EN VIDEOS
+   ============================================ */
+.video-label {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.video-label i {
+    margin-right: 6px;
+}
+
+.video-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 12px;
+    color: #94a3b8;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.video-status i {
+    font-size: 8px;
+}
+
+/* Placeholder para video remoto */
+.video-remoto-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 18px;
+    background: #12121f;
+    border-radius: 12px;
+    z-index: 2;
+}
+
+.video-remoto-placeholder i {
+    font-size: 64px;
+    margin-bottom: 16px;
+    color: #4b5563;
+}
+
+.video-remoto-placeholder span {
+    font-size: 18px;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.video-remoto-placeholder small {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+/* Cuando el video remoto está activo, ocultar placeholder */
+#video-remoto:not([src=""]):not([src="about:blank"]) ~ .video-remoto-placeholder {
+    display: none !important;
+}
+
+/* ============================================
+   CONTROLES INFERIORES
+   ============================================ */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    flex-shrink: 0;
+    background: rgba(15, 15, 26, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 10;
+}
+
+.btn-control {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.btn-control:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.04);
+}
+
+.btn-control.active {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+    color: #ffffff;
+}
+
+.btn-control.active:hover {
+    background: #7c3aed;
+    border-color: #7c3aed;
+}
+
+.btn-control.btn-end-call {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.btn-control.btn-end-call:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    transform: scale(1.04);
+}
+
+/* ============================================
+   TOAST / NOTIFICACIONES
+   ============================================ */
+#toast-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.toast {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    animation: toastAnim 2.5s ease forwards;
+    pointer-events: none;
+}
+
+.toast.success {
+    border-left: 4px solid #10b981;
+}
+
+.toast.error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast.info {
+    border-left: 4px solid #8b5cf6;
+}
+
+@keyframes toastAnim {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    #video-container {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 12px;
+    }
+
+    .video-box {
+        min-height: 200px;
+    }
+
+    .video-box video {
+        max-height: 300px;
+    }
+
+    .controls {
+        padding: 12px 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-control {
+        padding: 8px 14px;
+        font-size: 12px;
+        min-width: 60px;
+    }
+
+    .btn-control span {
+        display: none;
+    }
+
+    #sala-info {
+        padding: 10px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sala-info-right {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .video-remoto-placeholder i {
+        font-size: 40px;
+    }
+
+    .video-remoto-placeholder span {
+        font-size: 15px;
+    }
+
+    .video-remoto-placeholder small {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-icon {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    #participantes {
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+
+    .video-label {
+        font-size: 11px;
+        padding: 4px 12px;
+        bottom: 12px;
+        left: 12px;
+    }
+
+    .video-status {
+        font-size: 10px;
+        padding: 3px 10px;
+        top: 12px;
+        right: 12px;
+    }
+}

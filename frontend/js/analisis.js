@@ -439,6 +439,7 @@ document.getElementById('selectorEquipo')?.addEventListener('change', (e) => {
     }
 });
 
+
 // ============================================
 // INICIALIZAR
 // ============================================

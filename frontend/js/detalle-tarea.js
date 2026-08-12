@@ -97,7 +97,7 @@ function mostrarDetalle(tarea) {
                     </div>
                     <div class="mi-entrega-body">
                         <div class="entrega-info">
-                            <strong><i class="fas fa-calendar-check"></i> Entregado:</strong> ${formatearFechaCompleta(miEntrega.fecha_entrega)}
+                            <p><strong><i class="fas fa-calendar-check"></i> Entregado:</strong> ${formatearFechaCompleta(miEntrega.fecha_entrega)}</p>
                             ${miEntrega.comentario ? `
                                 <div class="entrega-comentario-texto">
                                     <strong><i class="fas fa-comment"></i> Comentario:</strong><br>
@@ -105,16 +105,16 @@ function mostrarDetalle(tarea) {
                                 </div>
                             ` : ''}
                             ${archivoUrl ? `
-                                <div class="entrega-archivo" style="margin-top: 10px; padding: 8px; background: #f1f5f9; border-radius: 8px;">
+                                <div class="entrega-archivo">
                                     <i class="fas fa-paperclip"></i> <a href="${archivoUrl}" target="_blank">Ver archivo adjunto: ${escapeHtml(miEntrega.nombre_archivo || 'archivo')}</a>
                                 </div>
-                            ` : '<div class="entrega-archivo" style="margin-top: 10px;"><i class="fas fa-ban"></i> Sin archivo adjunto</div>'}
+                            ` : '<div class="entrega-archivo"><i class="fas fa-ban"></i> Sin archivo adjunto</div>'}
                             ${miEntrega.calificacion !== null ? `
                                 <div class="entrega-calificacion-mostrada">
                                     <i class="fas fa-star"></i> Calificación: ${miEntrega.calificacion}/100
                                 </div>
                             ` : `
-                                <div class="entrega-calificacion-mostrada" style="color: #f59e0b;">
+                                <div class="entrega-calificacion-mostrada pendiente">
                                     <i class="fas fa-hourglass-half"></i> Pendiente de calificar
                                 </div>
                             `}
@@ -130,7 +130,8 @@ function mostrarDetalle(tarea) {
                     </div>
                     <div class="mi-entrega-body">
                         <div class="sin-entrega">
-                            <i class="fas fa-inbox"></i> Aún no has entregado esta tarea.
+                            <i class="fas fa-inbox"></i>
+                            <p>Aún no has entregado esta tarea.</p>
                         </div>
                         <div class="acciones-tarea">
                             <button onclick="entregarTarea()" class="btn btn-entregar-ahora">
@@ -160,7 +161,7 @@ function mostrarDetalle(tarea) {
                                 `<span class="entrega-status no-entregado"><i class="fas fa-clock"></i> Sin calificar</span>`
                             }
                         </div>
-                        <button onclick="verEntrega('${entrega._id}')" class="btn btn-ver-entrega">
+                        <button onclick="verEntrega('${entrega._id}')" class="btn-ver-entrega">
                             <i class="fas fa-eye"></i> Ver entrega
                         </button>
                     </div>
@@ -171,7 +172,7 @@ function mostrarDetalle(tarea) {
         entregasHtml = `
             <div class="entregas-lista-detalle">
                 <h3><i class="fas fa-users"></i> Entregas de alumnos</h3>
-                <div class="sin-entrega"><i class="fas fa-info-circle"></i> Aún no hay entregas para esta tarea.</div>
+                <div class="sin-entregas"><i class="fas fa-info-circle"></i> Aún no hay entregas para esta tarea.</div>
             </div>
         `;
     }
@@ -196,7 +197,7 @@ function mostrarDetalle(tarea) {
         
         ${esLider ? `
             <div class="acciones-tarea" style="margin-top: 2rem;">
-                <button onclick="verTodasEntregas()" class="btn primario">
+                <button onclick="verTodasEntregas()" class="btn btn-primary">
                     <i class="fas fa-list-alt"></i> Ver todas las entregas
                 </button>
             </div>

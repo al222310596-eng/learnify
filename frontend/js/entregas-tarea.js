@@ -116,7 +116,7 @@ async function cargarDatos() {
                                         <label><i class="fas fa-star"></i> Calificación (0-100):</label>
                                         <input type="number" id="calif-${entrega._id}" min="0" max="100" placeholder="Ej: 85">
                                     `}
-                                    <button onclick="calificarEntrega('${entrega._id}')" class="btn btn-calificar-entrega">
+                                    <button onclick="calificarEntrega('${entrega._id}')" class="btn-calificar-entrega">
                                         <i class="fas fa-save"></i> Guardar calificación
                                     </button>
                                 </div>

@@ -1,0 +1,540 @@
+/* ============================================
+     ARCHIVO: reporte-detalle.css
+     Estilos para reporte detallado de alumno
+     ============================================ */
+
+/* ============================================
+     CONTENEDOR PRINCIPAL
+     ============================================ */
+.reporte-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* ============================================
+     BOTÓN VOLVER
+     ============================================ */
+.back-button-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* ============================================
+     ESTADO DE CARGA
+     ============================================ */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #94a3b8;
+}
+
+.loading-state i {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* ============================================
+     PERFIL DEL ALUMNO
+     ============================================ */
+.perfil-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.perfil-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.perfil-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.perfil-info {
+    flex: 1;
+}
+
+.perfil-info h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.perfil-email {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin: 0.15rem 0 0.5rem 0;
+}
+
+.perfil-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-rol {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.badge-estado {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.perfil-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-mini {
+    text-align: center;
+}
+
+.stat-mini-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: block;
+}
+
+.stat-mini-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+/* ============================================
+     EQUIPOS DEL ALUMNO
+     ============================================ */
+.equipos-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+}
+
+.equipos-section h3,
+.rendimiento-section h3,
+.grafica-section h3,
+.tareas-detalle-section h3 {
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.equipos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.equipo-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.equipo-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.equipo-card i {
+    font-size: 1.5rem;
+    color: #667eea;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.equipo-card .equipo-nombre {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.equipo-card .equipo-rol {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    display: block;
+}
+
+/* ============================================
+     RENDIMIENTO POR EQUIPO
+     ============================================ */
+.rendimiento-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+}
+
+.rendimiento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.rendimiento-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.rendimiento-card .equipo-nombre {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.rendimiento-card .equipo-nombre i {
+    color: #667eea;
+}
+
+.rendimiento-detalle {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #475569;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.rendimiento-detalle:last-child {
+    border-bottom: none;
+}
+
+.rendimiento-detalle .label {
+    color: #94a3b8;
+}
+
+.rendimiento-detalle .value {
+    font-weight: 600;
+}
+
+/* ============================================
+     GRÁFICA
+     ============================================ */
+.grafica-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    padding: 1rem 0;
+}
+
+.chart-card canvas {
+    max-height: 220px;
+    width: 100%;
+}
+
+/* ============================================
+     TABLA DE TAREAS
+     ============================================ */
+.tareas-detalle-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+/* Estados de tareas */
+.estado-completada {
+    background: #d1fae5;
+    color: #059669;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.estado-pendiente {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.estado-vencida {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.calificacion-buena {
+    color: #059669;
+    font-weight: 600;
+}
+
+.calificacion-regular {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.calificacion-mala {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.btn-ver-tarea {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-ver-tarea:hover {
+    background: #1d4ed8;
+}
+
+.sin-datos {
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+     MODO OSCURO
+     ============================================ */
+body.dark-mode .perfil-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .perfil-info h1 {
+    color: #ececf0;
+}
+
+body.dark-mode .perfil-email {
+    color: #6a6a82;
+}
+
+body.dark-mode .badge-rol {
+    background: rgba(124, 109, 240, 0.2);
+    color: #7c6df0;
+}
+
+body.dark-mode .badge-estado {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode .stat-mini-value {
+    color: #ececf0;
+}
+
+body.dark-mode .stat-mini-label {
+    color: #6a6a82;
+}
+
+body.dark-mode .equipos-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .equipos-section h3,
+body.dark-mode .rendimiento-section h3,
+body.dark-mode .grafica-section h3,
+body.dark-mode .tareas-detalle-section h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .equipo-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .equipo-card .equipo-nombre {
+    color: #ececf0;
+}
+
+body.dark-mode .rendimiento-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .rendimiento-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .rendimiento-card .equipo-nombre {
+    color: #ececf0;
+}
+
+body.dark-mode .rendimiento-detalle {
+    color: #a8a8c0;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode .rendimiento-detalle .label {
+    color: #6a6a82;
+}
+
+body.dark-mode .grafica-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .tareas-detalle-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode table th {
+    background: #0a0a0f;
+    color: #a8a8c0;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode table td {
+    color: #a8a8c0;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode table tr:hover {
+    background: #1a1a2e;
+}
+
+body.dark-mode .estado-completada {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode .estado-pendiente {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+body.dark-mode .estado-vencida {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+body.dark-mode .calificacion-buena {
+    color: #34d399;
+}
+
+body.dark-mode .calificacion-regular {
+    color: #fbbf24;
+}
+
+body.dark-mode .calificacion-mala {
+    color: #f87171;
+}
+
+body.dark-mode .btn-ver-tarea {
+    background: #7c6df0;
+}
+
+body.dark-mode .btn-ver-tarea:hover {
+    background: #9b8cf0;
+}
+
+body.dark-mode .sin-datos {
+    color: #6a6a82;
+}
+
+body.dark-mode .btn-outline {
+    border-color: #2a2a3e;
+    color: #a8a8c0;
+}
+
+body.dark-mode .btn-outline:hover {
+    background: #1a1a2e;
+    border-color: #3a3a52;
+}

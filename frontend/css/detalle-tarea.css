@@ -1,26 +1,134 @@
 /* ============================================
-     ARCHIVO 27/30: ESTILOS PARA DETALLE DE TAREA
+     ARCHIVO: detalle-tarea.css
+     Estilos para detalle de tarea - Diseño profesional
      ============================================ */
 
-/* Información principal */
-.tarea-info-principal {
-    background: #f8fafc;
-    border-radius: 20px;
+/* ============================================
+     CONTENEDOR PRINCIPAL
+     ============================================ */
+.page-container {
+    max-width: 900px;
+    margin: 0 auto;
     padding: 1.5rem;
-    margin-bottom: 2rem;
+}
+
+/* ============================================
+     BOTÓN VOLVER
+     ============================================ */
+.back-button-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================
+     BOTONES
+     ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+     ESTADOS DE CARGA
+     ============================================ */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #94a3b8;
+}
+
+.loading-state i {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.loading-state p {
+    font-size: 1rem;
+}
+
+/* ============================================
+     TARJETA PRINCIPAL DE LA TAREA
+     ============================================ */
+.tarea-info-principal {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .tarea-titulo-grande {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.tarea-titulo-grande i {
+    color: #667eea;
+    margin-right: 0.5rem;
 }
 
 .tarea-descripcion-completa {
     color: #475569;
-    line-height: 1.6;
+    line-height: 1.7;
+    font-size: 0.95rem;
     margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
 }
 
 .tarea-metadatos {
@@ -35,28 +143,49 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #334155;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.metadato i {
+    color: #94a3b8;
     font-size: 0.9rem;
 }
 
-/* Sección de entrega del alumno */
+.metadato strong {
+    color: #1e293b;
+}
+
+/* ============================================
+     SECCIÓN DE MI ENTREGA
+     ============================================ */
 .mi-entrega {
-    background: white;
-    border-radius: 20px;
+    background: #ffffff;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .mi-entrega-header {
     background: #f8fafc;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .mi-entrega-header h3 {
     margin: 0;
     color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.mi-entrega-header i {
+    color: #667eea;
 }
 
 .mi-entrega-body {
@@ -64,44 +193,98 @@
 }
 
 .entrega-info {
-    background: #f1f5f9;
+    background: #f8fafc;
     border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 1.25rem;
+}
+
+.entrega-info p {
+    margin: 0.25rem 0;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.entrega-info strong {
+    color: #1e293b;
 }
 
 .entrega-comentario-texto {
     color: #334155;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0.5rem 0;
+    padding: 0.75rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.entrega-archivo {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.entrega-archivo a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.entrega-archivo a:hover {
+    text-decoration: underline;
 }
 
 .entrega-calificacion-mostrada {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #059669;
     margin-top: 0.5rem;
 }
 
-.sin-entrega {
-    text-align: center;
-    padding: 2rem;
-    color: #64748b;
+.entrega-calificacion-mostrada.pendiente {
+    color: #f59e0b;
 }
 
-/* Botones de acción */
+.sin-entrega {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #94a3b8;
+}
+
+.sin-entrega i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1;
+}
+
+.sin-entrega p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+/* ============================================
+     ACCIONES DE TAREA
+     ============================================ */
 .acciones-tarea {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-top: 1rem;
+    justify-content: center;
 }
 
 .btn-entregar-ahora {
     background: #f59e0b;
-    color: white;
+    color: #fff;
     padding: 12px 24px;
     font-size: 1rem;
+}
+
+.btn-entregar-ahora:hover {
+    background: #d97706;
+    transform: translateY(-2px);
 }
 
 .btn-volver {
@@ -109,44 +292,74 @@
     color: #475569;
 }
 
-/* Lista de entregas (para líder) */
+.btn-volver:hover {
+    background: #cbd5e1;
+}
+
+/* ============================================
+     LISTA DE ENTREGAS (LÍDER)
+     ============================================ */
 .entregas-lista-detalle {
-    margin-top: 2rem;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    margin-top: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .entregas-lista-detalle h3 {
-    margin-bottom: 1rem;
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    margin: 0;
     color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.entregas-lista-detalle h3 i {
+    color: #667eea;
+    margin-right: 0.5rem;
 }
 
 .entrega-item-detalle {
-    background: white;
-    border-radius: 16px;
+    background: #ffffff;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.entrega-item-detalle:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .entrega-alumno-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .entrega-alumno-nombre {
-    font-weight: 600;
+    font-weight: 500;
     color: #1e293b;
+    font-size: 0.9rem;
 }
 
 .entrega-status {
-    font-size: 0.8rem;
-    padding: 2px 10px;
+    font-size: 0.7rem;
+    padding: 2px 12px;
     border-radius: 20px;
+    font-weight: 500;
 }
 
 .entrega-status.entregado {
@@ -161,13 +374,38 @@
 
 .btn-ver-entrega {
     background: #2563eb;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    margin: 0;
+    color: #fff;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-ver-entrega:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.sin-entregas {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    color: #94a3b8;
+}
+
+.sin-entregas i {
+    font-size: 2rem;
+    color: #cbd5e1;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 /* ============================================
-     MODAL PARA VER ENTREGA
+     MODAL
      ============================================ */
 .modal {
     position: fixed;
@@ -180,42 +418,313 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-contenido {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
     padding: 1.5rem;
-    max-width: 500px;
+    max-width: 520px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .modal-header h3 {
     margin: 0;
     color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.modal-header h3 i {
+    color: #667eea;
+    margin-right: 0.5rem;
 }
 
 .modal-cerrar {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     cursor: pointer;
     color: #94a3b8;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 8px;
 }
 
 .modal-cerrar:hover {
     color: #ef4444;
+    background: #fef2f2;
+}
+
+#modalEntregaContent p {
+    margin: 0.6rem 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+#modalEntregaContent strong {
+    color: #1e293b;
+}
+
+#modalEntregaContent i {
+    color: #94a3b8;
+    width: 20px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+#modalEntregaContent a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+#modalEntregaContent a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+
+    .tarea-info-principal {
+        padding: 1.25rem;
+    }
+
+    .tarea-titulo-grande {
+        font-size: 1.3rem;
+    }
+
+    .tarea-metadatos {
+        gap: 0.75rem;
+        flex-direction: column;
+    }
+
+    .entrega-item-detalle {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .entrega-alumno-info {
+        flex-wrap: wrap;
+    }
+
+    .modal-contenido {
+        padding: 1.25rem;
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        padding: 0.75rem;
+    }
+
+    .tarea-info-principal {
+        padding: 1rem;
+    }
+
+    .tarea-titulo-grande {
+        font-size: 1.1rem;
+    }
+
+    .tarea-descripcion-completa {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+
+    .mi-entrega-body {
+        padding: 1rem;
+    }
+
+    .acciones-tarea {
+        flex-direction: column;
+    }
+
+    .acciones-tarea .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .entrega-item-detalle {
+        padding: 0.6rem 0.75rem;
+        margin: 0.5rem;
+    }
+
+    .modal-contenido {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+}
+/* ============================================
+     MODO OSCURO - SOBRESCRITURAS LOCALES
+     ============================================ */
+body.dark-mode.menu-lateral .page-container {
+    background: transparent !important;
+}
+
+body.dark-mode.menu-lateral #tareaContent {
+    background: transparent !important;
+}
+
+body.dark-mode.menu-lateral .tarea-info-principal {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .tarea-titulo-grande {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral .tarea-descripcion-completa {
+    color: #a8a8c0 !important;
+    background: #0a0a0f !important;
+    border-left-color: #7c6df0 !important;
+}
+
+body.dark-mode.menu-lateral .tarea-metadatos {
+    border-top-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .metadato {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.menu-lateral .metadato strong {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral .mi-entrega {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .mi-entrega-header {
+    background: #0a0a0f !important;
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .mi-entrega-header h3 {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-info {
+    background: #0a0a0f !important;
+}
+
+body.dark-mode.menu-lateral .entrega-info p {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-comentario-texto {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-archivo {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .entrega-archivo a {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-calificacion-mostrada {
+    color: #34d399 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-calificacion-mostrada.pendiente {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode.menu-lateral .sin-entrega {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode.menu-lateral .entregas-lista-detalle {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .entregas-lista-detalle h3 {
+    background: #0a0a0f !important;
+    border-bottom-color: #2a2a3e !important;
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral .entrega-item-detalle {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .entrega-alumno-nombre {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral .sin-entregas {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode.menu-lateral .modal-contenido {
+    background: #12121e !important;
+    border: 1px solid #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .modal-header {
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode.menu-lateral .modal-header h3 {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.menu-lateral #modalEntregaContent p {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.menu-lateral .btn-outline {
+    border-color: #2a2a3e !important;
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.menu-lateral .btn-outline:hover {
+    background: #1a1a2e !important;
+    border-color: #3a3a52 !important;
 }

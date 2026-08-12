@@ -1,6 +1,6 @@
 <!-- ============================================
      ARCHIVO: mis_duales.html
-     Gestión de Duales (Empresas/Prácticas profesionales)
+     Gestión de Duales (VERSIÓN COMPLETA CON FIRMA Y PDF)
      ============================================ -->
 
 <!DOCTYPE html>
@@ -15,15 +15,7 @@
     <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-    /* Ocultar el flash inicial */
-    body:not(.dark-mode) {
-        background: #f1f5f9;
-    }
-    body.dark-mode {
-        background: #0a0a0a;
-    }
-    </style>
+    
 </head>
 <body class="menu-lateral">
     <div class="app-container">
@@ -60,48 +52,105 @@
         <!-- Contenido principal -->
         <main class="main-content">
             <div class="duales-container">
+                <!-- ========================================== -->
+                <!-- HEADER DE DUALES                          -->
+                <!-- ========================================== -->
                 <div class="header-duales">
                     <h2><i class="fas fa-briefcase"></i> Mis Duales</h2>
-                    <button id="btnCrearDual" class="btn primario">
-                        <i class="fas fa-plus-circle"></i> Registrar Dual
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <!-- Botón solo visible para MAESTROS -->
+                        <button id="btnCrearDual" class="btn primario" style="display: none;">
+                            <i class="fas fa-plus-circle"></i> Registrar Dual
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Mensajes -->
                 <div id="mensaje" class="mensaje"></div>
 
-                <!-- Contenedor de duales -->
                 <div id="dualesContainer" class="duales-grid">
                     <div class="sin-duales">
-                        <i class="fas fa-briefcase"></i> Cargando duales...
-                    </div>
-                </div>
-            </div>
-            <!-- Modal de confirmación para eliminar dual -->
-            <div id="modalConfirmar" class="modal-confirmar" style="display: none;">
-                <div class="modal-confirmar-contenido">
-                    <div class="modal-confirmar-header">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Confirmar eliminación</h3>
-                    </div>
-                    <div class="modal-confirmar-body">
-                        <p>¿Estás seguro de que quieres eliminar este dual?</p>
-                        <p class="modal-advertencia">Esta acción no se puede deshacer.</p>
-                    </div>
-                    <div class="modal-confirmar-footer">
-                        <button id="btnCancelarEliminar" class="btn secundario">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button id="btnConfirmarEliminar" class="btn-danger">
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
+                        <i class="fas fa-spinner fa-pulse"></i> Cargando duales...
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR        -->
+    <!-- ========================================== -->
+    <div id="modalConfirmar" class="modal-confirmar" style="display: none;">
+        <div class="modal-confirmar-contenido">
+            <div class="modal-confirmar-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Confirmar eliminación</h3>
+            </div>
+            <div class="modal-confirmar-body">
+                <p>¿Estás seguro de que quieres eliminar este dual?</p>
+                <p class="modal-advertencia">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-confirmar-footer">
+                <button id="btnCancelarEliminar" class="btn secundario">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button id="btnConfirmarEliminar" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL DE DETALLE DEL DUAL                 -->
+    <!-- ========================================== -->
+    <div id="modalDetalleDual" class="modal-detalle-dual">
+        <div class="modal-detalle-contenido">
+            <div class="modal-detalle-header">
+                <h3><i class="fas fa-briefcase"></i> Detalle del Dual</h3>
+                <button class="close-btn" onclick="cerrarDetalleDual()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detalleDualContent">
+                <p><i class="fas fa-spinner fa-pulse"></i> Cargando detalles...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL DE FIRMA                             -->
+    <!-- ========================================== -->
+    <div id="modalFirma" class="modal-firma">
+        <div class="modal-firma-contenido">
+            <div class="modal-firma-header">
+                <h3><i class="fas fa-pen-fancy"></i> Firmar Dual</h3>
+                <button class="close-btn" onclick="cerrarModalFirma()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-firma-body">
+                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                    <i class="fas fa-info-circle"></i> Firma en el recuadro para confirmar tu aceptación
+                </p>
+                <div class="canvas-container" id="canvasContainer">
+                    <canvas id="firmaCanvas"></canvas>
+                    <div class="firma-placeholder" id="firmaPlaceholder">Firma aquí</div>
+                </div>
+                <div class="firma-buttons">
+                    <button class="btn btn-limpiar" onclick="limpiarFirma()">
+                        <i class="fas fa-eraser"></i> Limpiar
+                    </button>
+                    <button class="btn btn-guardar-firma" onclick="guardarFirma()">
+                        <i class="fas fa-check"></i> Firmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../../js/menu.js"></script>
     <script src="../../js/duales.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>

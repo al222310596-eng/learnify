@@ -1,0 +1,998 @@
+<!-- ============================================
+     ANALISIS_REGRESION.HTML - Regresión Lineal con Datos Reales
+     ============================================ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Análisis de Regresión</title>
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/menu.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .regresion-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .regresion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .regresion-header h2 {
+            font-size: 1.6rem;
+            color: #1e293b;
+            margin: 0;
+        }
+        .regresion-header h2 i {
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+        .badge-ml {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .selector-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .selector-container label {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .selector-container select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+            min-width: 200px;
+            color: #1e293b;
+            cursor: pointer;
+        }
+        .selector-container select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .selector-container .info-equipo {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+        .selector-container .info-equipo i {
+            margin-right: 0.3rem;
+        }
+        .regresion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .regresion-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+        .regresion-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .regresion-card h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .regresion-card h3 i {
+            font-size: 1.3rem;
+        }
+        .regresion-card .ecuacion {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .regresion-card .coeficientes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .regresion-card .coef-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .regresion-card .coef-item .nombre {
+            color: #64748b;
+        }
+        .regresion-card .coef-item .valor {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .regresion-card .metricas-reg {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .regresion-card .metricas-reg .item {
+            background: #f8fafc;
+            padding: 0.4rem 0.3rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .regresion-card .metricas-reg .item .val {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
+        .regresion-card .metricas-reg .item .label {
+            font-size: 0.6rem;
+            color: #94a3b8;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        .chart-container h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        .predicciones-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .predicciones-container h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+        .tabla-predicciones {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .tabla-predicciones th,
+        .tabla-predicciones td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        .tabla-predicciones th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .tabla-predicciones .real { color: #667eea; font-weight: 600; }
+        .tabla-predicciones .predicha { color: #10b981; font-weight: 600; }
+        .tabla-predicciones .error { font-weight: 600; }
+        .tabla-predicciones .error.alto { color: #ef4444; }
+        .tabla-predicciones .error.bajo { color: #10b981; }
+        .tabla-predicciones .sin-datos { color: #f59e0b; text-align: center; }
+        .loading-text {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+        .mensaje {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .mensaje.exito {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            display: block;
+        }
+        .mensaje.error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        .mensaje.advertencia {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .regresion-grid { grid-template-columns: 1fr; }
+            .regresion-card .metricas-reg { grid-template-columns: repeat(2, 1fr); }
+            .regresion-card .coeficientes { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="menu-lateral">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../../dashboard.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i><span> Dashboard</span>
+                </a>
+                <a href="analisis_regresion.html" class="menu-item active">
+                    <i class="fas fa-chart-line"></i><span> Regresión</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-sidebar" id="userInfoSidebar"></div>
+                <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="regresion-container">
+
+                <div class="regresion-header">
+                    <h2><i class="fas fa-chart-line"></i> Análisis de Regresión</h2>
+                    <span class="badge-ml"><i class="fas fa-robot"></i> Machine Learning</span>
+                </div>
+
+                <div class="selector-container">
+                    <label><i class="fas fa-users"></i> Equipo:</label>
+                    <select id="selectorEquipo">
+                        <option value="">Selecciona un equipo...</option>
+                    </select>
+                    <span class="info-equipo" id="equipoInfo">
+                        <i class="fas fa-info-circle"></i> Selecciona un equipo para ver análisis
+                    </span>
+                </div>
+
+                <div class="regresion-grid">
+                    <!-- Regresión Lineal Simple -->
+                    <div class="regresion-card" id="cardSimple">
+                        <h3><i class="fas fa-arrow-right" style="color:#10b981;"></i> Regresión Lineal Simple</h3>
+                        <div class="ecuacion" id="ecuacionSimple">Y = m·X + b</div>
+                        <div class="coeficientes">
+                            <div class="coef-item"><span class="nombre">📋 Tareas completadas (X)</span><span class="valor" id="coefSimple">-</span></div>
+                            <div class="coef-item"><span class="nombre">📊 Intersección (b)</span><span class="valor" id="interSimple">-</span></div>
+                        </div>
+                        <div class="metricas-reg">
+                            <div class="item"><div class="val" id="r2Simple">-</div><div class="label">R²</div></div>
+                            <div class="item"><div class="val" id="corrSimple">-</div><div class="label">Correlación</div></div>
+                            <div class="item"><div class="val" id="maeSimple">-</div><div class="label">Error Absoluto</div></div>
+                            <div class="item"><div class="val" id="precisionSimple">-</div><div class="label">Precisión</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Regresión Lineal Múltiple -->
+                    <div class="regresion-card" id="cardMultiple">
+                        <h3><i class="fas fa-arrow-right" style="color:#667eea;"></i> Regresión Lineal Múltiple</h3>
+                        <div class="ecuacion" id="ecuacionMultiple">Y = m₁·X₁ + m₂·X₂ + m₃·X₃ + b</div>
+                        <div class="coeficientes">
+                            <div class="coef-item"><span class="nombre">📋 Tareas completadas (X₁)</span><span class="valor" id="coefX1">-</span></div>
+                            <div class="coef-item"><span class="nombre">📊 Tareas totales (X₂)</span><span class="valor" id="coefX2">-</span></div>
+                            <div class="coef-item"><span class="nombre">⏰ Entregas tardías (X₃)</span><span class="valor" id="coefX3">-</span></div>
+                            <div class="coef-item"><span class="nombre">📊 Intersección (b)</span><span class="valor" id="interMultiple">-</span></div>
+                        </div>
+                        <div class="metricas-reg">
+                            <div class="item"><div class="val" id="r2Multiple">-</div><div class="label">R²</div></div>
+                            <div class="item"><div class="val" id="r2AdjMultiple">-</div><div class="label">R² Ajustado</div></div>
+                            <div class="item"><div class="val" id="maeMultiple">-</div><div class="label">Error Absoluto</div></div>
+                            <div class="item"><div class="val" id="precisionMultiple">-</div><div class="label">Precisión</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfica -->
+                <div class="chart-container">
+                    <h3><i class="fas fa-chart-scatter"></i> Regresión: Tareas completadas vs Calificación</h3>
+                    <canvas id="graficaRegresion" height="300"></canvas>
+                </div>
+
+                <!-- Tabla de predicciones -->
+                <div class="predicciones-container">
+                    <h3><i class="fas fa-table"></i> Predicciones vs Realidad</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="tabla-predicciones" id="tablaPredicciones">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Real</th>
+                                    <th>Predicción Simple</th>
+                                    <th>Error Simple</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prediccionesBody">
+                                <tr><td colspan="6" class="loading-text">Selecciona un equipo para ver predicciones</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="mensaje" class="mensaje"></div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- JAVASCRIPT - REGRESIÓN CON DATOS REALES                    -->
+    <!-- ========================================================== -->
+    <script>
+        // ==========================================================
+        // 1. CONFIGURACIÓN INICIAL
+        // ==========================================================
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+        if (!usuario) {
+            window.location.href = '../../iniciar_sesion.html';
+        }
+
+        if (usuario.rol !== 'maestro') {
+            alert('Solo los maestros tienen acceso a esta sección');
+            window.location.href = '../../dashboard.html';
+        }
+
+        // ==========================================================
+        // 2. VARIABLES GLOBALES
+        // ==========================================================
+        let graficaRegresion = null;
+        let equiposCache = [];
+
+        // ==========================================================
+        // 3. CARGAR EQUIPOS
+        // ==========================================================
+        async function cargarEquipos() {
+            const selector = document.getElementById('selectorEquipo');
+
+            try {
+                const respuesta = await fetch(`/api/equipos/${usuario._id}`);
+                const resultado = await respuesta.json();
+
+                if (resultado.exito && resultado.equipos) {
+                    equiposCache = resultado.equipos;
+                    selector.innerHTML = '<option value="">Selecciona un equipo...</option>';
+
+                    equiposCache.forEach(equipo => {
+                        const option = document.createElement('option');
+                        option.value = equipo._id;
+                        option.textContent = `${equipo.nombre} (${equipo.total_miembros || 0} alumnos)`;
+                        selector.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar equipos:', error);
+                selector.innerHTML = '<option value="">Error al cargar equipos</option>';
+                mostrarMensaje('error', 'Error al cargar los equipos');
+            }
+        }
+
+        // ==========================================================
+        // 4. CALCULAR REGRESIÓN LINEAL SIMPLE
+        // ==========================================================
+        function calcularRegresionSimple(datos) {
+            const n = datos.length;
+            if (n < 2) return null;
+
+            const sumX = datos.reduce((a, d) => a + d.x, 0);
+            const sumY = datos.reduce((a, d) => a + d.y, 0);
+            const sumXY = datos.reduce((a, d) => a + d.x * d.y, 0);
+            const sumX2 = datos.reduce((a, d) => a + d.x * d.x, 0);
+            const sumY2 = datos.reduce((a, d) => a + d.y * d.y, 0);
+
+            const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b = (sumY - m * sumX) / n;
+
+            const mediaY = sumY / n;
+            const ssTot = datos.reduce((a, d) => a + (d.y - mediaY) ** 2, 0);
+            const ssRes = datos.reduce((a, d) => a + (d.y - (m * d.x + b)) ** 2, 0);
+            const r2 = ssTot > 0 ? 1 - (ssRes / ssTot) : 0;
+
+            const corr = (n * sumXY - sumX * sumY) / Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+            const mae = datos.reduce((a, d) => a + Math.abs(d.y - (m * d.x + b)), 0) / n;
+
+            return { m, b, r2, corr, mae, precision: r2 * 100 };
+        }
+
+        // ==========================================================
+        // 5. CALCULAR REGRESIÓN LINEAL MÚLTIPLE (3 variables)
+        // ==========================================================
+        function calcularRegresionMultiple(datos) {
+            const n = datos.length;
+            if (n < 4) return null;
+
+            const X = datos.map(d => [1, d.x1, d.x2, d.x3]);
+            const Y = datos.map(d => d.y);
+
+            const XtX = [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
+            const XtY = [0, 0, 0, 0];
+
+            for (let i = 0; i < n; i++) {
+                const x0 = X[i][0], x1 = X[i][1], x2 = X[i][2], x3 = X[i][3];
+                const y = Y[i];
+
+                XtX[0][0] += x0 * x0;
+                XtX[0][1] += x0 * x1;
+                XtX[0][2] += x0 * x2;
+                XtX[0][3] += x0 * x3;
+                XtX[1][0] += x1 * x0;
+                XtX[1][1] += x1 * x1;
+                XtX[1][2] += x1 * x2;
+                XtX[1][3] += x1 * x3;
+                XtX[2][0] += x2 * x0;
+                XtX[2][1] += x2 * x1;
+                XtX[2][2] += x2 * x2;
+                XtX[2][3] += x2 * x3;
+                XtX[3][0] += x3 * x0;
+                XtX[3][1] += x3 * x1;
+                XtX[3][2] += x3 * x2;
+                XtX[3][3] += x3 * x3;
+
+                XtY[0] += x0 * y;
+                XtY[1] += x1 * y;
+                XtY[2] += x2 * y;
+                XtY[3] += x3 * y;
+            }
+
+            function resolverSistema(A, b) {
+                const n = A.length;
+                const aug = A.map((row, i) => [...row, b[i]]);
+
+                for (let i = 0; i < n; i++) {
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(aug[k][i]) > Math.abs(aug[maxRow][i])) {
+                            maxRow = k;
+                        }
+                    }
+                    [aug[i], aug[maxRow]] = [aug[maxRow], aug[i]];
+
+                    for (let k = i + 1; k < n; k++) {
+                        const factor = aug[k][i] / aug[i][i];
+                        for (let j = i; j <= n; j++) {
+                            aug[k][j] -= factor * aug[i][j];
+                        }
+                    }
+                }
+
+                const x = new Array(n).fill(0);
+                for (let i = n - 1; i >= 0; i--) {
+                    let sum = 0;
+                    for (let j = i + 1; j < n; j++) {
+                        sum += aug[i][j] * x[j];
+                    }
+                    x[i] = (aug[i][n] - sum) / aug[i][i];
+                }
+                return x;
+            }
+
+            const coef = resolverSistema(XtX, XtY);
+
+            const mediaY = Y.reduce((a, y) => a + y, 0) / n;
+            const ssTot = Y.reduce((a, y) => a + (y - mediaY) ** 2, 0);
+
+            let ssRes = 0;
+            for (let i = 0; i < n; i++) {
+                const pred = coef[0] + coef[1] * X[i][1] + coef[2] * X[i][2] + coef[3] * X[i][3];
+                ssRes += (Y[i] - pred) ** 2;
+            }
+            const r2 = ssTot > 0 ? 1 - (ssRes / ssTot) : 0;
+            const r2Adj = 1 - (1 - r2) * (n - 1) / (n - 4 - 1);
+
+            let mae = 0;
+            for (let i = 0; i < n; i++) {
+                const pred = coef[0] + coef[1] * X[i][1] + coef[2] * X[i][2] + coef[3] * X[i][3];
+                mae += Math.abs(Y[i] - pred);
+            }
+            mae /= n;
+
+            return {
+                b: coef[0],
+                m1: coef[1],
+                m2: coef[2],
+                m3: coef[3],
+                r2: r2,
+                r2Adj: r2Adj,
+                mae: mae,
+                precision: r2 * 100
+            };
+        }
+
+        // ==========================================================
+        // 6. CARGAR DATOS DEL EQUIPO (DATOS REALES CON VALIDACIÓN)
+        // ==========================================================
+        async function cargarDatosEquipo(equipoId) {
+            if (!equipoId) {
+                resetearVista();
+                return;
+            }
+
+            document.getElementById('equipoInfo').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando datos...';
+
+            try {
+                const statsResp = await fetch(`/api/analisis/equipo/${equipoId}`);
+                const statsResult = await statsResp.json();
+
+                console.log('📦 Datos recibidos:', statsResult);
+
+                if (!statsResult.exito) {
+                    mostrarMensaje('error', 'Error al cargar datos del equipo');
+                    return;
+                }
+
+                let alumnos = statsResult.estadisticas?.alumnos || [];
+
+                if (alumnos.length === 0) {
+                    mostrarMensaje('error', 'No hay alumnos en este equipo');
+                    resetearVista();
+                    return;
+                }
+
+                // ==========================================================
+                // EXTRAER DATOS REALES DE CADA ALUMNO
+                // ==========================================================
+                const datosReales = alumnos.map(alumno => {
+                    const stats = alumno.estadisticas || {};
+
+                    const calificacion = stats.promedio || 0;
+                    const tareasCompletadas = stats.tareas_completadas || 0;
+                    const tareasTotales = stats.tareas_totales || 0;
+                    const entregasTardias = stats.entregas_tardias || 0;
+
+                    return {
+                        nombre: alumno.nombre || 'Sin nombre',
+                        x: tareasCompletadas,
+                        y: calificacion,
+                        x1: tareasCompletadas,
+                        x2: tareasTotales,
+                        x3: entregasTardias,
+                        tareasCompletadas: tareasCompletadas,
+                        tareasTotales: tareasTotales,
+                        entregasTardias: entregasTardias,
+                        calificacion: calificacion
+                    };
+                });
+
+                console.log('📊 Datos procesados:', datosReales);
+
+                const totalAlumnos = alumnos.length;
+                const promedioGeneral = datosReales.reduce((sum, d) => sum + d.y, 0) / totalAlumnos;
+
+                document.getElementById('equipoInfo').innerHTML =
+                    `<i class="fas fa-users"></i> ${totalAlumnos} alumnos · ` +
+                    `<i class="fas fa-chart-line"></i> Promedio: ${promedioGeneral.toFixed(1)}% · ` +
+                    `<i class="fas fa-database"></i> ${datosReales.length} registros`;
+
+                // ==========================================================
+                // REGRESIÓN SIMPLE (necesita al menos 2 alumnos)
+                // ==========================================================
+                if (datosReales.length >= 2) {
+                    const simple = calcularRegresionSimple(datosReales);
+                    if (simple) {
+                        document.getElementById('ecuacionSimple').textContent =
+                            `Y = ${simple.m.toFixed(2)}·X + ${simple.b.toFixed(2)}`;
+                        document.getElementById('coefSimple').textContent = simple.m.toFixed(2);
+                        document.getElementById('interSimple').textContent = simple.b.toFixed(2);
+                        document.getElementById('r2Simple').textContent = simple.r2.toFixed(3);
+                        document.getElementById('corrSimple').textContent = simple.corr.toFixed(2);
+                        document.getElementById('maeSimple').textContent = `±${simple.mae.toFixed(1)}`;
+                        document.getElementById('precisionSimple').textContent = `${Math.round(simple.precision)}%`;
+                    }
+                } else {
+                    document.getElementById('ecuacionSimple').textContent =
+                        `⚠️ Se necesitan al menos 2 alumnos (tienes ${datosReales.length})`;
+                    document.getElementById('coefSimple').textContent = '-';
+                    document.getElementById('interSimple').textContent = '-';
+                    document.getElementById('r2Simple').textContent = '-';
+                    document.getElementById('corrSimple').textContent = '-';
+                    document.getElementById('maeSimple').textContent = '-';
+                    document.getElementById('precisionSimple').textContent = '-';
+                }
+
+                // ==========================================================
+                // REGRESIÓN MÚLTIPLE (necesita al menos 4 alumnos)
+                // ==========================================================
+                if (datosReales.length >= 4) {
+                    const multiple = calcularRegresionMultiple(datosReales);
+                    if (multiple) {
+                        document.getElementById('ecuacionMultiple').textContent =
+                            `Y = ${multiple.m1.toFixed(2)}·X₁ + ${multiple.m2.toFixed(2)}·X₂ + ${multiple.m3.toFixed(2)}·X₃ + ${multiple.b.toFixed(2)}`;
+                        document.getElementById('coefX1').textContent = multiple.m1.toFixed(2);
+                        document.getElementById('coefX2').textContent = multiple.m2.toFixed(2);
+                        document.getElementById('coefX3').textContent = multiple.m3.toFixed(2);
+                        document.getElementById('interMultiple').textContent = multiple.b.toFixed(2);
+                        document.getElementById('r2Multiple').textContent = multiple.r2.toFixed(3);
+                        document.getElementById('r2AdjMultiple').textContent = multiple.r2Adj.toFixed(3);
+                        document.getElementById('maeMultiple').textContent = `±${multiple.mae.toFixed(1)}`;
+                        document.getElementById('precisionMultiple').textContent = `${Math.round(multiple.precision)}%`;
+                    }
+                } else {
+                    const mensaje = datosReales.length >= 2 ?
+                        `⚠️ Se necesitan al menos 4 alumnos para regresión múltiple (tienes ${datosReales.length})` :
+                        `⚠️ Se necesitan al menos 4 alumnos`;
+
+                    document.getElementById('ecuacionMultiple').textContent = mensaje;
+                    document.getElementById('coefX1').textContent = '-';
+                    document.getElementById('coefX2').textContent = '-';
+                    document.getElementById('coefX3').textContent = '-';
+                    document.getElementById('interMultiple').textContent = '-';
+                    document.getElementById('r2Multiple').textContent = '-';
+                    document.getElementById('r2AdjMultiple').textContent = '-';
+                    document.getElementById('maeMultiple').textContent = '-';
+                    document.getElementById('precisionMultiple').textContent = '-';
+                }
+
+                // ==========================================================
+                // ACTUALIZAR GRÁFICA
+                // ==========================================================
+                if (datosReales.length >= 2) {
+                    const simple = calcularRegresionSimple(datosReales);
+                    actualizarGrafica(datosReales, simple);
+                } else {
+                    actualizarGraficaUnPunto(datosReales);
+                }
+
+                // ==========================================================
+                // ACTUALIZAR TABLA DE PREDICCIONES
+                // ==========================================================
+                if (datosReales.length >= 2) {
+                    const simple = calcularRegresionSimple(datosReales);
+                    const multiple = datosReales.length >= 4 ? calcularRegresionMultiple(datosReales) : null;
+                    actualizarTablaPredicciones(datosReales, simple, multiple);
+                } else {
+                    mostrarAlumnoUnico(datosReales);
+                }
+
+                // ==========================================================
+                // MENSAJE DE ESTADO
+                // ==========================================================
+                let mensaje, tipo;
+                if (datosReales.length < 2) {
+                    mensaje = `⚠️ Se necesitan al menos 2 alumnos para regresión simple (tienes ${datosReales.length})`;
+                    tipo = 'error';
+                } else if (datosReales.length < 4) {
+                    mensaje =
+                    `✅ Regresión simple disponible (${datosReales.length} alumnos). Múltiple necesita 4+ alumnos`;
+                    tipo = 'advertencia';
+                } else {
+                    mensaje = `✅ Regresión simple y múltiple disponibles (${datosReales.length} alumnos)`;
+                    tipo = 'exito';
+                }
+                mostrarMensaje(tipo, mensaje);
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('error', 'Error al cargar los datos: ' + error.message);
+                document.getElementById('equipoInfo').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+            }
+        }
+
+        // ==========================================================
+        // 6.5 MOSTRAR ALUMNO ÚNICO (CUANDO HAY SOLO 1)
+        // ==========================================================
+        function mostrarAlumnoUnico(datos) {
+            const tbody = document.getElementById('prediccionesBody');
+
+            if (!datos || datos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No hay alumnos</td></tr>';
+                return;
+            }
+
+            const d = datos[0];
+
+            tbody.innerHTML = `
+                <tr>
+                    <td><strong>${d.nombre}</strong></td>
+                    <td class="real">${d.y.toFixed(1)}%</td>
+                    <td colspan="4" class="sin-datos">
+                        <i class="fas fa-info-circle"></i> Se necesitan más alumnos para predicciones
+                    </td>
+                </tr>
+            `;
+        }
+
+        // ==========================================================
+        // 6.6 ACTUALIZAR GRÁFICA CON UN SOLO PUNTO
+        // ==========================================================
+        function actualizarGraficaUnPunto(datos) {
+            const ctx = document.getElementById('graficaRegresion').getContext('2d');
+
+            if (graficaRegresion) {
+                graficaRegresion.destroy();
+            }
+
+            if (!datos || datos.length === 0) {
+                graficaRegresion = new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets: [{ label: 'Sin datos', data: [] }] },
+                    options: { responsive: true }
+                });
+                return;
+            }
+
+            const punto = datos[0];
+
+            graficaRegresion = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Alumno (único)',
+                        data: [{ x: punto.x, y: punto.y }],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        pointRadius: 12,
+                        pointHoverRadius: 16
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${punto.nombre}: ${context.raw.y.toFixed(1)}% (${context.raw.x} tareas)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Tareas completadas', font: { weight: 'bold' } },
+                            min: 0,
+                            max: Math.max(10, punto.x + 3)
+                        },
+                        y: {
+                            title: { display: true, text: 'Calificación (%)', font: { weight: 'bold' } },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================================
+        // 7. ACTUALIZAR GRÁFICA DE REGRESIÓN
+        // ==========================================================
+        function actualizarGrafica(datos, simple) {
+            const ctx = document.getElementById('graficaRegresion').getContext('2d');
+
+            const puntos = datos.map(d => ({ x: d.x, y: d.y }));
+
+            const xMin = Math.max(0, Math.min(...datos.map(d => d.x)) - 1);
+            const xMax = Math.max(...datos.map(d => d.x)) + 1;
+            const lineaRegresion = [];
+            if (simple) {
+                for (let x = xMin; x <= xMax; x += 0.5) {
+                    lineaRegresion.push({ x: x, y: Math.min(100, Math.max(0, simple.m * x + simple.b)) });
+                }
+            }
+
+            if (graficaRegresion) {
+                graficaRegresion.destroy();
+            }
+
+            graficaRegresion = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Alumnos (datos reales)',
+                        data: puntos,
+                        backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }, {
+                        label: 'Línea de regresión',
+                        data: lineaRegresion,
+                        type: 'line',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const alumno = datos[context.dataIndex];
+                                        return `${alumno?.nombre || ''} · Calificación: ${context.raw.y.toFixed(1)}% · Tareas: ${alumno?.x}`;
+                                    }
+                                    return `Predicción: ${context.raw.y.toFixed(1)}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Tareas completadas', font: { weight: 'bold' } },
+                            min: 0,
+                            max: xMax + 2
+                        },
+                        y: {
+                            title: { display: true, text: 'Calificación (%)', font: { weight: 'bold' } },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================================
+        // 8. ACTUALIZAR TABLA DE PREDICCIONES
+        // ==========================================================
+        function actualizarTablaPredicciones(datos, simple, multiple) {
+            const tbody = document.getElementById('prediccionesBody');
+
+            if (!datos || datos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading-text">No hay datos disponibles</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = datos.map(d => {
+                let predSimple = '-',
+                    errorSimple = '-',
+                    classErrorSimple = '';
+                let predMultiple = '-',
+                    errorMultiple = '-',
+                    classErrorMultiple = '';
+
+                if (simple) {
+                    predSimple = (simple.m * d.x + simple.b);
+                    errorSimple = Math.abs(d.y - predSimple);
+                    classErrorSimple = errorSimple > 10 ? 'alto' : 'bajo';
+                }
+
+                if (multiple) {
+                    predMultiple = multiple.b + multiple.m1 * d.x1 + multiple.m2 * d.x2 + multiple.m3 * d.x3;
+                    errorMultiple = Math.abs(d.y - predMultiple);
+                    classErrorMultiple = errorMultiple > 10 ? 'alto' : 'bajo';
+                }
+
+                return `
+                    <tr>
+                        <td><strong>${d.nombre}</strong></td>
+                        <td class="real">${d.y.toFixed(1)}%</td>
+                        <td class="predicha">${predSimple !== '-' ? Math.round(predSimple) + '%' : '-'}</td>
+                        <td class="error ${classErrorSimple}">${errorSimple !== '-' ? errorSimple.toFixed(1) : '-'}</td>
+                        <td class="predicha">${predMultiple !== '-' ? Math.round(predMultiple) + '%' : '-'}</td>
+                        <td class="error ${classErrorMultiple}">${errorMultiple !== '-' ? errorMultiple.toFixed(1) : '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ==========================================================
+        // 9. RESETEAR VISTA
+        // ==========================================================
+        function resetearVista() {
+            document.getElementById('equipoInfo').innerHTML = '<i class="fas fa-info-circle"></i> Selecciona un equipo';
+            document.getElementById('ecuacionSimple').textContent = 'Y = m·X + b';
+            document.getElementById('coefSimple').textContent = '-';
+            document.getElementById('interSimple').textContent = '-';
+            document.getElementById('r2Simple').textContent = '-';
+            document.getElementById('corrSimple').textContent = '-';
+            document.getElementById('maeSimple').textContent = '-';
+            document.getElementById('precisionSimple').textContent = '-';
+            document.getElementById('ecuacionMultiple').textContent = 'Y = m₁·X₁ + m₂·X₂ + ... + b';
+            document.getElementById('coefX1').textContent = '-';
+            document.getElementById('coefX2').textContent = '-';
+            document.getElementById('coefX3').textContent = '-';
+            document.getElementById('interMultiple').textContent = '-';
+            document.getElementById('r2Multiple').textContent = '-';
+            document.getElementById('r2AdjMultiple').textContent = '-';
+            document.getElementById('maeMultiple').textContent = '-';
+            document.getElementById('precisionMultiple').textContent = '-';
+            document.getElementById('prediccionesBody').innerHTML =
+                '<tr><td colspan="6" class="loading-text">Selecciona un equipo</td></tr>';
+
+            if (graficaRegresion) {
+                graficaRegresion.destroy();
+                graficaRegresion = null;
+            }
+        }
+
+        // ==========================================================
+        // 10. MOSTRAR MENSAJE
+        // ==========================================================
+        function mostrarMensaje(tipo, texto) {
+            const mensajeDiv = document.getElementById('mensaje');
+            mensajeDiv.className = `mensaje ${tipo}`;
+            mensajeDiv.innerHTML = texto;
+            mensajeDiv.style.display = 'block';
+            setTimeout(() => { mensajeDiv.style.display = 'none'; }, 5000);
+        }
+
+        // ==========================================================
+        // 11. CERRAR SESIÓN
+        // ==========================================================
+        function cerrarSesion() {
+            localStorage.removeItem('usuario');
+            window.location.href = '../../iniciar_sesion.html';
+        }
+
+        // ==========================================================
+        // 12. INICIALIZAR
+        // ==========================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEquipos();
+
+            document.getElementById('selectorEquipo').addEventListener('change', function(e) {
+                const equipoId = e.target.value;
+                if (equipoId) {
+                    cargarDatosEquipo(equipoId);
+                } else {
+                    resetearVista();
+                }
+            });
+
+            console.log('📊 Panel de Regresión Lineal cargado');
+            console.log('📡 Usando datos REALES del endpoint /api/analisis/equipo');
+            console.log('📈 Requisitos: Simple (2+ alumnos), Múltiple (4+ alumnos)');
+        });
+    </script>
+</body>
+</html>

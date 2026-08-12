@@ -1,10 +1,21 @@
 /* ============================================
      ARCHIVO: equipos.css
-     Estilos específicos para la gestión de equipos
+     Estilos para la gestión de equipos - Diseño profesional
      ============================================ */
 
-/* Cabecera de equipos */
-.header-equipos {
+/* ============================================
+     CONTENEDOR PRINCIPAL
+     ============================================ */
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ============================================
+     HEADER DE LA PÁGINA
+     ============================================ */
+.page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,154 +24,375 @@
     gap: 1rem;
 }
 
-.header-equipos h2 {
-    margin-bottom: 0;
+.page-header-left h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
 }
 
-.btn-crear {
-    background: #48bb78;
-    color: white;
+.page-header-left h1 i {
+    color: #667eea;
+    margin-right: 0.5rem;
 }
 
-.btn-crear:hover {
-    background: #38a169;
+.page-subtitle {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
 }
 
-/* Grid de equipos */
+.page-header-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+     BOTONES
+     ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+}
+
+/* ============================================
+     MENSAJES
+     ============================================ */
+.message-container {
+    margin-bottom: 1.5rem;
+    padding: 12px 20px;
+    border-radius: 12px;
+    animation: fadeInUp 0.3s ease;
+}
+
+.message-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.message-container.success {
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    color: #065f46;
+}
+
+.message-container.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.message-container.success i {
+    color: #10b981;
+}
+
+.message-container.error i {
+    color: #ef4444;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+     FORMULARIO PARA UNIRSE
+     ============================================ */
+.join-form {
+    display: none;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.join-form.visible {
+    display: block;
+    animation: fadeInUp 0.3s ease;
+}
+
+.join-form-content h3 {
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.join-form-content h3 i {
+    color: #667eea;
+}
+
+.join-form-desc {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.join-form-input-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.join-form-input-group i {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.join-form-input-group input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #1e293b;
+    transition: border-color 0.3s;
+}
+
+.join-form-input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================
+     GRID DE EQUIPOS
+     ============================================ */
 .equipos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
-    margin-top: 1.5rem;
 }
 
-/* Tarjeta de equipo */
+/* ============================================
+     TARJETA DE EQUIPO
+     ============================================ */
 .equipo-card {
-    background: #f8fafc;
+    background: #ffffff;
     border-radius: 16px;
     padding: 1.5rem;
     border: 1px solid #e2e8f0;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .equipo-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-color: #cbd5e1;
+}
+
+.equipo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
 }
 
 .equipo-nombre {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: #1e293b;
-    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.equipo-nombre i {
+    color: #667eea;
+}
+
+.equipo-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-lider {
+    background: #e6f0ff;
+    color: #2563eb;
+}
+
+.badge-miembro {
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 .equipo-descripcion {
     color: #64748b;
     font-size: 0.9rem;
-    margin-bottom: 1rem;
     line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .equipo-meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
-}
-
-.equipo-miembros {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #475569;
-    font-size: 0.9rem;
-}
-
-.equipo-lider {
-    background: #e6f0ff;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    color: #2563eb;
-}
-
-.btn-ver {
-    background: #2563eb;
-    padding: 6px 16px;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-.btn-unirse {
-    background: #f59e0b;
-    padding: 6px 16px;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-/* Mensaje cuando no hay equipos */
-.sin-equipos {
-    text-align: center;
-    padding: 3rem;
-    background: #f8fafc;
-    border-radius: 16px;
-    color: #64748b;
-}
-
-/* Formulario para unirse */
-.form-unirse {
-    display: none;
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: #f1f5f9;
-    border-radius: 16px;
-}
-
-.form-unirse.visible {
-    display: block;
-}
-
-.form-group {
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
     margin-bottom: 1rem;
 }
 
-.form-group input {
-    margin: 0;
+.equipo-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #64748b;
 }
 
-/* Botón eliminar equipo */
-.btn-eliminar {
-    background: #fee2e2;
-    color: #dc2626;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    margin: 0;
+.equipo-meta-item i {
+    color: #94a3b8;
+    font-size: 0.85rem;
 }
 
-.btn-eliminar:hover {
-    background: #fecaca;
-    transform: none;
+.equipo-meta-item .miembro-count {
+    font-weight: 600;
+    color: #1e293b;
 }
 
-/* Contenedor de acciones en tarjeta */
 .equipo-acciones {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1rem;
-    justify-content: flex-end;
 }
 
-.btn-ver {
-    background: #2563eb;
-    padding: 6px 16px;
-    font-size: 0.9rem;
-    margin: 0;
+.equipo-acciones .btn {
+    flex: 1;
+    min-width: 70px;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 8px 12px;
 }
 
-/* Modal de confirmación */
+/* ============================================
+     ESTADOS DE CARGA Y VACÍO
+     ============================================ */
+.loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #94a3b8;
+}
+
+.loading-state i {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px dashed #e2e8f0;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-state h3 {
+    color: #1e293b;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* ============================================
+     MODAL DE CONFIRMACIÓN
+     ============================================ */
 .modal-confirmacion {
     position: fixed;
     top: 0;
@@ -168,76 +400,321 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .modal-confirmacion .modal-contenido {
-    background: white;
+    background: #fff;
     border-radius: 20px;
-    padding: 1.5rem;
-    max-width: 350px;
+    padding: 2rem;
+    max-width: 400px;
     width: 90%;
     text-align: center;
+    animation: scaleIn 0.2s ease;
 }
 
-.modal-confirmacion .modal-botones {
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-confirmacion .modal-contenido h3 {
+    font-size: 1.2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.modal-confirmacion .modal-contenido h3 i {
+    color: #f59e0b;
+    margin-right: 0.5rem;
+}
+
+.modal-confirmacion .modal-contenido p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.modal-confirmacion .modal-contenido .advertencia {
+    color: #dc2626;
+    font-size: 0.8rem;
+}
+
+.modal-botones {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-top: 1.5rem;
     justify-content: center;
 }
 
-.modal-confirmacion .btn-confirmar {
-    background: #dc2626;
-    color: white;
+.modal-botones .btn {
+    min-width: 100px;
+    justify-content: center;
 }
 
-.modal-confirmacion .btn-cancelar {
-    background: #e2e8f0;
-    color: #334155;
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .page-header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .equipos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .join-form-input-group {
+        flex-direction: column;
+    }
+
+    .join-form-input-group input {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .join-form-input-group .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .equipo-acciones .btn {
+        flex: 1;
+        min-width: 60px;
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
 }
 
-/* Botón salir del equipo (para alumnos) */
-.btn-salir {
-    background: #fef3c7;
-    color: #d97706;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    margin: 0;
+@media (max-width: 480px) {
+    .page-container {
+        padding: 1rem;
+    }
+
+    .page-header-left h1 {
+        font-size: 1.4rem;
+    }
+
+    .equipo-card {
+        padding: 1rem;
+    }
+
+    .equipo-nombre {
+        font-size: 1rem;
+    }
+
+    .modal-confirmacion .modal-contenido {
+        padding: 1.5rem;
+    }
 }
 
-.btn-salir:hover {
-    background: #fde68a;
-    transform: none;
+/* ============================================
+     MODO OSCURO - EQUIPOS
+     ============================================ */
+body.dark-mode .page-header-left h1 {
+    color: #ececf0;
 }
 
-/* Botón de tareas */
-.btn-tareas {
-    background: #8b5cf6;
-    color: white;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    margin: 0;
+body.dark-mode .page-subtitle {
+    color: #6a6a82;
 }
 
-.btn-tareas:hover {
-    background: #7c3aed;
+body.dark-mode .equipo-card {
+    background: #12121e;
+    border-color: #2a2a3e;
 }
 
-.btn-chat {
-    background: #8b5cf6;
-    color: white;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    margin: 0;
-    border-radius: 8px;
-    border: none;
+body.dark-mode .equipo-card:hover {
+    border-color: #3a3a52;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .equipo-nombre {
+    color: #ececf0;
+}
+
+body.dark-mode .equipo-nombre i {
+    color: #7c6df0;
+}
+
+body.dark-mode .equipo-descripcion {
+    color: #a8a8c0;
+}
+
+body.dark-mode .equipo-meta {
+    border-top-color: #2a2a3e;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode .equipo-meta-item {
+    color: #a8a8c0;
+}
+
+body.dark-mode .equipo-meta-item i {
+    color: #6a6a82;
+}
+
+body.dark-mode .equipo-meta-item .miembro-count {
+    color: #ececf0;
+}
+
+body.dark-mode .badge-lider {
+    background: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+}
+
+body.dark-mode .badge-miembro {
+    background: rgba(255,255,255,0.05);
+    color: #a8a8c0;
+}
+
+body.dark-mode .join-form {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .join-form-content h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .join-form-desc {
+    color: #6a6a82;
+}
+
+body.dark-mode .join-form-input-group input {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode .join-form-input-group input:focus {
+    border-color: #7c6df0;
+}
+
+body.dark-mode .join-form-input-group i {
+    color: #6a6a82;
+}
+
+body.dark-mode .btn-outline {
+    color: #a8a8c0;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .btn-outline:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+body.dark-mode .modal-confirmacion .modal-contenido {
+    background: #12121e;
+}
+
+body.dark-mode .modal-confirmacion .modal-contenido h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .modal-confirmacion .modal-contenido p {
+    color: #a8a8c0;
+}
+
+body.dark-mode .empty-state {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .empty-state h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .empty-state p {
+    color: #6a6a82;
+}
+
+body.dark-mode .message-container.success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode .message-container.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+/* ============================================
+     BOTÓN DE TEMA EN SIDEBAR
+     ============================================ */
+.theme-toggle-sidebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
-.btn-chat:hover {
-    background: #7c3aed;
+.theme-toggle-sidebar:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.theme-toggle-sidebar i {
+    font-size: 18px;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-sidebar span {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .theme-toggle-sidebar {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.06);
+}
+
+body.dark-mode .theme-toggle-sidebar:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+body.dark-mode .theme-toggle-sidebar i {
+    color: #7c6df0;
+}
+
+body.dark-mode .theme-toggle-sidebar span {
+    color: #a8a8c0;
 }

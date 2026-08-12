@@ -1,10 +1,6 @@
 /* ============================================
-     ARCHIVO 7/10: ESTILOS BASE
-     ============================================
-     Este archivo contiene los estilos para:
-     - Bienvenida
-     - Login
-     - Registro
+     ARCHIVO: base.css
+     Estilos base para toda la aplicación
      ============================================ */
 
 /* ============================================
@@ -14,230 +10,1518 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding: 1rem;
-}
-
-/* ============================================
-     CONTENEDOR PRINCIPAL (reutilizable)
-     ============================================ */
-.contenedor {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 400px;
-}
-
-/* Para páginas especiales como bienvenida */
-.contenedor-grande {
-    max-width: 600px;
-}
-
-/* ============================================
-     TÍTULOS
-     ============================================ */
-h1 {
-    color: #333;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    text-align: center;
-}
-
-h2 {
-    color: #333;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 2rem;
-}
-
-/* ============================================
-     TEXTO DESCRIPTIVO
-     ============================================ */
-.descripcion {
-    font-size: 1.2rem;
-    color: #666;
-    margin: 20px 0;
-    line-height: 1.6;
-    text-align: center;
-}
-
-/* ============================================
-     BOTONES
-     ============================================ */
-.botones {
-    display: flex;
-    gap: 15px;
     justify-content: center;
-    margin: 30px 0;
+    background: #0a0a1a;
+    padding: 20px;
+    position: relative;
+    overflow: visible;
 }
 
-.btn {
-    display: inline-block;
-    padding: 12px 30px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.2s;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
+/* Fondo con gradiente y patrón - Colores Learnify */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(118, 75, 162, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(102, 126, 234, 0.08) 0%, transparent 50%);
+    z-index: 0;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
+/* Partículas decorativas */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.05), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.05), transparent),
+        radial-gradient(2px 2px at 50px 160px, rgba(255,255,255,0.05), transparent),
+        radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.05), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.05), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.05), transparent);
+    background-size: 200px 200px;
+    z-index: 0;
 }
 
-.btn.primario {
-    background: #667eea;
-    color: white;
-}
-
-.btn.secundario {
-    background: #f0f0f0;
-    color: #333;
-}
-
-/* Botón de ancho completo (para formularios) */
-.btn-block {
+/* ============================================
+     LOGIN WRAPPER
+     ============================================ */
+.login-wrapper {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    margin: 20px 0 10px;
+    max-width: 440px;
+}
+
+/* Brand / Logo */
+.brand {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.brand-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.brand-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.brand-text span {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 6px;
+    font-weight: 400;
+}
+
+/* Tarjeta de login - Glassmorphism */
+.login-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 40px 36px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.login-header {
+    margin-bottom: 32px;
+}
+
+.login-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+}
+
+.login-header p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    font-weight: 400;
 }
 
 /* ============================================
      FORMULARIOS
      ============================================ */
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
+.form-group {
+    margin-bottom: 20px;
 }
 
-input:focus, select:focus {
-    outline: none;
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
     border-color: #667eea;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.input-wrapper .input-icon {
+    flex-shrink: 0;
+    width: 44px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: #667eea;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+    width: 100%;
+    padding: 14px 16px 14px 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+}
+
+.input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 400;
+}
+
+.input-wrapper select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
+/* Botón de mostrar/ocultar contraseña */
+.toggle-password {
+    flex-shrink: 0;
+    width: 44px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* ============================================
-     MENSAJES (éxito/error)
+     OPCIONES DEL FORMULARIO
+     ============================================ */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0 28px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #667eea;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+    color: #667eea;
+}
+
+/* ============================================
+     BOTONES
+     ============================================ */
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+     MENSAJES
      ============================================ */
 .mensaje {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
     display: none;
-    text-align: center;
+    align-items: center;
+    gap: 10px;
 }
 
 .mensaje.exito {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    display: block;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    display: flex;
 }
 
 .mensaje.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    display: block;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    display: flex;
+}
+
+.mensaje i {
+    font-size: 16px;
 }
 
 /* ============================================
-     VISTA PREVIA (para bienvenida)
+     PIE DE PÁGINA
      ============================================ */
-.vista-previa {
-    margin-top: 40px;
-    padding: 40px;
-    background: #f7fafc;
-    border-radius: 10px;
-    border: 2px dashed #cbd5e0;
-    color: #718096;
+.login-footer {
     text-align: center;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* ============================================
-     ENLACES
-     ============================================ */
-.enlace-rapido {
-    margin-top: 30px;
-    font-size: 0.9rem;
-    color: #999;
-    text-align: center;
+.login-footer p {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 14px;
 }
 
-.enlace-rapido a {
+.login-footer a {
     color: #667eea;
     text-decoration: none;
-}
-
-.enlace-rapido a:hover {
-    text-decoration: underline;
-}
-
-/* Enlace para volver */
-.volver {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.volver a {
-    color: #999;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.volver a:hover {
-    color: #667eea;
-}
-
-/* ============================================
-     MENSAJES FLOTANTES PROFESIONALES
-     ============================================ */
-.mensaje-flotante {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    border-radius: 12px;
-    color: white;
     font-weight: 500;
-    z-index: 10000;
+    transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+    color: #764ba2;
+}
+
+.back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    font-size: 13px;
+    margin-top: 12px;
+    transition: color 0.3s ease;
+}
+
+.back-home:hover {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 28px 20px;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .brand-text {
+        font-size: 20px;
+    }
+
+    .login-header h2 {
+        font-size: 20px;
+    }
+
+    .form-options {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+        font-size: 14px;
+        padding: 12px 12px 12px 0;
+    }
+}
+
+/* ============================================
+     ESTILOS PARA PÁGINAS CON MENÚ LATERAL
+     ============================================ */
+
+/* Cuando tiene la clase .menu-lateral */
+body.menu-lateral {
+    display: block !important;
+    align-items: normal !important;
+    justify-content: normal !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    background: #f1f5f9;
+    overflow: visible !important;
+}
+
+/* Ocultar fondos decorativos en páginas con menú */
+body.menu-lateral::before,
+body.menu-lateral::after {
+    display: none !important;
+}
+
+/* Contenedor principal para páginas con menú */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Contenido principal para páginas con menú */
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2rem;
+    background: #f1f5f9;
+    min-height: 100vh;
+}
+
+/* ============================================
+     RESPONSIVE PARA PÁGINAS CON MENÚ
+     ============================================ */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 70px;
+        padding: 1rem;
+    }
+}
+
+/* ============================================
+     EXCEPCIÓN PARA PÁGINAS COMO CREAR EQUIPO
+     ============================================ */
+
+/* Excluir páginas específicas del centrado forzado de autenticación */
+body.page-crear-equipo {
+    display: block !important;
+    align-items: normal !important;
+    justify-content: normal !important;
+    padding: 20px !important;
+    min-height: 100vh;
+    background: #f1f5f9;
+    overflow: visible !important;
+}
+
+body.page-crear-equipo::before,
+body.page-crear-equipo::after {
+    display: none !important;
+}
+
+/* Modo oscuro para crear-equipo */
+body.dark-mode.page-crear-equipo {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode.page-crear-equipo .create-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .create-header h1 {
+    color: #ececf0;
+}
+
+body.dark-mode.page-crear-equipo .create-subtitle {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .form-group label {
+    color: #a8a8c0;
+}
+
+body.dark-mode.page-crear-equipo .form-group input,
+body.dark-mode.page-crear-equipo .form-group textarea {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode.page-crear-equipo .form-group input:focus,
+body.dark-mode.page-crear-equipo .form-group textarea:focus {
+    border-color: #7c6df0;
+}
+
+body.dark-mode.page-crear-equipo .form-help {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: #a8a8c0;
+}
+
+body.dark-mode.page-crear-equipo .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+body.dark-mode.page-crear-equipo .back-link a {
+    color: #6a6a82;
+}
+
+body.dark-mode.page-crear-equipo .back-link a:hover {
+    color: #7c6df0;
+}
+
+body.dark-mode.page-crear-equipo .create-header {
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .back-link {
+    border-top-color: #2a2a3e;
+}
+
+body.dark-mode.page-crear-equipo .create-header-icon {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%);
+}
+
+/* ============================================
+     EXCEPCIÓN PARA PÁGINAS DE TAREAS
+     ============================================ */
+
+/* Para páginas que usan el menú lateral pero necesitan fondo específico */
+body.menu-lateral .tareas-grid {
+    background: transparent;
+}
+
+/* Asegurar que las tarjetas de tareas se vean bien en modo oscuro */
+body.dark-mode.menu-lateral .tarea-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode.menu-lateral .tarea-card:hover {
+    border-color: #3a3a52;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+body.dark-mode.menu-lateral .tarea-titulo {
+    color: #ececf0;
+}
+
+body.dark-mode.menu-lateral .tarea-descripcion {
+    color: #a8a8c0;
+}
+
+body.dark-mode.menu-lateral .tarea-meta {
+    border-top-color: #2a2a3e;
+}
+
+body.dark-mode.menu-lateral .tarea-fecha {
+    color: #a8a8c0;
+}
+
+body.dark-mode.menu-lateral .tarea-fecha.vencida {
+    color: #f87171;
+}
+
+body.dark-mode.menu-lateral .tarea-creador {
+    background: rgba(255,255,255,0.05);
+    color: #a8a8c0;
+}
+
+body.dark-mode.menu-lateral .entregas-badge {
+    background: rgba(124, 109, 240, 0.15);
+    color: #7c6df0;
+}
+
+body.dark-mode.menu-lateral .sin-tareas {
+    background: #12121e;
+    color: #a8a8c0;
+}
+
+body.dark-mode.menu-lateral .header-tareas h2 {
+    color: #ececf0;
+}
+
+body.dark-mode.menu-lateral .header-tareas h2 i {
+    color: #7c6df0;
+}
+
+/* Estado de tareas en modo oscuro */
+body.dark-mode.menu-lateral .estado-pendiente {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+body.dark-mode.menu-lateral .estado-entregada {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode.menu-lateral .estado-calificada {
+    background: rgba(124, 109, 240, 0.2);
+    color: #7c6df0;
+}
+
+/* ============================================
+     ESTILOS PARA ENTREGAS DE TAREA Y ENTREGAR TAREA
+     ============================================ */
+
+/* ============================================
+     ESTILOS COMPARTIDOS
+     ============================================ */
+.contenedor {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.contenedor-grande {
+    max-width: 1100px;
+}
+
+/* ============================================
+     BOTONES REUTILIZABLES
+     ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn.primario {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn.primario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn.secundario {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn.secundario:hover {
+    background: #e2e8f0;
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* ============================================
+     SIN DATOS
+     ============================================ */
+.sin-tareas {
+    text-align: center;
+    padding: 3rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    color: #64748b;
+}
+
+.sin-tareas i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1;
+}
+
+.sin-entregas {
+    text-align: center;
+    padding: 3rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    color: #64748b;
+}
+
+.sin-entregas i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1;
+}
+
+/* ============================================
+     RESPONSIVE PARA ENTREGAS
+     ============================================ */
+@media (max-width: 768px) {
+    .contenedor {
+        padding: 1rem;
+    }
+
+    .entrega-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .entrega-calificacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .entrega-calificacion input {
+        width: 100%;
+    }
+
+    .btn-calificar-entrega {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .botones-form {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .contenedor {
+        padding: 0.75rem;
+    }
+
+    .info-tarea-calificar,
+    .info-tarea {
+        padding: 1rem;
+    }
+
+    .entrega-body {
+        padding: 0.75rem 1rem;
+    }
+
+    .tarea-meta {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+/* ============================================
+     ESTILOS PARA CREAR EQUIPO
+     ============================================ */
+
+/* ============================================
+     CONTENEDOR PRINCIPAL
+     ============================================ */
+.create-container {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+/* ============================================
+     TARJETA DE CREACIÓN
+     ============================================ */
+.create-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem 2rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+}
+
+/* ============================================
+     HEADER DE LA TARJETA
+     ============================================ */
+.create-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.create-header-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.create-header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.create-subtitle {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin: 0.15rem 0 0 0;
+}
+
+/* ============================================
+     MENSAJES
+     ============================================ */
+.message-container {
+    margin-bottom: 1.5rem;
+    padding: 12px 16px;
+    border-radius: 10px;
+    animation: fadeInUp 0.3s ease;
+}
+
+.message-content {
     display: flex;
     align-items: center;
     gap: 10px;
-    animation: slideInRight 0.3s ease-out;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
-.mensaje-flotante.exito {
-    background: #10b981;
+.message-container.success {
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    color: #065f46;
 }
 
-.mensaje-flotante.error {
-    background: #ef4444;
+.message-container.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
 }
 
-@keyframes slideInRight {
+.message-container.success i {
+    color: #10b981;
+}
+
+.message-container.error i {
+    color: #ef4444;
+}
+
+@keyframes fadeInUp {
     from {
-        transform: translateX(100%);
         opacity: 0;
+        transform: translateY(-10px);
     }
     to {
-        transform: translateX(0);
         opacity: 1;
+        transform: translateY(0);
     }
+}
+
+/* ============================================
+     FORMULARIO
+     ============================================ */
+.create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.form-group label i {
+    color: #667eea;
+}
+
+.form-group label .required {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.form-group label .optional {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #1e293b;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.form-help {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.form-help i {
+    color: #94a3b8;
+    font-size: 0.7rem;
+}
+
+/* ============================================
+     BOTONES
+     ============================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+/* ============================================
+     BACK LINK
+     ============================================ */
+.back-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.back-link a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.back-link a:hover {
+    color: #667eea;
+}
+
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 640px) {
+    .create-card {
+        padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .create-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .create-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .create-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .create-card {
+        padding: 1rem 0.75rem 1rem;
+        border-radius: 16px;
+    }
+
+    .create-header h1 {
+        font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+        padding: 10px 16px;
+    }
+}
+
+/* ============================================
+     ESTILOS PARA CREAR TAREA
+     ============================================ */
+
+/* ============================================
+     CONTENEDOR PRINCIPAL
+     ============================================ */
+.tarea-container {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ============================================
+     TARJETA DE CREACIÓN
+     ============================================ */
+.tarea-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem 2rem 1.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+}
+
+/* ============================================
+     HEADER DE LA TARJETA
+     ============================================ */
+.tarea-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tarea-header-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.tarea-header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.tarea-subtitle {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin: 0.15rem 0 0 0;
+}
+
+/* ============================================
+     FORMULARIO DE TAREA
+     ============================================ */
+.form-tarea {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-grupo label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.form-grupo label i {
+    color: #667eea;
+}
+
+.form-grupo label .required {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.form-grupo label .optional {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.form-grupo input,
+.form-grupo textarea {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #1e293b;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-grupo input:focus,
+.form-grupo textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-grupo textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.form-grupo input[type="date"] {
+    color-scheme: light;
+    cursor: pointer;
+}
+
+.form-grupo input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.form-grupo input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+.ayuda {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ayuda i {
+    color: #94a3b8;
+    font-size: 0.7rem;
+}
+
+/* ============================================
+     BOTONES DEL FORMULARIO
+     ============================================ */
+.botones-form {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.botones-form .btn {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* ============================================
+     BACK LINK
+     ============================================ */
+.back-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.back-link a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.back-link a:hover {
+    color: #667eea;
+}
+
+/* ============================================
+     RESPONSIVE
+     ============================================ */
+@media (max-width: 640px) {
+    .tarea-container {
+        padding: 0 1rem;
+    }
+
+    .tarea-card {
+        padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .tarea-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .tarea-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .tarea-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .botones-form {
+        flex-direction: column;
+    }
+
+    .botones-form .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .tarea-card {
+        padding: 1rem 0.75rem 1rem;
+        border-radius: 16px;
+    }
+
+    .tarea-header h1 {
+        font-size: 1rem;
+    }
+
+    .form-grupo input,
+    .form-grupo textarea {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .botones-form .btn {
+        font-size: 0.85rem;
+        padding: 10px 16px;
+    }
+}
+
+/* ============================================
+     EXCEPCIÓN PARA PÁGINAS DE CREAR TAREA
+     ============================================ */
+
+/* Asegurar que la página de crear tarea se vea correctamente */
+body.page-crear-tarea {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh;
+    background: #f1f5f9 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+/* Ocultar fondos decorativos en páginas de crear tarea */
+body.page-crear-tarea::before,
+body.page-crear-tarea::after {
+    display: none !important;
+}
+
+/* Asegurar que los inputs sean interactivos en crear tarea */
+body.page-crear-tarea .form-grupo input,
+body.page-crear-tarea .form-grupo textarea {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+}
+
+/* Modo oscuro para crear tarea */
+body.dark-mode.page-crear-tarea {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode.page-crear-tarea .tarea-card {
+    background: #12121e !important;
+    border-color: #2a2a3e !important;
+}
+
+body.dark-mode.page-crear-tarea .tarea-header {
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode.page-crear-tarea .tarea-header h1 {
+    color: #ececf0 !important;
+}
+
+body.dark-mode.page-crear-tarea .tarea-subtitle {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode.page-crear-tarea .form-grupo label {
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.page-crear-tarea .form-grupo label i {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode.page-crear-tarea .form-grupo input,
+body.dark-mode.page-crear-tarea .form-grupo textarea {
+    background: #0a0a0f !important;
+    border-color: #2a2a3e !important;
+    color: #ececf0 !important;
+}
+
+body.dark-mode.page-crear-tarea .form-grupo input:focus,
+body.dark-mode.page-crear-tarea .form-grupo textarea:focus {
+    border-color: #7c6df0 !important;
+    box-shadow: 0 0 0 4px rgba(124, 109, 240, 0.15) !important;
+}
+
+body.dark-mode.page-crear-tarea .ayuda {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode.page-crear-tarea .ayuda i {
+    color: #4a4a5a !important;
+}
+
+body.dark-mode.page-crear-tarea .btn-secundario {
+    background: rgba(255,255,255,0.06) !important;
+    color: #a8a8c0 !important;
+}
+
+body.dark-mode.page-crear-tarea .btn-secundario:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-mode.page-crear-tarea .back-link {
+    border-top-color: #2a2a3e !important;
+}
+
+body.dark-mode.page-crear-tarea .back-link a {
+    color: #6a6a82 !important;
+}
+
+body.dark-mode.page-crear-tarea .back-link a:hover {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode.page-crear-tarea .tarea-header-icon {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%) !important;
+}
+
+/* ============================================
+     ESTILOS PARA INPUTS DE LOGIN/REGISTRO
+     ============================================ */
+
+/* Asegurar que los inputs de login/registro tengan fondo semi-transparente */
+.login-wrapper .input-wrapper input,
+.login-wrapper .input-wrapper select {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* Placeholder más visible */
+.login-wrapper .input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Ajustar el wrapper para que se vea bien */
+.login-wrapper .input-wrapper {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.login-wrapper .input-wrapper:focus-within {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15) !important;
+}
+
+/* Iconos dentro de los inputs */
+.login-wrapper .input-wrapper .input-icon {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.login-wrapper .input-wrapper:focus-within .input-icon {
+    color: #667eea !important;
+}
+
+/* Botón toggle password */
+.login-wrapper .toggle-password {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.login-wrapper .toggle-password:hover {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Select en registro */
+.login-wrapper .input-wrapper select option {
+    background: #1a1a2e !important;
+    color: #fff !important;
 }

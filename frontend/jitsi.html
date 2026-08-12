@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Learnify · Videollamada Jitsi</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f1a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .icon {
+            font-size: 64px;
+            color: #2b7a4b;
+            margin-bottom: 16px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .info-box .label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .info-box .value {
+            font-size: 14px;
+            color: #e2e8f0;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+        
+        .info-box .value .highlight {
+            color: #10b981;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: #2b7a4b;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #1f5f37;
+            transform: scale(1.02);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #334155;
+            margin-top: 12px;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .link-directo {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #64748b;
+            word-break: break-all;
+        }
+        
+        .link-directo a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        
+        .link-directo a:hover {
+            text-decoration: underline;
+        }
+        
+        .spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #0f0f1a;
+            color: #94a3b8;
+        }
+        
+        .loading-container i {
+            font-size: 48px;
+            color: #2b7a4b;
+            margin-bottom: 16px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-container h2 {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        
+        .loading-container p {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+            .btn {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen" class="loading-container">
+        <i class="fas fa-spinner"></i>
+        <h2>Preparando videollamada...</h2>
+        <p>Abriendo sala en Jitsi Meet</p>
+    </div>
+
+    <div id="mainContent" class="container" style="display:none;">
+        <div class="icon">🎥</div>
+        <h1>Videollamada Jitsi</h1>
+        <p class="subtitle">Haz clic en el botón para abrir la videollamada</p>
+        
+        <div class="info-box">
+            <div class="label">🔍 Sala</div>
+            <div class="value"><span class="highlight" id="roomNameDisplay">Cargando...</span></div>
+            <br>
+            <div class="label">👤 Usuario</div>
+            <div class="value" id="userNameDisplay">Cargando...</div>
+        </div>
+        
+        <button id="btnAbrirJitsi" class="btn">
+            <i class="fas fa-video"></i>
+            <span id="btnText">Abrir videollamada</span>
+        </button>
+        
+        <button id="btnCopiarLink" class="btn btn-outline" style="margin-top: 8px;">
+            <i class="fas fa-copy"></i> Copiar enlace
+        </button>
+        
+        <button id="btnVolver" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al dashboard
+        </button>
+        
+        <div class="link-directo" id="linkDirecto">
+            <span>📋 Enlace directo:</span><br>
+            <a href="#" id="linkDirectoUrl" target="_blank">Cargando...</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener parámetros de la URL
+            const params = new URLSearchParams(window.location.search);
+            const roomName = params.get('room');
+            const displayName = params.get('name') || 'Participante';
+            const usuarioId = params.get('usuario_id');
+            
+            console.log('🚀 Iniciando jitsi.html');
+            console.log('📋 Sala:', roomName);
+            console.log('📋 Usuario:', displayName);
+            
+            // Mostrar información
+            document.getElementById('roomNameDisplay').textContent = roomName || 'No especificada';
+            document.getElementById('userNameDisplay').textContent = displayName;
+            
+            // Validar sala
+            if (!roomName) {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('roomNameDisplay').textContent = '❌ No se proporcionó sala';
+                document.getElementById('btnAbrirJitsi').disabled = true;
+                document.getElementById('btnAbrirJitsi').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sala inválida';
+                return;
+            }
+            
+            // Construir URL directa de Jitsi con parámetros
+            const jitsiUrl = `https://meet.jit.si/${roomName}#config.startWithAudioMuted=false&config.startWithVideoMuted=false&userInfo.displayName=${encodeURIComponent(displayName)}`;
+            
+            // Mostrar link directo
+            document.getElementById('linkDirectoUrl').textContent = jitsiUrl;
+            document.getElementById('linkDirectoUrl').href = jitsiUrl;
+            
+            // Ocultar loading y mostrar contenido
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            // Botón: Abrir videollamada
+            document.getElementById('btnAbrirJitsi').addEventListener('click', function() {
+                const btn = this;
+                const text = document.getElementById('btnText');
+                const icon = btn.querySelector('i');
+                
+                text.textContent = 'Abriendo...';
+                icon.className = 'fas fa-spinner spinner';
+                btn.disabled = true;
+                
+                // Abrir en nueva pestaña
+                const newWindow = window.open(jitsiUrl, '_blank');
+                
+                // Si el popup fue bloqueado, mostrar mensaje
+                if (!newWindow) {
+                    alert('⚠️ Por favor, permite las ventanas emergentes para abrir la videollamada.\n\nO copia el enlace y pégalo en tu navegador.');
+                    text.textContent = 'Abrir videollamada';
+                    icon.className = 'fas fa-video';
+                    btn.disabled = false;
+                    return;
+                }
+                
+                // Registrar actividad
+                if (usuarioId) {
+                    fetch('/api/registrar-actividad', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            usuario_id: usuarioId,
+                            tipo: 'jitsi_abrir_sala',
+                            descripcion: `Abrió sala ${roomName} en nueva pestaña`
+                        })
+                    }).catch(e => console.error('Error al registrar actividad:', e));
+                }
+                
+                // Restaurar botón después de 3 segundos
+                setTimeout(() => {
+                    text.textContent = 'Abrir videollamada';
+                    icon.className = 'fas fa-video';
+                    btn.disabled = false;
+                }, 3000);
+            });
+            
+            // Botón: Copiar link
+            document.getElementById('btnCopiarLink').addEventListener('click', function() {
+                const link = jitsiUrl;
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(link)
+                        .then(() => {
+                            const btn = this;
+                            const originalText = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                            btn.style.borderColor = '#10b981';
+                            setTimeout(() => {
+                                btn.innerHTML = originalText;
+                                btn.style.borderColor = '';
+                            }, 3000);
+                        })
+                        .catch(() => {
+                            // Fallback: seleccionar y copiar manualmente
+                            const input = document.createElement('input');
+                            input.value = link;
+                            document.body.appendChild(input);
+                            input.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(input);
+                            
+                            const btn = this;
+                            const originalText = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                            setTimeout(() => {
+                                btn.innerHTML = originalText;
+                            }, 3000);
+                        });
+                } else {
+                    // Fallback para navegadores sin clipboard API
+                    const input = document.createElement('input');
+                    input.value = link;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                    }, 3000);
+                }
+            });
+            
+            // Botón: Volver al dashboard
+            document.getElementById('btnVolver').addEventListener('click', function() {
+                window.location.href = '/dashboard.html';
+            });
+            
+            console.log('✅ jitsi.html cargado correctamente');
+            console.log('🔗 URL de Jitsi:', jitsiUrl);
+        });
+    </script>
+</body>
+</html>

@@ -397,3 +397,12 @@ document.addEventListener('DOMContentLoaded', function() {
     loadTheme();
     agregarBotonTema();
 });
+
+// ============================================
+// EXPONER FUNCIONES GLOBALMENTE
+// ============================================
+
+// Asegurar que loadTheme esté disponible globalmente
+window.loadTheme = loadTheme;
+window.toggleTheme = toggleTheme;
+window.cargarInfoUsuarioEnMenu = cargarInfoUsuarioEnMenu;

@@ -405,3 +405,678 @@ tr:hover {
 .alerta-activa.alerta-roja { background: #ef4444; }
 .alerta-activa.alerta-naranja { background: #f59e0b; }
 .alerta-activa.alerta-verde { background: #10b981; }
+
+/* ============================================
+     MODO OSCURO - ANÁLISIS
+     ============================================ */
+
+body.dark-mode .analisis-container {
+    background: transparent;
+}
+
+/* Selector de equipo */
+body.dark-mode .selector-equipo {
+    background: #12121e;
+    border: 1px solid #2a2a3e;
+}
+
+body.dark-mode .selector-equipo label {
+    color: #a8a8c0;
+}
+
+body.dark-mode .selector-equipo select {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode .selector-equipo select option {
+    background: #0a0a0f;
+    color: #ececf0;
+}
+
+/* Tarjetas de estadísticas */
+body.dark-mode .stat-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .stat-value {
+    color: #ececf0;
+}
+
+body.dark-mode .stat-label {
+    color: #6a6a82;
+}
+
+/* Gráficas */
+body.dark-mode .chart-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .chart-card h3 {
+    color: #ececf0;
+}
+
+/* Tabla de alumnos */
+body.dark-mode .alumnos-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .alumnos-section h3 {
+    color: #ececf0;
+}
+
+body.dark-mode table th {
+    background: #0a0a0f;
+    color: #a8a8c0;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode table td {
+    color: #a8a8c0;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode table tr:hover {
+    background: #1a1a2e;
+}
+
+/* Etiquetas de riesgo en modo oscuro */
+body.dark-mode .riesgo-alto {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+body.dark-mode .riesgo-medio {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+body.dark-mode .riesgo-bajo {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+body.dark-mode .riesgo-sin {
+    background: rgba(255,255,255,0.05);
+    color: #6a6a82;
+}
+
+body.dark-mode .btn-ver-alumno {
+    background: #7c6df0;
+}
+
+body.dark-mode .btn-ver-alumno:hover {
+    background: #9b8cf0;
+}
+
+/* Métricas */
+body.dark-mode .metricas-section {
+    background: #12121e;
+    border: 1px solid #2a2a3e;
+}
+
+body.dark-mode .metricas-section h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .metrica-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .metrica-card h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .metrica-card p {
+    color: #6a6a82;
+}
+
+body.dark-mode .metrica-valor {
+    color: #ececf0;
+}
+
+body.dark-mode .metrica-umbral {
+    color: #6a6a82;
+}
+
+body.dark-mode .metrica-bar {
+    background: #2a2a3e;
+}
+
+/* Segmentación */
+body.dark-mode .segmentacion-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .segmentacion-section h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .segmentacion-card {
+    background: #0a0a0f;
+}
+
+body.dark-mode .segmentacion-card h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .barra-label {
+    color: #a8a8c0;
+}
+
+body.dark-mode .barra-contenedor {
+    background: #2a2a3e;
+}
+
+body.dark-mode .barra-count {
+    color: #ececf0;
+}
+
+/* Detección de abandono */
+body.dark-mode .abandono-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .abandono-section h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .abandono-stat {
+    background: #0a0a0f;
+}
+
+body.dark-mode .abandono-stat .stat-label {
+    color: #6a6a82;
+}
+
+body.dark-mode .abandono-stat .stat-value {
+    color: #ececf0;
+}
+
+/* Alertas en modo oscuro */
+body.dark-mode .text-red {
+    color: #f87171;
+}
+
+body.dark-mode .text-green {
+    color: #34d399;
+}
+
+/* ============================================
+     ANÁLISIS NO SUPERVISADO - CLUSTERIZACIÓN
+     ============================================ */
+
+.cluster-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.cluster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cluster-header h3 {
+    color: #1e293b;
+    margin: 0;
+}
+
+.cluster-header h3 i {
+    color: #8b5cf6;
+    margin-right: 0.5rem;
+}
+
+.cluster-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.control-group label {
+    font-weight: 500;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.control-group input[type="range"] {
+    width: 150px;
+    accent-color: #8b5cf6;
+}
+
+.control-group select {
+    padding: 0.4rem 0.8rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    color: #1e293b;
+}
+
+.control-group select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+#kValue {
+    font-weight: 700;
+    color: #8b5cf6;
+    font-size: 1.1rem;
+    min-width: 20px;
+}
+
+/* Métricas de Cluster */
+.cluster-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.cluster-metric-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+.cluster-metric-card i {
+    font-size: 1.5rem;
+    color: #8b5cf6;
+    width: 40px;
+    text-align: center;
+}
+
+.cluster-metric-card div {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Gráficas de Cluster */
+.cluster-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.cluster-chart-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.cluster-chart-card h4 {
+    margin-bottom: 0.75rem;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.cluster-chart-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.cluster-chart-card canvas {
+    max-height: 220px;
+    width: 100%;
+}
+
+.cluster-chart-card.full-width canvas {
+    max-height: 280px;
+}
+
+/* Leyenda de Clusters */
+.cluster-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    justify-content: center;
+}
+
+.legend-item {
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.legend-item::before {
+    content: "●";
+    font-size: 1rem;
+}
+
+/* Centroides */
+.cluster-centroids-section {
+    margin-bottom: 1.5rem;
+}
+
+.cluster-centroids-section h4 {
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.centroids-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.centroid-card {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    text-align: center;
+}
+
+.centroid-card .centroid-label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.85rem;
+}
+
+.centroid-card .centroid-values {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.2rem;
+}
+
+.centroid-card.cluster-1 { border-color: #10b981; }
+.centroid-card.cluster-2 { border-color: #f59e0b; }
+.centroid-card.cluster-3 { border-color: #ef4444; }
+.centroid-card.cluster-4 { border-color: #8b5cf6; }
+.centroid-card.cluster-5 { border-color: #3b82f6; }
+
+/* Clasificación de Alumnos */
+.cluster-alumnos-section {
+    margin-bottom: 1.5rem;
+}
+
+.cluster-alumnos-section h4 {
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.cluster-alumnos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.cluster-alumno-group {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+}
+
+.cluster-alumno-group .group-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cluster-alumno-group .group-count {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.cluster-alumno-group .alumno-tag {
+    display: inline-block;
+    background: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #1e293b;
+    margin: 0.2rem 0.2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.cluster-alumno-group.group-1 { border-color: #10b981; }
+.cluster-alumno-group.group-2 { border-color: #f59e0b; }
+.cluster-alumno-group.group-3 { border-color: #ef4444; }
+.cluster-alumno-group.group-4 { border-color: #8b5cf6; }
+.cluster-alumno-group.group-5 { border-color: #3b82f6; }
+
+/* Resumen de Entrenamiento */
+.cluster-summary {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.cluster-summary h4 {
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+#summaryContent {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+}
+
+#summaryContent p {
+    font-size: 0.85rem;
+    color: #475569;
+    margin: 0;
+}
+
+#summaryContent strong {
+    color: #1e293b;
+}
+
+/* Estado de Error */
+.error-state {
+    text-align: center;
+    padding: 2rem;
+    color: #dc2626;
+}
+
+.error-state i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cluster-charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cluster-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cluster-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .control-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .control-group input[type="range"] {
+        width: 100px;
+    }
+
+    .cluster-metrics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .centroids-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .cluster-alumnos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .cluster-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .centroids-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+     MODO OSCURO - CLUSTERIZACIÓN
+     ============================================ */
+
+body.dark-mode .cluster-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .cluster-header h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-controls {
+    background: #0a0a0f;
+}
+
+body.dark-mode .control-group label {
+    color: #a8a8c0;
+}
+
+body.dark-mode .control-group select {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-metric-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .metric-value {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-chart-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .cluster-chart-card h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-centroids-section h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .centroid-card {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .centroid-card .centroid-label {
+    color: #ececf0;
+}
+
+body.dark-mode .centroid-card .centroid-values {
+    color: #6a6a82;
+}
+
+body.dark-mode .cluster-alumnos-section h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-alumno-group {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .cluster-alumno-group .group-title {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-alumno-group .alumno-tag {
+    background: #12121e;
+    border-color: #2a2a3e;
+    color: #a8a8c0;
+}
+
+body.dark-mode .cluster-summary {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .cluster-summary h4 {
+    color: #ececf0;
+}
+
+body.dark-mode #summaryContent p {
+    color: #a8a8c0;
+}
+
+body.dark-mode #summaryContent strong {
+    color: #ececf0;
+}
+
+body.dark-mode .cluster-legend .legend-item {
+    color: #a8a8c0;
+}
+
+body.dark-mode .cluster-legend .legend-item::before {
+    color: inherit;
+}

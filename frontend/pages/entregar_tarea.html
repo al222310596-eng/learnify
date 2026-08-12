@@ -1,6 +1,6 @@
 <!-- ============================================
-     ARCHIVO 24/30: ENTREGAR TAREA
-     Formulario para que los alumnos entreguen una tarea
+     ARCHIVO: entregar-tarea.html
+     Entregar tarea - Diseño profesional
      ============================================ -->
 
 <!DOCTYPE html>
@@ -9,52 +9,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learnify | Entregar Tarea</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/entregar-tarea.css">
+    <link rel="stylesheet" href="../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="contenedor">
-        <h2><i class="fas fa-upload"></i> Entregar Tarea</h2>
+    <div class="entregar-wrapper">
+        <div class="entregar-container">
 
-        <!-- Mensajes -->
-        <div id="mensaje" class="mensaje"></div>
-
-        <!-- Información de la tarea -->
-        <div id="infoTarea" class="info-tarea">
-            <div class="sin-tareas"><i class="fas fa-spinner fa-pulse"></i> Cargando información de la tarea...</div>
-        </div>
-
-        <!-- Formulario de entrega -->
-        <form id="formEntregar" class="form-entrega" style="display: none;">
-            <div class="form-grupo">
-                <label for="comentario"><i class="fas fa-comment"></i> Comentario / Explicación</label>
-                <textarea id="comentario" placeholder="Explica qué hiciste, cómo resolviste la tarea, etc."></textarea>
-                <div class="ayuda"><i class="fas fa-lightbulb"></i> Opcional: puedes agregar una explicación de tu trabajo.</div>
+            <!-- Logo -->
+            <div class="brand">
+                <div class="brand-logo">
+                    <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="brand-text"><span>Learnify</span></div>
+                </div>
+                <div class="brand-subtitle">Entrega tu tarea</div>
             </div>
 
-            <!-- Campo para archivo -->
-            <div class="form-grupo">
-                <label for="archivo"><i class="fas fa-paperclip"></i> Adjuntar archivo (opcional)</label>
-                <input type="file" id="archivo" accept=".pdf,.jpg,.png,.doc,.docx,.txt">
-                <div class="ayuda"><i class="fas fa-file-alt"></i> Formatos permitidos: PDF, imágenes, Word, TXT (máx 10MB)</div>
-            </div>
+            <!-- Tarjeta -->
+            <div class="entregar-card">
 
-            <div class="botones-form">
-                <button type="button" class="btn secundario btn-cancelar" onclick="cancelar()">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="submit" class="btn primario">
-                    <i class="fas fa-paper-plane"></i> Entregar tarea
-                </button>
-            </div>
-        </form>
+                <!-- Título -->
+                <div class="entregar-header">
+                    <h2><i class="fas fa-upload"></i> Entregar Tarea</h2>
+                    <p>Sube tu trabajo y agrega un comentario</p>
+                </div>
 
-        <div class="volver" style="margin-top: 1.5rem;">
-            <a href="#" id="volverLink"><i class="fas fa-arrow-left"></i> Volver a tareas</a>
+                <!-- Mensajes -->
+                <div id="mensaje" class="mensaje" style="display: none;"></div>
+
+                <!-- Información de la tarea -->
+                <div id="infoTarea" class="info-tarea">
+                    <div class="sin-tareas">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Cargando información de la tarea...</p>
+                    </div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- FORMULARIO DE ENTREGA                        -->
+                <!-- ============================================ -->
+                <form id="formEntregar" class="form-entrega">
+                    <div class="form-grupo">
+                        <label for="comentario"><i class="fas fa-comment"></i> Comentario / Explicación</label>
+                        <textarea id="comentario" placeholder="Explica qué hiciste, cómo resolviste la tarea, etc."></textarea>
+                        <div class="ayuda"><i class="fas fa-lightbulb"></i> Opcional: puedes agregar una explicación de tu trabajo.</div>
+                    </div>
+
+                    <!-- Campo para archivo -->
+                    <div class="form-grupo">
+                        <label for="archivo"><i class="fas fa-paperclip"></i> Adjuntar archivo (opcional)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="archivo" accept=".pdf,.jpg,.png,.doc,.docx,.txt">
+                            <div class="file-input-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Seleccionar archivo</span>
+                            </div>
+                            <div class="file-input-filename" id="fileName">Ningún archivo seleccionado</div>
+                        </div>
+                        <div class="ayuda"><i class="fas fa-file-alt"></i> Formatos permitidos: PDF, imágenes, Word, TXT (máx 10MB)</div>
+                    </div>
+
+                    <div class="botones-form">
+                        <button type="button" class="btn btn-secundario" onclick="cancelar()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primario" id="btnEntregar">
+                            <i class="fas fa-paper-plane"></i> Entregar tarea
+                        </button>
+                    </div>
+                </form>
+
+                <!-- BOTÓN VOLVER -->
+                <div class="volver">
+                    <a href="#" id="volverLink">
+                        <i class="fas fa-arrow-left"></i> Volver a tareas
+                    </a>
+                </div>
+
+            </div>
         </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                      -->
+    <!-- ============================================ -->
+    <script src="../js/menu.js"></script>
     <script src="../js/entregar-tarea.js"></script>
 </body>
 </html>

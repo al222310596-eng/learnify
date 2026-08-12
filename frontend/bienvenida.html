@@ -1,8 +1,3 @@
-<!-- ============================================
-     ARCHIVO: bienvenida.html
-     Landing page con Hero section y diseño moderno
-     ============================================ -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,17 +7,30 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/bienvenida.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <!-- ============================================
          HERO SECTION
          ============================================ -->
     <section class="hero">
-        <h1><i class="fas fa-graduation-cap"></i> Learnify</h1>
-        <p>La plataforma educativa que conecta maestros y alumnos. Gestiona equipos, tareas y entregas en un solo lugar.</p>
-        <div class="hero-buttons">
-            <a href="iniciar_sesion.html" class="btn btn-primario"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a>
-            <a href="registrarse.html" class="btn btn-secundario"><i class="fas fa-user-plus"></i> Registrarse</a>
+        <div class="hero-content">
+            <div class="hero-badge">🚀 Plataforma Educativa</div>
+            <h1>Learnify</h1>
+            <p>La plataforma educativa que conecta maestros y alumnos. Gestiona equipos, tareas y entregas en un solo lugar.</p>
+            <div class="hero-buttons">
+                <a href="iniciar_sesion.html" class="btn btn-primario">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+                <a href="registrarse.html" class="btn btn-secundario">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </a>
+            </div>
         </div>
     </section>
 
@@ -30,27 +38,32 @@
          CARACTERÍSTICAS
          ============================================ -->
     <section class="features">
-        <h2><i class="fas fa-star"></i> ¿Qué puedes hacer?</h2>
+        <div class="features-header">
+            <span class="section-tag">Características</span>
+            <h2>¿Qué puedes hacer en <span>Learnify</span>?</h2>
+            <p>Todas las herramientas que necesitas para una experiencia educativa completa.</p>
+        </div>
+
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-users"></i></div>
                 <h3>Gestiona Equipos</h3>
-                <p>Crea equipos, invita miembros y organiza tu clase o proyecto.</p>
+                <p>Crea equipos, invita miembros y organiza tu clase o proyecto de manera sencilla.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-tasks"></i></div>
                 <h3>Crea Tareas</h3>
-                <p>Asigna tareas, establece fechas límite y da seguimiento.</p>
+                <p>Asigna tareas, establece fechas límite y da seguimiento al progreso de tus alumnos.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-comments"></i></div>
                 <h3>Chat en Tiempo Real</h3>
-                <p>Comunícate con tu equipo al instante.</p>
+                <p>Comunícate con tu equipo al instante y resuelve dudas rápidamente.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon"><i class="fas fa-upload"></i></div>
                 <h3>Sube Archivos</h3>
-                <p>Entrega trabajos con documentos, imágenes o PDFs.</p>
+                <p>Entrega trabajos con documentos, imágenes o PDFs de forma fácil y rápida.</p>
             </div>
         </div>
     </section>
@@ -60,7 +73,10 @@
          ============================================ -->
     <section class="preview">
         <div class="preview-container">
-            <h2><i class="fas fa-chart-line"></i> Así se ve tu dashboard</h2>
+            <span class="section-tag">Vista previa</span>
+            <h2>Así se ve tu <span>dashboard</span></h2>
+            <p>Una interfaz limpia y organizada para gestionar todo tu trabajo.</p>
+
             <div class="dashboard-mockup">
                 <div class="mockup-header">
                     <span class="mockup-title"><i class="fas fa-chart-simple"></i> Vista previa</span>
@@ -71,41 +87,45 @@
                         <h4><i class="fas fa-users"></i> Mis Equipos</h4>
                         <div class="mockup-item">
                             <span><i class="fas fa-tag"></i> Equipo Verde</span>
-                            <span><i class="fas fa-user"></i> 5 miembros</span>
+                            <span class="mockup-count"><i class="fas fa-user"></i> 5</span>
                         </div>
                         <div class="mockup-item">
                             <span><i class="fas fa-tag"></i> Equipo Azul</span>
-                            <span><i class="fas fa-user"></i> 4 miembros</span>
+                            <span class="mockup-count"><i class="fas fa-user"></i> 4</span>
                         </div>
                         <div class="mockup-item">
                             <span><i class="fas fa-tag"></i> Equipo Rojo</span>
-                            <span><i class="fas fa-user"></i> 6 miembros</span>
+                            <span class="mockup-count"><i class="fas fa-user"></i> 6</span>
                         </div>
                     </div>
                     <div class="mockup-card">
                         <h4><i class="fas fa-tasks"></i> Tareas Recientes</h4>
                         <div class="mockup-item">
                             <span><i class="fas fa-file-alt"></i> Reporte semanal</span>
-                            <span class="tag-completada"><i class="fas fa-check"></i> completada</span>
+                            <span class="tag-completada"><i class="fas fa-check"></i> Completada</span>
                         </div>
                         <div class="mockup-item">
                             <span><i class="fas fa-file-alt"></i> Validar entregas</span>
-                            <span class="tag-pendiente"><i class="fas fa-clock"></i> pendiente</span>
+                            <span class="tag-pendiente"><i class="fas fa-clock"></i> Pendiente</span>
                         </div>
                         <div class="mockup-item">
                             <span><i class="fas fa-file-alt"></i> Revisar inventario</span>
-                            <span class="tag-pendiente"><i class="fas fa-clock"></i> pendiente</span>
+                            <span class="tag-pendiente"><i class="fas fa-clock"></i> Pendiente</span>
                         </div>
                     </div>
                     <div class="mockup-card">
-                        <h4><i class="fas fa-comments"></i> Chat Activo</h4>
+                        <h4><i class="fas fa-chart-line"></i> Progreso</h4>
                         <div class="mockup-item">
-                            <span><i class="fas fa-mobile-alt"></i> Aplicación móvil</span>
-                            <span>96%</span>
+                            <span><i class="fas fa-mobile-alt"></i> App móvil</span>
+                            <span class="progress-bar"><span style="width:96%"></span></span>
                         </div>
                         <div class="mockup-item">
                             <span><i class="fas fa-chart-line"></i> Progreso general</span>
-                            <span>73%</span>
+                            <span class="progress-bar"><span style="width:73%"></span></span>
+                        </div>
+                        <div class="mockup-item">
+                            <span><i class="fas fa-users"></i> Participación</span>
+                            <span class="progress-bar"><span style="width:85%"></span></span>
                         </div>
                     </div>
                 </div>
@@ -114,19 +134,55 @@
     </section>
 
     <!-- ============================================
-         CTA FINAL
+         ESTADÍSTICAS
          ============================================ -->
-    <section class="cta">
-        <h2><i class="fas fa-rocket"></i> ¿Listo para empezar?</h2>
-        <p>Únete a cientos de estudiantes y maestros que ya usan Learnify</p>
-        <a href="registrarse.html" class="btn"><i class="fas fa-arrow-right"></i> Comenzar ahora</a>
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Usuarios activos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Equipos creados</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">2K+</span>
+                <span class="stat-label">Tareas completadas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">98%</span>
+                <span class="stat-label">Satisfacción</span>
+            </div>
+        </div>
     </section>
 
     <!-- ============================================
          FOOTER
          ============================================ -->
     <footer class="footer">
-        <p><i class="fas fa-copyright"></i> 2026 Learnify. Todos los derechos reservados.</p>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="footer-logo"><i class="fas fa-graduation-cap"></i> Learnify</span>
+                <p>Plataforma educativa inteligente</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">Acerca de</a>
+                <a href="#">Contacto</a>
+                <a href="#">Términos</a>
+                <a href="#">Privacidad</a>
+            </div>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p><i class="fas fa-copyright"></i> 2026 Learnify. Todos los derechos reservados.</p>
+        </div>
     </footer>
+
 </body>
 </html>

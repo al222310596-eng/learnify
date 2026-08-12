@@ -1,0 +1,562 @@
+/* ============================================
+   ARCHIVO: vizualizacion.css
+   Visualización General - Gráficas Avanzadas
+   ============================================ */
+/* ============================================
+   COLORES DE RIESGO
+   ============================================ */
+:root {
+    --riesgo-rojo: #ef4444;
+    --riesgo-amarillo: #facc15;
+    --riesgo-verde: #22c55e;
+}
+/* ============================================
+   SECCIÓN PRINCIPAL
+   ============================================ */
+
+.viz-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.viz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.viz-header-left h3 {
+    color: #1e293b;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.viz-header-left h3 i {
+    color: var(--riesgo-verde);
+    margin-right: 0.5rem;
+}
+
+.viz-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0.15rem 0 0 0;
+}
+
+
+/* ============================================
+   FILAS DE GRÁFICAS
+   ============================================ */
+
+.viz-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.viz-row:last-child {
+    margin-bottom: 0;
+}
+
+.viz-row-full {
+    grid-template-columns: 1fr;
+}
+
+
+/* ============================================
+   OUTLIERS
+   ============================================ */
+
+.viz-outliers-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.viz-outliers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.viz-outliers-header h4 {
+    color: #1e293b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.viz-outliers-header h4 i {
+    color: var(--riesgo-rojo);
+    margin-right: 0.3rem;
+}
+
+.viz-badge {
+    background: #e2e8f0;
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.viz-badge.has-outliers {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.viz-badge.no-outliers {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.viz-outliers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.viz-outlier-card {
+    background: white;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--riesgo-rojo);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.viz-outlier-card .outlier-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.85rem;
+}
+
+.viz-outlier-card .outlier-value {
+    font-weight: 700;
+    color: var(--riesgo-rojo);
+    font-size: 0.85rem;
+}
+
+.viz-loading {
+    text-align: center;
+    padding: 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.viz-loading i {
+    margin-right: 0.3rem;
+}
+
+
+/* ============================================
+   TARJETAS DE GRÁFICAS
+   ============================================ */
+
+.viz-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.viz-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.viz-card-full {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.viz-card-half {
+    grid-column: span 1;
+    width: 100%;
+}
+
+
+/* ============================================
+   ENCABEZADO DE GRÁFICA
+   ============================================ */
+
+.viz-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.75rem 1.25rem 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.viz-card-header-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.viz-card-tag {
+    display: inline-block;
+    background: var(--riesgo-verde);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.1rem 0.6rem;
+    border-radius: 12px;
+    margin-bottom: 0.2rem;
+}
+
+.viz-card-header h4 {
+    color: #1e293b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0.1rem 0 0 0;
+}
+
+.viz-card-header h4 i {
+    color: var(--riesgo-verde);
+    margin-right: 0.3rem;
+}
+
+.viz-card-subtitle {
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    margin: 0.1rem 0 0 0;
+}
+
+
+/* ============================================
+   BOTÓN EXPORTAR
+   ============================================ */
+
+.viz-btn-export {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    color: #64748b;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.viz-btn-export:hover {
+    background: var(--riesgo-verde);
+    color: white;
+}
+
+.viz-btn-export i {
+    font-size: 0.9rem;
+}
+
+
+/* ============================================
+   CUERPO DE GRÁFICAS
+   ============================================ */
+
+.viz-card-body {
+    padding: 0.75rem 1rem 0.75rem;
+    flex: 1;
+    min-height: 300px;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+}
+
+.viz-card-body canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 380px !important;
+    min-height: 280px !important;
+}
+
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.viz-card-footer {
+    padding: 0.4rem 1.25rem 0.7rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem;
+}
+
+.viz-label {
+    font-size: 0.65rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.viz-label::before {
+    content: "•";
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.viz-label.riesgo-alto::before {
+    color: var(--riesgo-rojo);
+}
+
+.viz-label.riesgo-medio::before {
+    color: var(--riesgo-amarillo);
+}
+
+.viz-label.riesgo-bajo::before {
+    color: var(--riesgo-amarillo);
+}
+
+.viz-label.riesgo-sin::before {
+    color: var(--riesgo-verde);
+}
+
+
+/* ============================================
+   CONCLUSIONES
+   ============================================ */
+
+.viz-conclusion {
+    margin: 0.5rem 1.25rem 0.9rem;
+    padding: 0.8rem 1rem;
+    background: #f8fafc;
+    border-left: 4px solid var(--riesgo-verde);
+    border-radius: 8px;
+}
+
+.viz-conclusion-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #1e293b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.viz-conclusion-title i {
+    color: var(--riesgo-verde);
+}
+
+.viz-conclusion-text {
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+
+    .viz-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .viz-row {
+        grid-template-columns: 1fr;
+    }
+
+    .viz-card-half {
+        grid-column: span 1;
+    }
+
+    .viz-card-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .viz-btn-export {
+        align-self: flex-start;
+    }
+
+    .viz-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .viz-outliers-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .viz-card-body {
+        min-height: 240px;
+    }
+
+    .viz-card-body canvas {
+        max-height: 280px !important;
+        min-height: 220px !important;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .viz-outliers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .viz-card-body canvas {
+        max-height: 220px !important;
+        min-height: 180px !important;
+    }
+
+    .viz-section {
+        padding: 1rem;
+    }
+
+    .viz-conclusion {
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+    }
+}
+
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+
+body.dark-mode .viz-section {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .viz-header-left h3 {
+    color: #ececf0;
+}
+
+body.dark-mode .viz-header-left h3 i {
+    color: var(--riesgo-verde);
+}
+
+body.dark-mode .viz-subtitle {
+    color: #a8a8c0;
+}
+
+body.dark-mode .viz-outliers-section {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .viz-outliers-header h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .viz-badge {
+    background: #2a2a3e;
+    color: #a8a8c0;
+}
+
+body.dark-mode .viz-badge.has-outliers {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+body.dark-mode .viz-badge.no-outliers {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+body.dark-mode .viz-outlier-card {
+    background: #12121e;
+    border-left-color: var(--riesgo-rojo);
+}
+
+body.dark-mode .viz-outlier-card .outlier-name {
+    color: #ececf0;
+}
+
+body.dark-mode .viz-outlier-card .outlier-value {
+    color: #f87171;
+}
+
+body.dark-mode .viz-card {
+    background: #12121e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .viz-card-header {
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode .viz-card-tag {
+    background: var(--riesgo-verde);
+}
+
+body.dark-mode .viz-card-header h4 {
+    color: #ececf0;
+}
+
+body.dark-mode .viz-card-header h4 i {
+    color: var(--riesgo-verde);
+}
+
+body.dark-mode .viz-card-subtitle {
+    color: #a8a8c0;
+}
+
+body.dark-mode .viz-card-footer {
+    border-top-color: #2a2a3e;
+}
+
+body.dark-mode .viz-label {
+    color: #a8a8c0;
+}
+
+body.dark-mode .viz-btn-export {
+    background: #2a2a3e;
+    color: #94a3b8;
+}
+
+body.dark-mode .viz-btn-export:hover {
+    background: var(--riesgo-verde);
+    color: white;
+}
+
+body.dark-mode .viz-conclusion {
+    background: #0a0a0f;
+}
+
+body.dark-mode .viz-conclusion-title {
+    color: #ececf0;
+}
+
+body.dark-mode .viz-conclusion-text {
+    color: #a8a8c0;
+}

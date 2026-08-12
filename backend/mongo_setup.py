@@ -1,6 +1,3 @@
-# ============================================
-# CREAR COLECCIONES EN MONGODB
-# ============================================
 
 from mongo_config import get_mongo_connection
 

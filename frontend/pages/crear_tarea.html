@@ -1,6 +1,6 @@
 <!-- ============================================
-     ARCHIVO 23/30: CREAR TAREA
-     Formulario para crear una nueva tarea en un equipo
+     ARCHIVO: crear-tarea.html
+     Crear nueva tarea - Diseño profesional
      ============================================ -->
 
 <!DOCTYPE html>
@@ -9,53 +9,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learnify | Crear Tarea</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/crear-tarea.css">
+    <link rel="stylesheet" href="../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="contenedor">
-        <h2><i class="fas fa-tasks"></i> Crear Nueva Tarea</h2>
 
-        <!-- Mensajes -->
-        <div id="mensaje" class="mensaje"></div>
+<body class="page-crear-tarea">
+    <div class="tarea-container">
 
-        <!-- Formulario -->
-        <form id="formCrearTarea" class="form-tarea">
-            <div class="form-grupo">
-                <label for="titulo"><i class="fas fa-heading"></i> Título de la tarea *</label>
-                <input type="text" id="titulo" placeholder="Ej: Reporte semanal, Examen parcial, etc." required>
-                <div class="ayuda"><i class="fas fa-lightbulb"></i> Elige un título claro para la tarea.</div>
+        <!-- Tarjeta de creación -->
+        <div class="tarea-card">
+            <div class="tarea-header">
+                <div class="tarea-header-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div>
+                    <h1>Crear Nueva Tarea</h1>
+                    <p class="tarea-subtitle">Asigna una tarea a los miembros del equipo</p>
+                </div>
             </div>
 
-            <div class="form-grupo">
-                <label for="descripcion"><i class="fas fa-align-left"></i> Descripción (opcional)</label>
-                <textarea id="descripcion" placeholder="Describe qué deben hacer los alumnos, instrucciones, etc."></textarea>
-                <div class="ayuda"><i class="fas fa-info-circle"></i> Explica claramente lo que se espera.</div>
-            </div>
+            <!-- Mensajes -->
+            <div id="mensaje" class="mensaje" style="display: none;"></div>
 
-            <div class="form-grupo">
-                <label for="fecha_limite"><i class="fas fa-calendar-alt"></i> Fecha límite (opcional)</label>
-                <input type="date" id="fecha_limite">
-                <div class="ayuda"><i class="fas fa-hourglass-end"></i> Fecha máxima para entregar la tarea.</div>
-            </div>
+            <!-- ============================================ -->
+            <!-- FORMULARIO - VISIBLE POR DEFECTO              -->
+            <!-- ============================================ -->
+            <form id="formCrearTarea" class="form-tarea">
+                <div class="form-grupo">
+                    <label for="titulo">
+                        <i class="fas fa-heading"></i> Título de la tarea <span class="required">*</span>
+                    </label>
+                    <input type="text" id="titulo" placeholder="Ej: Reporte semanal, Examen parcial, etc." required>
+                    <div class="ayuda"><i class="fas fa-lightbulb"></i> Elige un título claro para la tarea.</div>
+                </div>
 
-            <div class="botones-form">
-                <button type="button" class="btn secundario btn-cancelar" onclick="cancelar()">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="submit" class="btn primario">
-                    <i class="fas fa-save"></i> Crear tarea
-                </button>
-            </div>
-        </form>
+                <div class="form-grupo">
+                    <label for="descripcion">
+                        <i class="fas fa-align-left"></i> Descripción <span class="optional">(opcional)</span>
+                    </label>
+                    <textarea id="descripcion" placeholder="Describe qué deben hacer los alumnos, instrucciones, etc."></textarea>
+                    <div class="ayuda"><i class="fas fa-info-circle"></i> Explica claramente lo que se espera.</div>
+                </div>
 
-        <div class="volver" style="margin-top: 1.5rem;">
-            <a href="#" id="volverLink"><i class="fas fa-arrow-left"></i> Volver a tareas</a>
+                <div class="form-grupo">
+                    <label for="fecha_limite">
+                        <i class="fas fa-calendar-alt"></i> Fecha límite <span class="optional">(opcional)</span>
+                    </label>
+                    <input type="date" id="fecha_limite">
+                    <div class="ayuda"><i class="fas fa-hourglass-end"></i> Fecha máxima para entregar la tarea.</div>
+                </div>
+
+                <div class="botones-form">
+                    <button type="button" class="btn btn-secondary" onclick="cancelar()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                        <i class="fas fa-save"></i> <span id="btnTexto">Crear tarea</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="back-link">
+                <a href="#" id="volverLink"><i class="fas fa-arrow-left"></i> Volver a tareas</a>
+            </div>
         </div>
+
     </div>
 
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                       -->
+    <!-- ============================================ -->
     <script src="../js/menu.js"></script>
     <script src="../js/crear-tarea.js"></script>
 </body>
