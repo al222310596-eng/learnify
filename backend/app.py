@@ -314,7 +314,6 @@ def iniciar_sesion():
             # Login fallido
             info = registrar_intento_fallido(id_cliente)
             
-            # ✅ Calcular intentos restantes DENTRO del scope
             intentos_restantes = 3 - info["intentos"]
             if intentos_restantes < 0:
                 intentos_restantes = 0
@@ -365,7 +364,6 @@ def estado_intentos():
                         if minutos_restantes < 1:
                             minutos_restantes = 1
                     else:
-                        # ✅ El bloqueo ya expiró, limpiar el registro
                         del intentos[id_cliente]
                         guardar_intentos(intentos)
                 except:
@@ -395,7 +393,7 @@ def estado_intentos():
 @app.route('/api/reiniciar-intentos', methods=['POST'])
 def reiniciar_intentos_endpoint():
     try:
-        id_cliente = obtener_id_cliente()  # ✅ CORREGIDO
+        id_cliente = obtener_id_cliente()
         reiniciar_intentos(id_cliente)
         return jsonify({
             "exito": True,
@@ -411,7 +409,7 @@ def reiniciar_intentos_endpoint():
 def debug_intentos():
     """Endpoint para depuración - Muestra los intentos guardados"""
     try:
-        id_cliente = obtener_id_cliente()  # ✅ CORREGIDO
+        id_cliente = obtener_id_cliente()
         intentos = cargar_intentos()
         info = intentos.get(id_cliente, {})
         return jsonify({
@@ -1547,7 +1545,7 @@ def obtener_datos_vizualizacion(equipo_id):
                 "participacion": round(participacion, 1),
                 "entregas_tardias": entregas_tardias,
                 "nivel_riesgo": nivel_riesgo,
-                "calificaciones": calificaciones  # Lista de calificaciones individuales
+                "calificaciones": calificaciones
             })
         
         # Obtener tareas del equipo
@@ -1564,12 +1562,11 @@ def obtener_datos_vizualizacion(equipo_id):
                 "calificaciones": calif_tarea
             })
         
-        # Distribucion de calificaciones (todas las calificaciones de todos los alumnos)
+        # Distribucion de calificaciones
         todas_calificaciones = []
         for alumno in alumnos_data:
             todas_calificaciones.extend(alumno["calificaciones"])
         
-        # Distribucion por rangos
         rangos = {"0-59": 0, "60-69": 0, "70-79": 0, "80-89": 0, "90-100": 0}
         for c in todas_calificaciones:
             if c < 60:
@@ -1583,12 +1580,11 @@ def obtener_datos_vizualizacion(equipo_id):
             else:
                 rangos["90-100"] += 1
         
-        # Matriz de calificaciones (alumno x tarea) para heatmap
+        # Matriz de calificaciones (alumno x tarea)
         matriz_calificaciones = []
         for alumno in alumnos_data:
             fila = []
             for tarea in tareas:
-                # Buscar calificacion de este alumno en esta tarea
                 entrega = db.entregas.find_one({
                     "tarea_id": tarea["_id"],
                     "alumno_id": ObjectId(alumno["alumno_id"])
@@ -1613,6 +1609,7 @@ def obtener_datos_vizualizacion(equipo_id):
     except Exception as error:
         print(f"Error en obtener_datos_vizualizacion: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
+
 # ============================================
 # 8. DUALES
 # ============================================
@@ -1871,24 +1868,44 @@ def crear_estadia():
         if not usuario:
             return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
         
-        if not datos.get('titulo') or not datos.get('empresa'):
-            return jsonify({"exito": False, "mensaje": "Título y empresa son obligatorios"}), 400
+        if not datos.get('nombre') or not datos.get('empresa'):
+            return jsonify({"exito": False, "mensaje": "Nombre y empresa son obligatorios"}), 400
+        
+        nombre_completo = f"{datos.get('nombre', '').strip()} {datos.get('apellidos', '').strip()}".strip()
         
         nueva_estadia = {
             "usuario_id": ObjectId(usuario_id),
-            "titulo": datos.get('titulo'),
-            "empresa": datos.get('empresa'),
-            "descripcion": datos.get('descripcion', ''),
+            # Datos del alumno
+            "nombre": datos.get('nombre', '').strip(),
+            "apellidos": datos.get('apellidos', '').strip(),
+            "titulo": nombre_completo,
+            "carrera": datos.get('carrera', '').strip(),
+            "grupo": datos.get('grupo', '').strip(),
+            # Empresa
+            "empresa": datos.get('empresa', '').strip(),
+            "ubicacion": datos.get('lugar_estadia', datos.get('ubicacion', '')).strip(),
+            "asesor_academico": datos.get('asesor_academico', '').strip(),
+            "asesor_externo": datos.get('asesor_externo', '').strip(),
+            # Proyecto
+            "proyecto": datos.get('proyecto', '').strip(),
+            "equipo": datos.get('equipo', '').strip(),
+            "descripcion": datos.get('descripcion', '').strip(),
+            # Periodo
+            "periodo": datos.get('periodo', '').strip(),
             "fecha_inicio": datetime.strptime(datos.get('fecha_inicio'), '%Y-%m-%d') if datos.get('fecha_inicio') else None,
             "fecha_fin": datetime.strptime(datos.get('fecha_fin'), '%Y-%m-%d') if datos.get('fecha_fin') else None,
-            "horas": int(datos.get('horas', 0)),
-            "ubicacion": datos.get('ubicacion', ''),
-            "tutor": datos.get('tutor', ''),
-            "estado": datos.get('estado', 'pendiente'),
+            "horas": int(datos.get('horas', 0)) if datos.get('horas') else 0,
+            "estado": "pendiente",
             "fecha_creacion": datetime.now()
         }
+        
         resultado = db.estadias.insert_one(nueva_estadia)
-        return jsonify({"exito": True, "mensaje": "Estadía registrada correctamente", "estadia_id": str(resultado.inserted_id)})
+        
+        return jsonify({
+            "exito": True,
+            "mensaje": "Estadía registrada correctamente",
+            "estadia_id": str(resultado.inserted_id)
+        })
     except Exception as error:
         print(f"Error en crear_estadia: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
@@ -1896,27 +1913,78 @@ def crear_estadia():
 @app.route('/api/estadias/<string:usuario_id>', methods=['GET'])
 def listar_estadias(usuario_id):
     try:
-        cursor = db.estadias.find({"usuario_id": ObjectId(usuario_id)}).sort("fecha_creacion", -1)
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+        
         estadias = []
+        
+        if usuario['rol'] == 'maestro':
+            # MAESTRO: buscar estadías de los alumnos que están en SUS equipos
+            
+            # 1. Obtener los equipos donde el maestro es líder
+            equipos = list(db.equipos.find({"lider_id": ObjectId(usuario_id)}))
+            
+            # 2. Recolectar IDs de todos los alumnos miembros de esos equipos
+            alumnos_ids = []
+            for eq in equipos:
+                for m in eq.get("miembros", []):
+                    if m not in alumnos_ids:
+                        alumnos_ids.append(m)
+            
+            print(f"👨‍🏫 Maestro {usuario['nombre']}: equipos={len(equipos)}, alumnos={len(alumnos_ids)}")
+            
+            # 3. Buscar estadías creadas por esos alumnos
+            if alumnos_ids:
+                cursor = db.estadias.find({
+                    "usuario_id": {"$in": alumnos_ids}
+                }).sort("fecha_creacion", -1)
+            else:
+                cursor = []
+            
+        else:
+            # ✅ ALUMNO: solo sus estadías
+            cursor = db.estadias.find({
+                "usuario_id": ObjectId(usuario_id)
+            }).sort("fecha_creacion", -1)
+        
         for estadia in cursor:
+            alumno_creador = db.usuarios.find_one({"_id": estadia["usuario_id"]})
+            
             estadias.append({
                 "_id": str(estadia["_id"]),
-                "titulo": estadia["titulo"],
-                "empresa": estadia["empresa"],
+                "usuario_id": str(estadia["usuario_id"]),
+                "alumno_creador_nombre": alumno_creador["nombre"] if alumno_creador else "Desconocido",
+                "alumno_creador_email": alumno_creador["email"] if alumno_creador else "",
+                "nombre": estadia.get("nombre", ""),
+                "apellidos": estadia.get("apellidos", ""),
+                "titulo": estadia.get("titulo", ""),
+                "carrera": estadia.get("carrera", ""),
+                "grupo": estadia.get("grupo", ""),
+                "empresa": estadia.get("empresa", ""),
+                "ubicacion": estadia.get("ubicacion", ""),
+                "asesor_academico": estadia.get("asesor_academico", ""),
+                "asesor_externo": estadia.get("asesor_externo", ""),
+                "proyecto": estadia.get("proyecto", ""),
+                "equipo": estadia.get("equipo", ""),
                 "descripcion": estadia.get("descripcion", ""),
+                "periodo": estadia.get("periodo", ""),
                 "fecha_inicio": estadia["fecha_inicio"].strftime('%Y-%m-%d') if estadia.get("fecha_inicio") else None,
                 "fecha_fin": estadia["fecha_fin"].strftime('%Y-%m-%d') if estadia.get("fecha_fin") else None,
                 "horas": estadia.get("horas", 0),
-                "ubicacion": estadia.get("ubicacion", ""),
-                "tutor": estadia.get("tutor", ""),
                 "estado": estadia.get("estado", "pendiente"),
                 "fecha_creacion": estadia["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if estadia.get("fecha_creacion") else None
             })
+        
+        print(f"📊 {usuario['rol']} {usuario['nombre']}: {len(estadias)} estadías encontradas")
+        
         return jsonify({"exito": True, "estadias": estadias})
     except Exception as error:
         print(f"Error en listar_estadias: {error}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"exito": False, "mensaje": str(error)}), 400
-
+    
 @app.route('/api/estadias/detalle/<string:estadia_id>', methods=['GET'])
 def detalle_estadia(estadia_id):
     try:
@@ -1929,14 +1997,22 @@ def detalle_estadia(estadia_id):
             "estadia": {
                 "_id": str(estadia["_id"]),
                 "usuario_id": str(estadia["usuario_id"]),
-                "titulo": estadia["titulo"],
-                "empresa": estadia["empresa"],
+                "nombre": estadia.get("nombre", ""),
+                "apellidos": estadia.get("apellidos", ""),
+                "titulo": estadia.get("titulo", ""),
+                "carrera": estadia.get("carrera", ""),
+                "grupo": estadia.get("grupo", ""),
+                "empresa": estadia.get("empresa", ""),
+                "ubicacion": estadia.get("ubicacion", ""),
+                "asesor_academico": estadia.get("asesor_academico", ""),
+                "asesor_externo": estadia.get("asesor_externo", ""),
+                "proyecto": estadia.get("proyecto", ""),
+                "equipo": estadia.get("equipo", ""),
                 "descripcion": estadia.get("descripcion", ""),
+                "periodo": estadia.get("periodo", ""),
                 "fecha_inicio": estadia["fecha_inicio"].strftime('%Y-%m-%d') if estadia.get("fecha_inicio") else None,
                 "fecha_fin": estadia["fecha_fin"].strftime('%Y-%m-%d') if estadia.get("fecha_fin") else None,
                 "horas": estadia.get("horas", 0),
-                "ubicacion": estadia.get("ubicacion", ""),
-                "tutor": estadia.get("tutor", ""),
                 "estado": estadia.get("estado", "pendiente"),
                 "fecha_creacion": estadia["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if estadia.get("fecha_creacion") else None
             }
@@ -1949,16 +2025,35 @@ def detalle_estadia(estadia_id):
 def actualizar_estadia(estadia_id):
     try:
         datos = request.json
+        
+        estadia_existente = db.estadias.find_one({"_id": ObjectId(estadia_id)})
+        if not estadia_existente:
+            return jsonify({"exito": False, "mensaje": "Estadía no encontrada"}), 404
+        
         actualizacion = {}
-        campos_permitidos = ["titulo", "empresa", "descripcion", "horas", "ubicacion", "tutor", "estado"]
+        # ✅ Permitir todos los campos, incluyendo "estado"
+        campos_permitidos = [
+            "nombre", "apellidos", "carrera", "grupo",
+            "empresa", "ubicacion", "asesor_academico", "asesor_externo",
+            "proyecto", "equipo", "descripcion", "periodo",
+            "horas", "estado", "titulo"
+        ]
         for campo in campos_permitidos:
             if campo in datos:
                 actualizacion[campo] = datos[campo]
+        
+        # Actualizar el titulo (nombre completo) si cambia
+        if "nombre" in datos or "apellidos" in datos:
+            nombre = datos.get("nombre", estadia_existente.get("nombre", ""))
+            apellidos = datos.get("apellidos", estadia_existente.get("apellidos", ""))
+            actualizacion["titulo"] = f"{nombre} {apellidos}".strip()
         
         if "fecha_inicio" in datos and datos["fecha_inicio"]:
             actualizacion["fecha_inicio"] = datetime.strptime(datos["fecha_inicio"], '%Y-%m-%d')
         if "fecha_fin" in datos and datos["fecha_fin"]:
             actualizacion["fecha_fin"] = datetime.strptime(datos["fecha_fin"], '%Y-%m-%d')
+        
+        actualizacion["fecha_actualizacion"] = datetime.now()
         
         if actualizacion:
             db.estadias.update_one({"_id": ObjectId(estadia_id)}, {"$set": actualizacion})
