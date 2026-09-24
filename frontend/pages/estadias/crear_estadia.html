@@ -1,10 +1,9 @@
 <!-- ============================================
-     ARCHIVO: crear_estadia.html
-     Formulario para solicitar/editar una estadía profesional
+     CREAR_ESTADIA.HTML - Registro de Estadías Profesionales
      ============================================ -->
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +13,93 @@
     <link rel="stylesheet" href="../../css/estadias.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .form-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-title i {
+            font-size: 1rem;
+        }
+
+        .form-grupo label .required {
+            color: #ef4444;
+            margin-left: 0.2rem;
+        }
+
+        .form-grupo input.error,
+        .form-grupo select.error,
+        .form-grupo textarea.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .form-grupo input.error~.error-msg,
+        .form-grupo select.error~.error-msg,
+        .form-grupo textarea.error~.error-msg {
+            display: block;
+        }
+
+        .form-help {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+        }
+
+        .periodo-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .periodo-option {
+            padding: 0.4rem 0.9rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #64748b;
+        }
+
+        .periodo-option:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .periodo-option.selected {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+    </style>
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
         <aside class="sidebar">
@@ -34,7 +119,7 @@
                 <a href="../duales/mis_duales.html" class="menu-item">
                     <i class="fas fa-briefcase"></i><span> Duales</span>
                 </a>
-                <a href="mis_estadias.html" class="menu-item">
+                <a href="mis_estadias.html" class="menu-item active">
                     <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
             </nav>
@@ -49,73 +134,170 @@
         <main class="main-content">
             <div class="estadias-container">
                 <div class="header-estadias">
-                    <h2><i class="fas fa-plus-circle"></i> Solicitar Estadía</h2>
+                    <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Solicitar Estadía</span></h2>
+                    <a href="mis_estadias.html" class="btn secundario">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
                 </div>
 
                 <div id="mensaje" class="mensaje"></div>
 
-                <form id="formCrearEstadia" class="form-estadia">
-                    <div class="form-grupo">
-                        <label for="titulo"><i class="fas fa-tag"></i> Título / Proyecto *</label>
-                        <input type="text" id="titulo" placeholder="Ej: Desarrollo Web, Implementación ERP" required>
-                    </div>
+                <form id="formCrearEstadia" class="form-estadia" novalidate>
 
-                    <div class="form-grupo">
-                        <label for="empresa"><i class="fas fa-building"></i> Empresa / Institución *</label>
-                        <input type="text" id="empresa" placeholder="Nombre de la empresa" required>
-                    </div>
-
-                    <div class="form-grupo">
-                        <label for="descripcion"><i class="fas fa-align-left"></i> Descripción del proyecto</label>
-                        <textarea id="descripcion" rows="4" placeholder="Describe las actividades y objetivos de la estadía..."></textarea>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-grupo">
-                            <label for="fecha_inicio"><i class="fas fa-calendar-alt"></i> Fecha de inicio</label>
-                            <input type="date" id="fecha_inicio">
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN 1: DATOS DEL ALUMNO -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-user-graduate"></i> Datos del Alumno
                         </div>
-                        <div class="form-grupo">
-                            <label for="fecha_fin"><i class="fas fa-calendar-check"></i> Fecha de término</label>
-                            <input type="date" id="fecha_fin">
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="nombre"><i class="fas fa-user"></i> Nombre(s) <span
+                                        class="required">*</span></label>
+                                <input type="text" id="nombre" placeholder="Ej: Juan Carlos" required>
+                                <div class="error-msg">El nombre es obligatorio</div>
+                            </div>
+                            <div class="form-grupo">
+                                <label for="apellidos"><i class="fas fa-user"></i> Apellidos <span
+                                        class="required">*</span></label>
+                                <input type="text" id="apellidos" placeholder="Ej: Pérez López" required>
+                                <div class="error-msg">Los apellidos son obligatorios</div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-grupo">
-                            <label for="horas"><i class="fas fa-clock"></i> Horas totales</label>
-                            <input type="number" id="horas" placeholder="Ej: 600" min="0">
-                        </div>
-                        <div class="form-grupo">
-                            <label for="ubicacion"><i class="fas fa-map-marker-alt"></i> Ubicación</label>
-                            <input type="text" id="ubicacion" placeholder="Ciudad, Estado">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-grupo">
-                            <label for="tutor"><i class="fas fa-chalkboard-user"></i> Tutor en la empresa</label>
-                            <input type="text" id="tutor" placeholder="Nombre del tutor">
-                        </div>
-                        <div class="form-grupo">
-                            <label for="estado"><i class="fas fa-flag-checkered"></i> Estado</label>
-                            <select id="estado">
-                                <option value="pendiente">Pendiente de aprobación</option>
-                                <option value="en-curso">En curso</option>
-                                <option value="completada">Completada</option>
-                                <option value="cancelada">Cancelada</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="carrera"><i class="fas fa-graduation-cap"></i> Carrera <span
+                                        class="required">*</span></label>
+                                <input type="text" id="carrera" placeholder="Ej: Ingeniería en Sistemas" required>
+                                <div class="error-msg">La carrera es obligatoria</div>
+                            </div>
+                            <div class="form-grupo">
+                                <label for="grupo"><i class="fas fa-users"></i> Grupo <span
+                                        class="required">*</span></label>
+                                <input type="text" id="grupo" placeholder="Ej: 9A" required>
+                                <div class="error-msg">El grupo es obligatorio</div>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN 2: DATOS DE LA EMPRESA -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-building"></i> Datos de la Empresa
+                        </div>
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="empresa"><i class="fas fa-industry"></i> Empresa <span
+                                        class="required">*</span></label>
+                                <input type="text" id="empresa" placeholder="Ej: Tech Solutions S.A." required>
+                                <div class="error-msg">La empresa es obligatoria</div>
+                            </div>
+                            <div class="form-grupo">
+                                <label for="lugar_estadia"><i class="fas fa-map-marker-alt"></i> Lugar de Estadía <span
+                                        class="required">*</span></label>
+                                <input type="text" id="lugar_estadia" placeholder="Ej: Av. Reforma 123, CDMX" required>
+                                <div class="error-msg">El lugar es obligatorio</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="asesor_academico"><i class="fas fa-chalkboard-teacher"></i> Asesor Académico
+                                    <span class="required">*</span></label>
+                                <input type="text" id="asesor_academico" placeholder="Ej: Ing. María González" required>
+                                <div class="error-msg">El asesor académico es obligatorio</div>
+                            </div>
+                            <div class="form-grupo">
+                                <label for="asesor_externo"><i class="fas fa-user-tie"></i> Asesor Externo <span
+                                        class="required">*</span></label>
+                                <input type="text" id="asesor_externo" placeholder="Ej: Lic. Pedro Ramírez" required>
+                                <div class="error-msg">El asesor externo es obligatorio</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN 3: PROYECTO -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-project-diagram"></i> Proyecto
+                        </div>
+                        <div class="form-grupo">
+                            <label for="proyecto"><i class="fas fa-lightbulb"></i> Proyecto <span
+                                    class="required">*</span></label>
+                            <input type="text" id="proyecto" placeholder="Ej: Sistema de Gestión Empresarial" required>
+                            <div class="error-msg">El proyecto es obligatorio</div>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="equipo"><i class="fas fa-users-cog"></i> Equipo de Trabajo</label>
+                            <textarea id="equipo" rows="2" placeholder="Ej: Juan Pérez, María López..."></textarea>
+                            <div class="form-help">Separa los nombres con comas</div>
+                        </div>
+                        <div class="form-grupo">
+                            <label for="descripcion"><i class="fas fa-align-left"></i> Descripción del Proyecto</label>
+                            <textarea id="descripcion" rows="3"
+                                placeholder="Describe las actividades y objetivos de la estadía..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN 4: PERIODO Y FECHAS -->
+                    <!-- ============================================ -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-calendar-alt"></i> Periodo y Fechas
+                        </div>
+                        <div class="form-grupo">
+                            <label><i class="fas fa-clock"></i> Periodo <span class="required">*</span></label>
+                            <div class="periodo-options" id="periodoOptions">
+                                <span class="periodo-option" data-value="Enero - Abril">Enero - Abril</span>
+                                <span class="periodo-option" data-value="Mayo - Agosto">Mayo - Agosto</span>
+                                <span class="periodo-option" data-value="Septiembre - Diciembre">Septiembre -
+                                    Diciembre</span>
+                            </div>
+                            <input type="hidden" id="periodo" required>
+                            <div class="error-msg">Selecciona un periodo</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="fecha_inicio"><i class="fas fa-calendar-plus"></i> Fecha de inicio</label>
+                                <input type="date" id="fecha_inicio">
+                            </div>
+                            <div class="form-grupo">
+                                <label for="fecha_fin"><i class="fas fa-calendar-check"></i> Fecha de término</label>
+                                <input type="date" id="fecha_fin">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label for="horas"><i class="fas fa-hourglass-half"></i> Horas totales</label>
+                                <input type="number" id="horas" placeholder="Ej: 600" min="0" max="2000">
+                            </div>
+                            <div class="form-grupo">
+                                <label for="estado"><i class="fas fa-flag-checkered"></i> Estado</label>
+                                <select id="estado">
+                                    <option value="pendiente">Pendiente de aprobación</option>
+                                    <option value="en-curso">En curso</option>
+                                    <option value="completada">Completada</option>
+                                    <option value="cancelada">Cancelada</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES -->
                     <div class="botones-form">
                         <button type="button" class="btn secundario" onclick="cancelar()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
-                        <button type="submit" class="btn primario">
-                            <i class="fas fa-save"></i> Guardar Estadía
+                        <button type="submit" class="btn primario" id="btnGuardar">
+                            <i class="fas fa-save"></i> <span id="btnText">Guardar Estadía</span>
                         </button>
                     </div>
+
                 </form>
             </div>
         </main>
@@ -124,113 +306,266 @@
     <script src="../../js/menu.js"></script>
     <script>
         // ============================================
-        // OBTENER USUARIO DEL LOCALSTORAGE
+        // 1. CONFIGURACIÓN INICIAL
         // ============================================
         const usuario = JSON.parse(localStorage.getItem('usuario'));
-        
+
         if (!usuario) {
             window.location.href = '../../iniciar_sesion.html';
         }
-        
-        // ============================================
-        // DETECTAR SI ES EDICIÓN
-        // ============================================
+
+        // Detectar modo edición
         const urlParams = new URLSearchParams(window.location.search);
         const estadiaId = urlParams.get('id');
-        
-        let modoEdicion = false;
-        
-        if (estadiaId) {
-            modoEdicion = true;
-            document.querySelector('h2').innerHTML = '<i class="fas fa-edit"></i> Editar Estadía';
-            cargarDatosEstadia(estadiaId);
+        const modoEdicion = !!estadiaId;
+
+        if (modoEdicion) {
+            document.getElementById('formTitle').textContent = 'Editar Estadía';
+            document.getElementById('btnText').textContent = 'Actualizar Estadía';
+            cargarEstadia(estadiaId);
         }
-        
+
         // ============================================
-        // CARGAR DATOS DE LA ESTADÍA PARA EDITAR
+        // 2. SELECTOR DE PERIODO
         // ============================================
-        async function cargarDatosEstadia(id) {
+        document.querySelectorAll('.periodo-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelectorAll('.periodo-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('periodo').value = this.dataset.value;
+                document.getElementById('periodo').classList.remove('error');
+            });
+        });
+
+        // ============================================
+        // 3. CARGAR ESTADÍA PARA EDICIÓN
+        // ============================================
+        async function cargarEstadia(id) {
             try {
-                const respuesta = await fetch(`/api/estadias/detalle/${id}`);
-                const resultado = await respuesta.json();
-                
-                if (resultado.exito) {
-                    const estadia = resultado.estadia;
-                    document.getElementById('titulo').value = estadia.titulo || '';
-                    document.getElementById('empresa').value = estadia.empresa || '';
-                    document.getElementById('descripcion').value = estadia.descripcion || '';
-                    document.getElementById('fecha_inicio').value = estadia.fecha_inicio || '';
-                    document.getElementById('fecha_fin').value = estadia.fecha_fin || '';
-                    document.getElementById('horas').value = estadia.horas || '';
-                    document.getElementById('ubicacion').value = estadia.ubicacion || '';
-                    document.getElementById('tutor').value = estadia.tutor || '';
-                    document.getElementById('estado').value = estadia.estado || 'pendiente';
+                const response = await fetch(`/api/estadias/detalle/${id}`);
+                const result = await response.json();
+
+                if (result.exito) {
+                    const e = result.estadia;
+                    document.getElementById('nombre').value = e.nombre || '';
+                    document.getElementById('apellidos').value = e.apellidos || '';
+                    document.getElementById('carrera').value = e.carrera || '';
+                    document.getElementById('grupo').value = e.grupo || '';
+                    document.getElementById('empresa').value = e.empresa || '';
+                    document.getElementById('lugar_estadia').value = e.ubicacion || '';
+                    document.getElementById('asesor_academico').value = e.asesor_academico || '';
+                    document.getElementById('asesor_externo').value = e.asesor_externo || '';
+                    document.getElementById('proyecto').value = e.proyecto || '';
+                    document.getElementById('equipo').value = e.equipo || '';
+                    document.getElementById('descripcion').value = e.descripcion || '';
+                    document.getElementById('horas').value = e.horas || '';
+                    document.getElementById('fecha_inicio').value = e.fecha_inicio || '';
+                    document.getElementById('fecha_fin').value = e.fecha_fin || '';
+                    document.getElementById('estado').value = e.estado || 'pendiente';
+
+                    if (e.periodo) {
+                        document.getElementById('periodo').value = e.periodo;
+                        document.querySelectorAll('.periodo-option').forEach(o => {
+                            if (o.dataset.value === e.periodo) o.classList.add('selected');
+                        });
+                    }
                 }
             } catch (error) {
-                console.error('Error al cargar datos:', error);
+                console.error('Error al cargar estadía:', error);
             }
         }
-        
+
         // ============================================
-        // CANCELAR
+        // 4. VALIDACIÓN FRONTEND
+        // ============================================
+        function validarFormulario() {
+            let valido = true;
+
+            document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('error'));
+
+            const camposObligatorios = [
+                'nombre', 'apellidos', 'carrera', 'grupo',
+                'empresa', 'lugar_estadia', 'asesor_academico', 'asesor_externo',
+                'proyecto', 'periodo'
+            ];
+
+            camposObligatorios.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input.value || input.value.trim() === '') {
+                    input.classList.add('error');
+                    valido = false;
+                }
+            });
+
+            // Validar fechas
+            const fechaInicio = document.getElementById('fecha_inicio').value;
+            const fechaFin = document.getElementById('fecha_fin').value;
+
+            if (fechaInicio && fechaFin && fechaInicio > fechaFin) {
+                document.getElementById('fecha_fin').classList.add('error');
+                mostrarMensaje('error', 'La fecha de fin no puede ser anterior a la fecha de inicio');
+                valido = false;
+            }
+
+            // Validar horas
+            const horas = document.getElementById('horas').value;
+            if (horas && (parseInt(horas) < 0 || parseInt(horas) > 2000)) {
+                document.getElementById('horas').classList.add('error');
+                mostrarMensaje('error', 'Las horas deben estar entre 0 y 2000');
+                valido = false;
+            }
+
+            return valido;
+        }
+
+        // ============================================
+        // 5. MOSTRAR MENSAJE
+        // ============================================
+        function mostrarMensaje(tipo, texto) {
+            const mensajeDiv = document.getElementById('mensaje');
+            mensajeDiv.className = `mensaje ${tipo}`;
+            mensajeDiv.innerHTML = `<i class="fas ${tipo === 'exito' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${texto}`;
+            mensajeDiv.style.display = 'block';
+
+            setTimeout(() => {
+                mensajeDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        // ============================================
+        // 6. ENVIAR FORMULARIO
+        // ============================================
+        document.getElementById('formCrearEstadia').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (!validarFormulario()) {
+                mostrarMensaje('error', 'Por favor, completa todos los campos obligatorios');
+                return;
+            }
+
+            const btnGuardar = document.getElementById('btnGuardar');
+            const textoOriginal = btnGuardar.innerHTML;
+            btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            btnGuardar.disabled = true;
+
+            try {
+                const datos = {
+                    usuario_id: usuario._id,
+                    nombre: document.getElementById('nombre').value.trim(),
+                    apellidos: document.getElementById('apellidos').value.trim(),
+                    carrera: document.getElementById('carrera').value.trim(),
+                    grupo: document.getElementById('grupo').value.trim(),
+                    empresa: document.getElementById('empresa').value.trim(),
+                    lugar_estadia: document.getElementById('lugar_estadia').value.trim(),
+                    asesor_academico: document.getElementById('asesor_academico').value.trim(),
+                    asesor_externo: document.getElementById('asesor_externo').value.trim(),
+                    proyecto: document.getElementById('proyecto').value.trim(),
+                    equipo: document.getElementById('equipo').value.trim(),
+                    descripcion: document.getElementById('descripcion').value.trim(),
+                    periodo: document.getElementById('periodo').value,
+                    fecha_inicio: document.getElementById('fecha_inicio').value || null,
+                    fecha_fin: document.getElementById('fecha_fin').value || null,
+                    horas: parseInt(document.getElementById('horas').value) || 0,
+                    estado: document.getElementById('estado').value
+                };
+
+                const url = modoEdicion
+                    ? `/api/estadias/actualizar/${estadiaId}`
+                    : '/api/estadias/crear';
+                const method = modoEdicion ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                const result = await response.json();
+
+                if (result.exito) {
+                    mostrarMensaje('exito', modoEdicion
+                        ? 'Estadía actualizada correctamente'
+                        : 'Estadía registrada correctamente');
+
+                    setTimeout(() => {
+                        window.location.href = 'mis_estadias.html';
+                    }, 1500);
+                } else {
+                    mostrarMensaje('error', result.mensaje || 'Error al guardar la estadía');
+                    btnGuardar.innerHTML = textoOriginal;
+                    btnGuardar.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('error', 'Error de conexión al guardar');
+                btnGuardar.innerHTML = textoOriginal;
+                btnGuardar.disabled = false;
+            }
+        });
+
+        // ============================================
+        // 7. CANCELAR
         // ============================================
         function cancelar() {
             window.location.href = 'mis_estadias.html';
         }
-        
+
         // ============================================
-        // ENVIAR FORMULARIO (CREAR O ACTUALIZAR)
+        // 8. CERRAR SESIÓN
         // ============================================
-        document.getElementById('formCrearEstadia').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const mensajeDiv = document.getElementById('mensaje');
-            
-            const datos = {
-                usuario_id: usuario._id,
-                titulo: document.getElementById('titulo').value,
-                empresa: document.getElementById('empresa').value,
-                descripcion: document.getElementById('descripcion').value,
-                fecha_inicio: document.getElementById('fecha_inicio').value,
-                fecha_fin: document.getElementById('fecha_fin').value,
-                horas: document.getElementById('horas').value,
-                ubicacion: document.getElementById('ubicacion').value,
-                tutor: document.getElementById('tutor').value,
-                estado: document.getElementById('estado').value
-            };
-            
-            const url = modoEdicion ? `/api/estadias/actualizar/${estadiaId}` : '/api/estadias/crear';
-            const metodo = modoEdicion ? 'PUT' : 'POST';
-            
-            mensajeDiv.className = 'mensaje';
-            mensajeDiv.textContent = 'Guardando...';
-            mensajeDiv.style.display = 'block';
-            
-            try {
-                const respuesta = await fetch(url, {
-                    method: metodo,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-                
-                const resultado = await respuesta.json();
-                
-            if (resultado.exito) {
-                mensajeDiv.className = 'mensaje exito';
-                mensajeDiv.innerHTML = '<i class="fas fa-check-circle"></i> ' + (modoEdicion ? 'Estadía actualizada correctamente' : 'Solicitud enviada correctamente');
-                setTimeout(() => {
-                    window.location.href = 'mis_estadias.html';
-                }, 1500);
-            } else {
-                mensajeDiv.className = 'mensaje error';
-                mensajeDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + resultado.mensaje;
-            }
-            } catch (error) {
-                console.error('Error:', error);
-                mensajeDiv.className = 'mensaje error';
-                mensajeDiv.innerHTML = '<i class="fas fa-wifi"></i> Error de conexión';
-            }
+        function cerrarSesion() {
+            localStorage.removeItem('usuario');
+            window.location.href = '../../iniciar_sesion.html';
+        }
+
+        // ============================================
+        // 9. INICIALIZAR
+        // ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    if (usuario) {
+        document.getElementById('userInfoSidebar').innerHTML = `
+            <div class="user-avatar">${usuario.nombre.charAt(0).toUpperCase()}</div>
+            <div class="user-name">${usuario.nombre}</div>
+            <div class="user-role">${usuario.rol === 'maestro' ? '👨‍🏫 Maestro' : '🎓 Alumno'}</div>
+        `;
+    }
+
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('input', function() {
+            this.classList.remove('error');
         });
+    });
+
+    //  PRE-LLENAR DATOS DEL ALUMNO
+    preLlenarDatosAlumno();
+
+    console.log('Formulario de Estadía cargado');
+    console.log('Modo:', modoEdicion ? 'Edición' : 'Creación');
+});
+            // ============================================
+// PRE-LLENAR DATOS DEL ALUMNO (solo en modo creación)
+// ============================================
+function preLlenarDatosAlumno() {
+    if (modoEdicion) return;
+    if (!usuario || !usuario.nombre) return;
+
+    const partes = usuario.nombre.trim().split(/\s+/);
+
+    if (partes.length >= 2) {
+        const mitad = Math.ceil(partes.length / 2);
+        const nombre = partes.slice(0, mitad).join(' ');
+        const apellidos = partes.slice(mitad).join(' ');
+
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('apellidos').value = apellidos;
+    } else {
+        document.getElementById('nombre').value = usuario.nombre;
+    }
+
+    console.log('Datos pre-llenados:', usuario.nombre);
+}
     </script>
 </body>
+
 </html>
