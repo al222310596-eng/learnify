@@ -362,6 +362,152 @@ body.dark-mode .estadistica-total strong {
     color: var(--text-primary) !important;
 }
 
+
+/* DETALLE DE ESTADÍA */
+
+body.dark-mode .detalle-header h2 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .detalle-header h2 i {
+    color: #7c6df0 !important;
+}
+body.dark-mode .detalle-card {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+body.dark-mode .detalle-hero {
+    border-bottom-color: var(--border-color) !important;
+}
+
+body.dark-mode .detalle-hero-icono {
+    background: linear-gradient(135deg, #7c6df0 0%, #5a4bd8 100%) !important;
+    box-shadow: 0 8px 20px rgba(124, 109, 240, 0.35) !important;
+}
+
+body.dark-mode .detalle-hero-info h1 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .detalle-hero-info .empresa-nombre {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .detalle-hero-info .empresa-nombre i {
+    color: #7c6df0 !important;
+}
+body.dark-mode .detalle-seccion {
+    border-top-color: var(--border-color) !important;
+}
+
+body.dark-mode .detalle-seccion-titulo {
+    color: #7c6df0 !important;
+}
+body.dark-mode .detalle-item-label {
+    color: var(--text-muted) !important;
+}
+
+body.dark-mode .detalle-item-valor {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .detalle-item-valor i {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode .detalle-item-valor.vacio {
+    color: #4a4a5a !important;
+}
+body.dark-mode .detalle-texto {
+    background: #0a0a0f !important;
+    color: var(--text-secondary) !important;
+    border-left-color: #7c6df0 !important;
+}
+body.dark-mode .equipo-chip {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .equipo-chip i {
+    color: #7c6df0 !important;
+}
+body.dark-mode .progreso-barra {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .progreso-barra-fill {
+    background: linear-gradient(90deg, #7c6df0, #5a4bd8) !important;
+}
+body.dark-mode .detalle-cargando,
+body.dark-mode .detalle-error {
+    color: var(--text-muted) !important;
+}
+
+body.dark-mode .detalle-cargando i {
+    color: #7c6df0 !important;
+}
+
+body.dark-mode .detalle-error i {
+    color: #f87171 !important;
+}
+
+body.dark-mode .detalle-error p {
+    color: var(--text-secondary) !important;
+}
+body.dark-mode .estadia-alumno-creador {
+    background: rgba(124, 109, 240, 0.12) !important;
+    color: #c7d2fe !important;
+}
+
+body.dark-mode .estadia-alumno-email {
+    color: var(--text-muted) !important;
+}
+body.dark-mode .estadia-info {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .estadia-info i {
+    color: #7c6df0 !important;
+}
+body.dark-mode .estadia-selector-estado label {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .estado-select {
+    background: #0a0a0f !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .estado-select:focus {
+    border-color: #7c6df0 !important;
+    box-shadow: 0 0 0 3px rgba(124, 109, 240, 0.15) !important;
+}
+body.dark-mode .header-estadias h2 {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .header-estadias h2 i {
+    color: #7c6df0 !important;
+}
+body.dark-mode .filtros-estadias select,
+body.dark-mode .filtros-estadias input {
+    background: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+body.dark-mode .sin-estadias {
+    background: var(--bg-card) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .sin-estadias i {
+    color: #2a2a3e !important;
+}
+
 /* ============================================
      ACTIVIDAD RECIENTE - MODO OSCURO
      ============================================ */
@@ -1601,3 +1747,5 @@ body.dark-mode.page-crear-tarea .btn-primary {
 body.dark-mode.page-crear-tarea .btn-primary:hover {
     box-shadow: 0 6px 25px rgba(124, 109, 240, 0.4);
 }
+
+

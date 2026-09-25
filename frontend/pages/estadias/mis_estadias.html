@@ -2,7 +2,6 @@
      ARCHIVO: mis_estadias.html
      Gestión de Estadías Profesionales
      ============================================ -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,19 +14,10 @@
     <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-    /* Ocultar el flash inicial */
-    body:not(.dark-mode) {
-        background: #f1f5f9;
-    }
-    body.dark-mode {
-        background: #0a0a0a;
-    }
-    </style>
+ 
 </head>
 <body class="menu-lateral">
     <div class="app-container">
-        <!-- Menú lateral -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
@@ -57,18 +47,19 @@
             </div>
         </aside>
 
-        <!-- Contenido principal -->
         <main class="main-content">
             <div class="estadias-container">
                 <div class="header-estadias">
-                    <h2><i class="fas fa-building"></i> Mis Estadías</h2>
-                    <button id="btnCrearEstadia" class="btn primario">
+                    <h2><i class="fas fa-building"></i> <span id="tituloEstadias">Mis Estadías</span></h2>
+                    <!-- Botón solo visible para ALUMNOS -->
+                    <button id="btnCrearEstadia" class="btn primario" style="display: none;">
                         <i class="fas fa-plus-circle"></i> Solicitar Estadía
                     </button>
                 </div>
 
-                <!-- Mensajes -->
                 <div id="mensaje" class="mensaje"></div>
+
+                
 
                 <!-- Filtros -->
                 <div class="filtros-estadias" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
@@ -80,16 +71,22 @@
                         <option value="cancelada">Cancelada</option>
                     </select>
                     <input type="text" id="filtroBusqueda" placeholder="Buscar por empresa o proyecto..." style="flex: 1; max-width: 300px;">
+                    <input type="date" id="filtroFechaInicio" title="Fecha desde">
+
+                    <input type="date" id="filtroFechaFin" title="Fecha hasta">
+                    <button type="button" id="btnLimpiarFiltros" class="btn secundario">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
                 </div>
 
-                <!-- Contenedor de estadías -->
                 <div id="estadiasContainer" class="estadias-grid">
                     <div class="sin-estadias">
                         <i class="fas fa-spinner fa-pulse"></i> Cargando estadías...
                     </div>
                 </div>
             </div>
-            <!-- Modal de confirmación para eliminar estadía -->
+
+            <!-- Modal de confirmación para eliminar -->
             <div id="modalConfirmarEstadia" class="modal-confirmar" style="display: none;">
                 <div class="modal-confirmar-contenido">
                     <div class="modal-confirmar-header">
