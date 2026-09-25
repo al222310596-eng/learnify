@@ -150,6 +150,9 @@ function renderizarDetalle(e) {
                 <a href="mis_estadias.html" class="btn secundario">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
+    <button class="btn imprimir" onclick="imprimirFormato()">
+        <i class="fas fa-print"></i> Imprimir Formato
+    </button>
                 ${esPropietario ? `
                     <a href="crear_estadia.html?id=${e._id}" class="btn primario">
                         <i class="fas fa-edit"></i> Editar
@@ -364,6 +367,172 @@ async function eliminarEstadiaDesdeDetalle() {
         btn.innerHTML = textoOriginal;
         btn.disabled = false;
     }
+}
+
+
+// ============================================
+// 5.5 IMPRIMIR FORMATO OFICIAL DE ESTADÍA
+// ============================================
+function generarFormatoImprimible(e) {
+    const fechaInicio = formatearFechaLarga(e.fecha_inicio);
+    const fechaFin = formatearFechaLarga(e.fecha_fin);
+    const estadoInfo = etiquetaEstado(e.estado);
+    const nombreCompleto = `${e.nombre || ''} ${e.apellidos || ''}`.trim() || 'No especificado';
+    const hoy = new Date().toLocaleDateString('es-MX', {
+        day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    // Equipo como texto
+    let equipoTexto = 'Proyecto individual';
+    if (e.equipo && e.equipo.trim()) {
+        const miembros = e.equipo.split(',').map(m => m.trim()).filter(Boolean);
+        if (miembros.length > 1) equipoTexto = miembros.join(', ');
+    }
+
+    return `
+        <div class="formato-pagina">
+            <!-- ENCABEZADO CON LOGOS -->
+            <header class="formato-header">
+                <div class="formato-logo formato-logo-izq">
+                    <img src="../../img/logo_escuela.png" alt="Logo Escuela"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>ESCUELA</div>';">
+                </div>
+                <div class="formato-titulo">
+                    <h1>FORMATO DE ESTADÍA PROFESIONAL</h1>
+                    <p class="formato-subtitulo">Registro y Control de Estadías</p>
+                </div>
+                <div class="formato-logo formato-logo-der">
+                    <img src="../../img/logo_tecnm.png" alt="Logo Institución"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>TECNM</div>';">
+                </div>
+            </header>
+
+            <div class="formato-info-doc">
+                <span><strong>Folio:</strong> EST-${String(e._id).slice(-6).toUpperCase()}</span>
+                <span><strong>Fecha de emisión:</strong> ${hoy}</span>
+            </div>
+
+            <!-- SECCIÓN 1: DATOS DEL ALUMNO -->
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">1. DATOS DEL ALUMNO</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Nombre completo</td>
+                        <td class="formato-valor">${escapeHtml(nombreCompleto)}</td>
+                        <td class="formato-label">Grupo</td>
+                        <td class="formato-valor">${escapeHtml(e.grupo || 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Carrera</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.carrera || 'No especificada')}</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- SECCIÓN 2: EMPRESA Y ASESORES -->
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">2. EMPRESA Y ASESORES</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Empresa</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.empresa || 'No especificada')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Lugar de estadía</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.ubicacion || e.lugar_estadia || 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Asesor Académico</td>
+                        <td class="formato-valor">${escapeHtml(e.asesor_academico || 'No especificado')}</td>
+                        <td class="formato-label">Asesor Externo</td>
+                        <td class="formato-valor">${escapeHtml(e.asesor_externo || 'No especificado')}</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- SECCIÓN 3: PROYECTO -->
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">3. PROYECTO</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Nombre del proyecto</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.proyecto || 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Equipo de trabajo</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(equipoTexto)}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Descripción</td>
+                        <td class="formato-valor formato-descripcion" colspan="3">
+                            ${escapeHtml(e.descripcion || 'Sin descripción')}
+                        </td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- SECCIÓN 4: PERIODO Y FECHAS -->
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">4. PERIODO Y FECHAS</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Periodo</td>
+                        <td class="formato-valor">${escapeHtml(e.periodo || 'No especificado')}</td>
+                        <td class="formato-label">Horas totales</td>
+                        <td class="formato-valor">${parseInt(e.horas) || 0} / 600 hrs</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Fecha de inicio</td>
+                        <td class="formato-valor">${fechaInicio || 'No especificada'}</td>
+                        <td class="formato-label">Fecha de término</td>
+                        <td class="formato-valor">${fechaFin || 'No especificada'}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Estado</td>
+                        <td class="formato-valor" colspan="3">${estadoInfo.texto}</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- FIRMAS -->
+            <section class="formato-firmas">
+                <div class="formato-firma">
+                    <div class="firma-linea"></div>
+                    <p><strong>${escapeHtml(nombreCompleto)}</strong></p>
+                    <p class="firma-rol">Alumno</p>
+                </div>
+                <div class="formato-firma">
+                    <div class="firma-linea"></div>
+                    <p><strong>${escapeHtml(e.asesor_academico || '___________________')}</strong></p>
+                    <p class="firma-rol">Asesor Académico</p>
+                </div>
+                <div class="formato-firma">
+                    <div class="firma-linea"></div>
+                    <p><strong>${escapeHtml(e.asesor_externo || '___________________')}</strong></p>
+                    <p class="firma-rol">Asesor Externo</p>
+                </div>
+            </section>
+
+            <footer class="formato-pie">
+                <p>Documento generado por <strong>Learnify</strong> · ${hoy}</p>
+            </footer>
+        </div>
+    `;
+}
+
+function imprimirFormato() {
+    if (!estadiaActual) {
+        mostrarMensaje('error', 'No hay datos para imprimir');
+        return;
+    }
+
+    const contenedor = document.getElementById('formatoImprimible');
+    contenedor.innerHTML = generarFormatoImprimible(estadiaActual);
+
+    // Esperar a que carguen las imágenes y lanzar impresión
+    setTimeout(() => {
+        window.print();
+    }, 300);
 }
 
 // ============================================

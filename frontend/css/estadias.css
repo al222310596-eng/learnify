@@ -734,3 +734,256 @@
 }
 
 
+/* ============================================
+   BOTÓN IMPRIMIR
+   ============================================ */
+.btn.imprimir {
+    background: #0ea5e9;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn.imprimir:hover {
+    background: #0284c7;
+}
+
+/* ============================================
+   FORMATO IMPRIMIBLE (oculto en pantalla)
+   ============================================ */
+.formato-imprimible {
+    display: none;
+}
+
+/* Solo se muestra al imprimir */
+@media print {
+    /* 1) Ocultar TODO con visibility (más seguro que display) */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* 2) Mostrar SOLO el formato imprimible y sus hijos */
+    .formato-imprimible,
+    .formato-imprimible * {
+        visibility: visible !important;
+    }
+
+    /* 3) Posicionar el formato en la esquina superior izquierda */
+    .formato-imprimible {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        font-size: 11pt !important;
+        z-index: 99999 !important;
+    }
+
+    /* 4) Resetear estilos heredados del body/app-container */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* 5) Asegurar que los contenedores padre no recorten el contenido */
+    .app-container,
+    .main-content,
+    .estadias-container,
+    .detalle-container {
+        overflow: visible !important;
+        position: static !important;
+        display: block !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    @page {
+        size: letter;
+        margin: 1cm;
+    }
+
+    .formato-pagina {
+        page-break-after: avoid;
+    }
+}
+
+/* ===== Estructura del formato ===== */
+.formato-pagina {
+    color: #1e293b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.formato-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px double #1e293b;
+    margin-bottom: 1rem;
+}
+
+.formato-logo {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.formato-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.logo-placeholder {
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 9pt;
+    color: #64748b;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.formato-titulo {
+    flex: 1;
+    text-align: center;
+}
+
+.formato-titulo h1 {
+    font-size: 15pt;
+    color: #1e293b;
+    margin: 0 0 0.3rem 0;
+    letter-spacing: 0.5px;
+}
+
+.formato-subtitulo {
+    font-size: 10pt;
+    color: #64748b;
+    margin: 0;
+    font-style: italic;
+}
+
+.formato-info-doc {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9pt;
+    color: #475569;
+    margin-bottom: 1.2rem;
+    padding: 0.5rem 0.8rem;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.formato-seccion {
+    margin-bottom: 1.2rem;
+}
+
+.formato-seccion-titulo {
+    font-size: 11pt;
+    color: #1e293b;
+    background: #e2e8f0;
+    padding: 6px 10px;
+    margin: 0 0 0.6rem 0;
+    border-left: 4px solid #667eea;
+    letter-spacing: 0.5px;
+}
+
+.formato-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+}
+
+.formato-tabla td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    vertical-align: top;
+}
+
+.formato-label {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #334155;
+    width: 20%;
+    text-transform: uppercase;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+}
+
+.formato-valor {
+    color: #1e293b;
+    width: 30%;
+}
+
+.formato-descripcion {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    min-height: 50px;
+}
+
+/* Firmas */
+.formato-firmas {
+    display: flex;
+    justify-content: space-around;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    page-break-inside: avoid;
+}
+
+.formato-firma {
+    flex: 1;
+    text-align: center;
+}
+
+.firma-linea {
+    border-top: 1px solid #1e293b;
+    margin-bottom: 0.4rem;
+    height: 40px;
+}
+
+.formato-firma p {
+    margin: 0;
+    font-size: 9pt;
+    color: #1e293b;
+}
+
+.firma-rol {
+    font-size: 8pt !important;
+    color: #64748b !important;
+    font-style: italic;
+    margin-top: 2px !important;
+}
+
+.formato-pie {
+    margin-top: 2rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid #cbd5e1;
+    text-align: center;
+    font-size: 8pt;
+    color: #94a3b8;
+}
