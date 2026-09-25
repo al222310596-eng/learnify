@@ -52,8 +52,21 @@ async function cargarEstadias() {
 
             const filtroEstado = document.getElementById('filtroEstado');
             const filtroBusqueda = document.getElementById('filtroBusqueda');
+            const filtroFechaInicio = document.getElementById('filtroFechaInicio');
+            const filtroFechaFin = document.getElementById('filtroFechaFin');
+
             if (filtroEstado) filtroEstado.addEventListener('change', filtrarEstadias);
             if (filtroBusqueda) filtroBusqueda.addEventListener('input', filtrarEstadias);
+
+             // Filtro por fecha de inicio
+            if (filtroFechaInicio) {
+                filtroFechaInicio.addEventListener('change', filtrarEstadias);
+            }
+
+            // Filtro por fecha de fin
+            if (filtroFechaFin) {
+                filtroFechaFin.addEventListener('change', filtrarEstadias);
+            }
         } else {
             container.innerHTML = `<div class="sin-estadias"><i class="fas fa-exclamation-triangle"></i> ${resultado.mensaje}</div>`;
         }
@@ -69,6 +82,8 @@ async function cargarEstadias() {
 function filtrarEstadias() {
     const estadoFiltro = document.getElementById('filtroEstado')?.value || 'todos';
     const busquedaFiltro = document.getElementById('filtroBusqueda')?.value.toLowerCase() || '';
+    const fechaInicioFiltro = document.getElementById('filtroFechaInicio')?.value || '';
+    const fechaFinFiltro = document.getElementById('filtroFechaFin')?.value || '';
 
     let filtrados = [...estadiasCache];
 
@@ -83,8 +98,78 @@ function filtrarEstadias() {
         );
     }
 
+    // Filtro por rango de fechas
+if (fechaInicioFiltro || fechaFinFiltro) {
+    filtrados = filtrados.filter(e => {
+
+        if (!e.fecha_inicio || !e.fecha_fin) {
+            return false;
+        }
+
+        const inicioEstadia = new Date(e.fecha_inicio);
+        const finEstadia = new Date(e.fecha_fin);
+
+        const inicioFiltro = fechaInicioFiltro
+            ? new Date(fechaInicioFiltro + 'T00:00:00')
+            : null;
+
+        const finFiltro = fechaFinFiltro
+            ? new Date(fechaFinFiltro + 'T23:59:59')
+            : null;
+
+        // Solo "Desde"
+        if (inicioFiltro && !finFiltro) {
+            return finEstadia >= inicioFiltro;
+        }
+
+        // Solo "Hasta"
+        if (!inicioFiltro && finFiltro) {
+            return inicioEstadia <= finFiltro;
+        }
+
+        // "Desde" y "Hasta"
+        return inicioEstadia <= finFiltro &&
+               finEstadia >= inicioFiltro;
+    });
+}
+
     mostrarEstadias(filtrados);
 }
+
+
+// ============================================
+// LIMPIAR FILTROS
+// ============================================
+function limpiarFiltros() {
+
+    // Restablecer estado
+    const filtroEstado = document.getElementById('filtroEstado');
+    if (filtroEstado) {
+        filtroEstado.value = 'todos';
+    }
+
+    // Limpiar búsqueda
+    const filtroBusqueda = document.getElementById('filtroBusqueda');
+    if (filtroBusqueda) {
+        filtroBusqueda.value = '';
+    }
+
+    // Limpiar fecha de inicio
+    const filtroFechaInicio = document.getElementById('filtroFechaInicio');
+    if (filtroFechaInicio) {
+        filtroFechaInicio.value = '';
+    }
+
+    // Limpiar fecha de fin
+    const filtroFechaFin = document.getElementById('filtroFechaFin');
+    if (filtroFechaFin) {
+        filtroFechaFin.value = '';
+    }
+
+    // Mostrar nuevamente todas las estadías
+    mostrarEstadias(estadiasCache);
+}
+
 
 // ============================================
 // MOSTRAR ESTADÍAS
@@ -399,4 +484,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target === modalConfirmar) cerrarModalEliminar();
         };
     }
+
+    const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+
+if (btnLimpiarFiltros) {
+    btnLimpiarFiltros.onclick = limpiarFiltros;
+}
+
+if (btnCancelarEliminar) {
+    btnCancelarEliminar.onclick = cerrarModalEliminar;
+}
 });
