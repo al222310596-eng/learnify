@@ -58,12 +58,10 @@ async function cargarEstadias() {
             if (filtroEstado) filtroEstado.addEventListener('change', filtrarEstadias);
             if (filtroBusqueda) filtroBusqueda.addEventListener('input', filtrarEstadias);
 
-             // Filtro por fecha de inicio
             if (filtroFechaInicio) {
                 filtroFechaInicio.addEventListener('change', filtrarEstadias);
             }
 
-            // Filtro por fecha de fin
             if (filtroFechaFin) {
                 filtroFechaFin.addEventListener('change', filtrarEstadias);
             }
@@ -99,39 +97,39 @@ function filtrarEstadias() {
     }
 
     // Filtro por rango de fechas
-if (fechaInicioFiltro || fechaFinFiltro) {
-    filtrados = filtrados.filter(e => {
+    if (fechaInicioFiltro || fechaFinFiltro) {
+        filtrados = filtrados.filter(e => {
 
-        if (!e.fecha_inicio || !e.fecha_fin) {
-            return false;
-        }
+            if (!e.fecha_inicio || !e.fecha_fin) {
+                return false;
+            }
 
-        const inicioEstadia = new Date(e.fecha_inicio);
-        const finEstadia = new Date(e.fecha_fin);
+            const inicioEstadia = new Date(e.fecha_inicio);
+            const finEstadia = new Date(e.fecha_fin);
 
-        const inicioFiltro = fechaInicioFiltro
-            ? new Date(fechaInicioFiltro + 'T00:00:00')
-            : null;
+            const inicioFiltro = fechaInicioFiltro
+                ? new Date(fechaInicioFiltro + 'T00:00:00')
+                : null;
 
-        const finFiltro = fechaFinFiltro
-            ? new Date(fechaFinFiltro + 'T23:59:59')
-            : null;
+            const finFiltro = fechaFinFiltro
+                ? new Date(fechaFinFiltro + 'T23:59:59')
+                : null;
 
-        // Solo "Desde"
-        if (inicioFiltro && !finFiltro) {
-            return finEstadia >= inicioFiltro;
-        }
+            // Solo "Desde"
+            if (inicioFiltro && !finFiltro) {
+                return finEstadia >= inicioFiltro;
+            }
 
-        // Solo "Hasta"
-        if (!inicioFiltro && finFiltro) {
-            return inicioEstadia <= finFiltro;
-        }
+            // Solo "Hasta"
+            if (!inicioFiltro && finFiltro) {
+                return inicioEstadia <= finFiltro;
+            }
 
-        // "Desde" y "Hasta"
-        return inicioEstadia <= finFiltro &&
-               finEstadia >= inicioFiltro;
-    });
-}
+            // "Desde" y "Hasta"
+            return inicioEstadia <= finFiltro &&
+                   finEstadia >= inicioFiltro;
+        });
+    }
 
     mostrarEstadias(filtrados);
 }
@@ -142,31 +140,26 @@ if (fechaInicioFiltro || fechaFinFiltro) {
 // ============================================
 function limpiarFiltros() {
 
-    // Restablecer estado
     const filtroEstado = document.getElementById('filtroEstado');
     if (filtroEstado) {
         filtroEstado.value = 'todos';
     }
 
-    // Limpiar búsqueda
     const filtroBusqueda = document.getElementById('filtroBusqueda');
     if (filtroBusqueda) {
         filtroBusqueda.value = '';
     }
 
-    // Limpiar fecha de inicio
     const filtroFechaInicio = document.getElementById('filtroFechaInicio');
     if (filtroFechaInicio) {
         filtroFechaInicio.value = '';
     }
 
-    // Limpiar fecha de fin
     const filtroFechaFin = document.getElementById('filtroFechaFin');
     if (filtroFechaFin) {
         filtroFechaFin.value = '';
     }
 
-    // Mostrar nuevamente todas las estadías
     mostrarEstadias(estadiasCache);
 }
 
@@ -295,8 +288,8 @@ function mostrarEstadias(estadias) {
         ` : '';
 
         // ✅ BOTONES SEGÚN ROL
-        // - ALUMNO: solo Ver y Eliminar (una vez enviada, no puede editar)
-        // - MAESTRO: Ver, Editar y Eliminar
+        // - ALUMNO: Ver, Registrar horas, Eliminar
+        // - MAESTRO: Ver, Editar, Eliminar
         const botonesHtml = esMaestro ? `
             <div class="estadia-acciones">
                 <button onclick="verDetalleEstadia('${estadia._id}')" class="btn-ver-estadia">
@@ -313,6 +306,21 @@ function mostrarEstadias(estadias) {
             <div class="estadia-acciones">
                 <button onclick="verDetalleEstadia('${estadia._id}')" class="btn-ver-estadia">
                     <i class="fas fa-eye"></i> Ver detalles
+                </button>
+                <button onclick="irARegistrarHoras('${estadia._id}')" class="btn-registrar-horas" style="
+                    background: #6366f1;
+                    color: white;
+                    border: none;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    <i class="fas fa-clock"></i> Registrar horas
                 </button>
                 <button onclick="mostrarModalEliminarEstadia('${estadia._id}')" class="btn-eliminar-estadia">
                     <i class="fas fa-trash-alt"></i> Eliminar
@@ -462,6 +470,11 @@ function crearEstadia() {
     window.location.href = 'crear_estadia.html';
 }
 
+// ✅ NUEVO: ir a la página de registro de horas
+function irARegistrarHoras(estadiaId) {
+    window.location.href = `registrar_horas.html?estadia_id=${estadiaId}`;
+}
+
 // ============================================
 // INICIALIZAR
 // ============================================
@@ -487,11 +500,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
 
-if (btnLimpiarFiltros) {
-    btnLimpiarFiltros.onclick = limpiarFiltros;
-}
+    if (btnLimpiarFiltros) {
+        btnLimpiarFiltros.onclick = limpiarFiltros;
+    }
 
-if (btnCancelarEliminar) {
-    btnCancelarEliminar.onclick = cerrarModalEliminar;
-}
+    if (btnCancelarEliminar) {
+        btnCancelarEliminar.onclick = cerrarModalEliminar;
+    }
 });

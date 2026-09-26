@@ -123,11 +123,6 @@ function renderizarDetalle(e) {
     const fechaFin = formatearFechaLarga(e.fecha_fin);
     const esPropietario = e.usuario_id === usuario._id;
 
-    // Progreso de horas (meta por defecto 600)
-    const metaHoras = 600;
-    const horasActuales = parseInt(e.horas) || 0;
-    const porcentajeHoras = Math.min(100, Math.round((horasActuales / metaHoras) * 100));
-
     // Equipo como chips
     let equipoHTML = '<span class="detalle-item-valor vacio">Sin equipo asignado</span>';
     if (e.equipo && e.equipo.trim()) {
@@ -277,6 +272,7 @@ function renderizarDetalle(e) {
             </div>
 
             <!-- SECCIÓN: Periodo y Fechas -->
+            <!-- ✅ Se quitó la barra de horas totales (ahora está en registrar_horas.html) -->
             <div class="detalle-seccion">
                 <div class="detalle-seccion-titulo">
                     <i class="fas fa-calendar-alt"></i> Periodo y Fechas
@@ -302,18 +298,6 @@ function renderizarDetalle(e) {
                             <i class="fas fa-calendar-check"></i>
                             ${fechaFin || 'No especificada'}
                         </span>
-                    </div>
-                    <div class="detalle-item">
-                        <span class="detalle-item-label">Horas totales</span>
-                        <span class="detalle-item-valor">
-                            <i class="fas fa-hourglass-half"></i>
-                            ${horasActuales} / ${metaHoras} hrs
-                        </span>
-                        <div class="progreso-horas">
-                            <div class="progreso-barra">
-                                <div class="progreso-barra-fill" style="width: ${porcentajeHoras}%"></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -471,15 +455,13 @@ function generarFormatoImprimible(e) {
                 </table>
             </section>
 
-            <!-- SECCIÓN 4: PERIODO Y FECHAS -->
+            <!-- SECCIÓN 4: PERIODO Y FECHAS (sin horas totales) -->
             <section class="formato-seccion">
                 <h2 class="formato-seccion-titulo">4. PERIODO Y FECHAS</h2>
                 <table class="formato-tabla">
                     <tr>
                         <td class="formato-label">Periodo</td>
-                        <td class="formato-valor">${escapeHtml(e.periodo || 'No especificado')}</td>
-                        <td class="formato-label">Horas totales</td>
-                        <td class="formato-valor">${parseInt(e.horas) || 0} / 600 hrs</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.periodo || 'No especificado')}</td>
                     </tr>
                     <tr>
                         <td class="formato-label">Fecha de inicio</td>

@@ -139,37 +139,6 @@
                         <div id="tareasPendientesLista">Cargando tareas...</div>
                     </div>
 
-                    <!-- Card: Estadísticas -->
-                    <div class="card">
-                        <h3><i class="fas fa-chart-bar"></i> Estadísticas de Tareas</h3>
-                        <div class="estadisticas-container">
-                            <div class="estadistica-item">
-                                <div class="estadistica-valor" id="tareasCompletadas">0</div>
-                                <div class="estadistica-label"><i class="fas fa-check-circle" style="color: #10b981;"></i> Tareas Completadas</div>
-                                <div class="estadistica-bar">
-                                    <div class="estadistica-progreso" id="progresoCompletadas" style="width: 0%; background: #10b981;"></div>
-                                </div>
-                            </div>
-                            <div class="estadistica-item">
-                                <div class="estadistica-valor" id="tareasPendientesEstadisticas">0</div>
-                                <div class="estadistica-label"><i class="fas fa-hourglass-half" style="color: #f59e0b;"></i> Tareas Pendientes</div>
-                                <div class="estadistica-bar">
-                                    <div class="estadistica-progreso" id="progresoPendientes" style="width: 0%; background: #f59e0b;"></div>
-                                </div>
-                            </div>
-                            <div class="estadistica-item">
-                                <div class="estadistica-valor" id="tareasVencidas">0</div>
-                                <div class="estadistica-label"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Tareas Vencidas</div>
-                                <div class="estadistica-bar">
-                                    <div class="estadistica-progreso" id="progresoVencidas" style="width: 0%; background: #ef4444;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="estadistica-total">
-                            <span><i class="fas fa-chart-pie"></i> Total de tareas: <strong id="totalTareas">0</strong></span>
-                        </div>
-                    </div>
-
                     <!-- Card: Actividad Reciente -->
                     <div class="card">
                         <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
@@ -231,16 +200,6 @@
                                     Jitsi funciona en navegadores sin instalar nada
                                 </p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Card: Gráfica -->
-                    <div class="card">
-                        <h3><i class="fas fa-chart-line"></i> Progreso de Tareas</h3>
-                        <canvas id="graficaTareas" width="400" height="200" style="max-width: 100%; height: auto;"></canvas>
-                        <div class="acciones-grafica">
-                            <button onclick="exportarGrafica()" class="btn-accion"><i class="fas fa-download"></i> Exportar PNG</button>
-                            <button onclick="generarReporte()" class="btn-accion btn-reporte"><i class="fas fa-file-alt"></i> Generar Reporte</button>
                         </div>
                     </div>
 

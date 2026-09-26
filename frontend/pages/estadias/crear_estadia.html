@@ -97,6 +97,217 @@
             border-color: #667eea;
             color: white;
         }
+
+        /* ============================================
+           ✅ MODO OSCURO COMPLETO — Forzar todos los colores
+           ============================================ */
+        body.dark-mode .form-estadia {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .estadias-container {
+            background: transparent;
+        }
+
+        body.dark-mode .form-section {
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .form-section-title {
+            color: #a5b4fc !important;
+        }
+
+        body.dark-mode .form-grupo label {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .form-grupo input,
+        body.dark-mode .form-grupo select,
+        body.dark-mode .form-grupo textarea {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        body.dark-mode .form-grupo input::placeholder,
+        body.dark-mode .form-grupo textarea::placeholder {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .form-grupo input:focus,
+        body.dark-mode .form-grupo select:focus,
+        body.dark-mode .form-grupo textarea:focus {
+            border-color: #818cf8 !important;
+            outline: none;
+        }
+
+        body.dark-mode .form-help {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .form-grupo input.error,
+        body.dark-mode .form-grupo select.error,
+        body.dark-mode .form-grupo textarea.error {
+            background: #450a0a !important;
+            border-color: #dc2626 !important;
+        }
+
+        body.dark-mode .error-msg {
+            color: #fca5a5 !important;
+        }
+
+        body.dark-mode .periodo-option {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .periodo-option:hover {
+            border-color: #818cf8 !important;
+            color: #a5b4fc !important;
+        }
+
+        body.dark-mode .periodo-option.selected {
+            background: #6366f1 !important;
+            border-color: #6366f1 !important;
+            color: white !important;
+        }
+
+        /* ============================================
+           AUTOCOMPLETADO DE MAESTROS
+           ============================================ */
+        .sugerencias-maestros {
+            position: absolute;
+            top: calc(100% - 22px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .sugerencia-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s;
+        }
+
+        .sugerencia-item:last-child {
+            border-bottom: none;
+        }
+
+        .sugerencia-item:hover {
+            background: #eef2ff;
+        }
+
+        .sugerencia-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .sugerencia-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sugerencia-nombre {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sugerencia-email {
+            font-size: 0.75rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sugerencia-vacio {
+            padding: 14px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* Modo oscuro autocompletado */
+        body.dark-mode .sugerencias-maestros {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .sugerencia-item {
+            border-bottom-color: #334155 !important;
+        }
+        body.dark-mode .sugerencia-item:hover {
+            background: #334155 !important;
+        }
+        body.dark-mode .sugerencia-nombre {
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .sugerencia-email {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .sugerencia-vacio {
+            color: #64748b !important;
+        }
+
+        /* Maestro seleccionado (badge) */
+        .maestro-seleccionado {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #4338ca;
+        }
+
+        .maestro-seleccionado i.fa-user-check {
+            color: #10b981;
+        }
+
+        .maestro-seleccionado .btn-quitar {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .maestro-seleccionado {
+            background: rgba(99, 102, 241, 0.15) !important;
+            border-color: rgba(99, 102, 241, 0.4) !important;
+            color: #c7d2fe !important;
+        }
     </style>
 </head>
 
@@ -144,9 +355,7 @@
 
                 <form id="formCrearEstadia" class="form-estadia" novalidate>
 
-                    <!-- ============================================ -->
                     <!-- SECCIÓN 1: DATOS DEL ALUMNO -->
-                    <!-- ============================================ -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-user-graduate"></i> Datos del Alumno
@@ -181,9 +390,7 @@
                         </div>
                     </div>
 
-                    <!-- ============================================ -->
                     <!-- SECCIÓN 2: DATOS DE LA EMPRESA -->
-                    <!-- ============================================ -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-building"></i> Datos de la Empresa
@@ -203,12 +410,31 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-grupo">
-                                <label for="asesor_academico"><i class="fas fa-chalkboard-teacher"></i> Asesor Académico
-                                    <span class="required">*</span></label>
-                                <input type="text" id="asesor_academico" placeholder="Ej: Ing. María González" required>
-                                <div class="error-msg">El asesor académico es obligatorio</div>
+                            <!-- ✅ ASESOR ACADÉMICO CON AUTOCOMPLETADO -->
+                            <div class="form-grupo" style="position: relative;">
+                                <label for="asesor_academico">
+                                    <i class="fas fa-chalkboard-teacher"></i> Asesor Académico
+                                    <span class="required">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="asesor_academico"
+                                    placeholder="Escribe el nombre del maestro..."
+                                    required
+                                    autocomplete="off"
+                                >
+                                <input type="hidden" id="maestro_id">
+                                <div id="sugerenciasMaestros" class="sugerencias-maestros" style="display: none;"></div>
+                                <div id="maestroSeleccionado" class="maestro-seleccionado" style="display: none;">
+                                    <i class="fas fa-user-check"></i>
+                                    <span id="maestroSeleccionadoTexto"></span>
+                                    <button type="button" class="btn-quitar" onclick="quitarMaestro()" title="Quitar">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="error-msg">Debes seleccionar un maestro registrado</div>
                             </div>
+
                             <div class="form-grupo">
                                 <label for="asesor_externo"><i class="fas fa-user-tie"></i> Asesor Externo <span
                                         class="required">*</span></label>
@@ -218,9 +444,7 @@
                         </div>
                     </div>
 
-                    <!-- ============================================ -->
                     <!-- SECCIÓN 3: PROYECTO -->
-                    <!-- ============================================ -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-project-diagram"></i> Proyecto
@@ -243,9 +467,7 @@
                         </div>
                     </div>
 
-                    <!-- ============================================ -->
                     <!-- SECCIÓN 4: PERIODO Y FECHAS -->
-                    <!-- ============================================ -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-calendar-alt"></i> Periodo y Fechas
@@ -276,15 +498,6 @@
                                 <label for="horas"><i class="fas fa-hourglass-half"></i> Horas totales</label>
                                 <input type="number" id="horas" placeholder="Ej: 600" min="0" max="2000">
                             </div>
-                            <div class="form-grupo">
-                                <label for="estado"><i class="fas fa-flag-checkered"></i> Estado</label>
-                                <select id="estado">
-                                    <option value="pendiente">Pendiente de aprobación</option>
-                                    <option value="en-curso">En curso</option>
-                                    <option value="completada">Completada</option>
-                                    <option value="cancelada">Cancelada</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -314,7 +527,6 @@
             window.location.href = '../../iniciar_sesion.html';
         }
 
-        // Detectar modo edición
         const urlParams = new URLSearchParams(window.location.search);
         const estadiaId = urlParams.get('id');
         const modoEdicion = !!estadiaId;
@@ -338,7 +550,109 @@
         });
 
         // ============================================
-        // 3. CARGAR ESTADÍA PARA EDICIÓN
+        // 3. AUTOCOMPLETADO DE MAESTROS
+        // ============================================
+        let timeoutBusqueda = null;
+        let maestroSeleccionadoData = null;
+
+        const inputAsesor = document.getElementById('asesor_academico');
+        const inputMaestroId = document.getElementById('maestro_id');
+        const dropdownSugerencias = document.getElementById('sugerenciasMaestros');
+        const badgeMaestro = document.getElementById('maestroSeleccionado');
+        const textoMaestro = document.getElementById('maestroSeleccionadoTexto');
+
+        // Al escribir, buscar maestros con debounce
+        inputAsesor.addEventListener('input', function () {
+            const q = this.value.trim();
+
+            // Si borra, quitar selección
+            if (!q) {
+                quitarMaestro();
+                dropdownSugerencias.style.display = 'none';
+                return;
+            }
+
+            // Si ya hay un maestro seleccionado y el texto coincide, no buscar
+            if (maestroSeleccionadoData && maestroSeleccionadoData.nombre === q) {
+                return;
+            }
+
+            clearTimeout(timeoutBusqueda);
+            timeoutBusqueda = setTimeout(() => buscarMaestros(q), 300);
+        });
+
+        async function buscarMaestros(q) {
+            try {
+                const res = await fetch(`/api/usuarios/maestros?q=${encodeURIComponent(q)}&limite=8`);
+                const data = await res.json();
+
+                if (!data.exito) {
+                    dropdownSugerencias.style.display = 'none';
+                    return;
+                }
+
+                mostrarSugerencias(data.maestros);
+            } catch (e) {
+                console.error('Error al buscar maestros:', e);
+                dropdownSugerencias.style.display = 'none';
+            }
+        }
+
+        function mostrarSugerencias(maestros) {
+            if (!maestros || maestros.length === 0) {
+                dropdownSugerencias.innerHTML = `
+                    <div class="sugerencia-vacio">
+                        <i class="fas fa-search"></i> No se encontraron maestros
+                    </div>
+                `;
+                dropdownSugerencias.style.display = 'block';
+                return;
+            }
+
+            dropdownSugerencias.innerHTML = maestros.map(m => `
+                <div class="sugerencia-item" onclick="seleccionarMaestro('${m._id}', '${escapeJs(m.nombre)}', '${escapeJs(m.email)}')">
+                    <div class="sugerencia-avatar">${m.nombre.charAt(0).toUpperCase()}</div>
+                    <div class="sugerencia-info">
+                        <div class="sugerencia-nombre">${escapeHtml(m.nombre)}</div>
+                        <div class="sugerencia-email">${escapeHtml(m.email)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            dropdownSugerencias.style.display = 'block';
+        }
+
+        function seleccionarMaestro(id, nombre, email) {
+            maestroSeleccionadoData = { _id: id, nombre, email };
+            inputAsesor.value = nombre;
+            inputMaestroId.value = id;
+            dropdownSugerencias.style.display = 'none';
+
+            // Mostrar badge
+            textoMaestro.textContent = `${nombre} (${email})`;
+            badgeMaestro.style.display = 'flex';
+
+            // Quitar error
+            inputAsesor.classList.remove('error');
+        }
+
+        function quitarMaestro() {
+            maestroSeleccionadoData = null;
+            inputAsesor.value = '';
+            inputMaestroId.value = '';
+            badgeMaestro.style.display = 'none';
+            dropdownSugerencias.style.display = 'none';
+        }
+
+        // Cerrar dropdown al hacer click afuera
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.form-grupo')) {
+                dropdownSugerencias.style.display = 'none';
+            }
+        });
+
+        // ============================================
+        // 4. CARGAR ESTADÍA PARA EDICIÓN
         // ============================================
         async function cargarEstadia(id) {
             try {
@@ -361,7 +675,11 @@
                     document.getElementById('horas').value = e.horas || '';
                     document.getElementById('fecha_inicio').value = e.fecha_inicio || '';
                     document.getElementById('fecha_fin').value = e.fecha_fin || '';
-                    document.getElementById('estado').value = e.estado || 'pendiente';
+
+                    // ✅ Si la estadía ya tiene maestro asignado, mostrarlo
+                    if (e.maestro_id && e.maestro_nombre) {
+                        seleccionarMaestro(e.maestro_id, e.maestro_nombre, e.maestro_email || '');
+                    }
 
                     if (e.periodo) {
                         document.getElementById('periodo').value = e.periodo;
@@ -376,7 +694,7 @@
         }
 
         // ============================================
-        // 4. VALIDACIÓN FRONTEND
+        // 5. VALIDACIÓN FRONTEND
         // ============================================
         function validarFormulario() {
             let valido = true;
@@ -385,7 +703,7 @@
 
             const camposObligatorios = [
                 'nombre', 'apellidos', 'carrera', 'grupo',
-                'empresa', 'lugar_estadia', 'asesor_academico', 'asesor_externo',
+                'empresa', 'lugar_estadia', 'asesor_externo',
                 'proyecto', 'periodo'
             ];
 
@@ -396,6 +714,14 @@
                     valido = false;
                 }
             });
+
+            // ✅ Validar que se haya seleccionado un maestro registrado
+            const maestroId = document.getElementById('maestro_id').value;
+            if (!maestroId) {
+                document.getElementById('asesor_academico').classList.add('error');
+                mostrarMensaje('error', 'Debes seleccionar un maestro registrado de la lista');
+                valido = false;
+            }
 
             // Validar fechas
             const fechaInicio = document.getElementById('fecha_inicio').value;
@@ -419,7 +745,7 @@
         }
 
         // ============================================
-        // 5. MOSTRAR MENSAJE
+        // 6. MOSTRAR MENSAJE
         // ============================================
         function mostrarMensaje(tipo, texto) {
             const mensajeDiv = document.getElementById('mensaje');
@@ -433,13 +759,12 @@
         }
 
         // ============================================
-        // 6. ENVIAR FORMULARIO
+        // 7. ENVIAR FORMULARIO
         // ============================================
         document.getElementById('formCrearEstadia').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             if (!validarFormulario()) {
-                mostrarMensaje('error', 'Por favor, completa todos los campos obligatorios');
                 return;
             }
 
@@ -451,6 +776,7 @@
             try {
                 const datos = {
                     usuario_id: usuario._id,
+                    maestro_id: document.getElementById('maestro_id').value || null,
                     nombre: document.getElementById('nombre').value.trim(),
                     apellidos: document.getElementById('apellidos').value.trim(),
                     carrera: document.getElementById('carrera').value.trim(),
@@ -466,7 +792,7 @@
                     fecha_inicio: document.getElementById('fecha_inicio').value || null,
                     fecha_fin: document.getElementById('fecha_fin').value || null,
                     horas: parseInt(document.getElementById('horas').value) || 0,
-                    estado: document.getElementById('estado').value
+                    estado: 'pendiente'
                 };
 
                 const url = modoEdicion
@@ -505,14 +831,14 @@
         });
 
         // ============================================
-        // 7. CANCELAR
+        // 8. CANCELAR
         // ============================================
         function cancelar() {
             window.location.href = 'mis_estadias.html';
         }
 
         // ============================================
-        // 8. CERRAR SESIÓN
+        // 9. CERRAR SESIÓN
         // ============================================
         function cerrarSesion() {
             localStorage.removeItem('usuario');
@@ -520,51 +846,66 @@
         }
 
         // ============================================
-        // 9. INICIALIZAR
+        // 10. HELPERS
         // ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    if (usuario) {
-        document.getElementById('userInfoSidebar').innerHTML = `
-            <div class="user-avatar">${usuario.nombre.charAt(0).toUpperCase()}</div>
-            <div class="user-name">${usuario.nombre}</div>
-            <div class="user-role">${usuario.rol === 'maestro' ? '👨‍🏫 Maestro' : '🎓 Alumno'}</div>
-        `;
-    }
+        function escapeHtml(texto) {
+            if (!texto) return '';
+            const div = document.createElement('div');
+            div.textContent = texto;
+            return div.innerHTML;
+        }
 
-    document.querySelectorAll('input, select, textarea').forEach(el => {
-        el.addEventListener('input', function() {
-            this.classList.remove('error');
+        function escapeJs(texto) {
+            if (!texto) return '';
+            return texto.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ============================================
+        // 11. INICIALIZAR
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function () {
+            if (usuario) {
+                document.getElementById('userInfoSidebar').innerHTML = `
+                    <div class="user-avatar">${usuario.nombre.charAt(0).toUpperCase()}</div>
+                    <div class="user-name">${usuario.nombre}</div>
+                    <div class="user-role">${usuario.rol === 'maestro' ? '👨‍🏫 Maestro' : '🎓 Alumno'}</div>
+                `;
+            }
+
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('input', function () {
+                    this.classList.remove('error');
+                });
+            });
+
+            preLlenarDatosAlumno();
+
+            console.log('Formulario de Estadía cargado');
+            console.log('Modo:', modoEdicion ? 'Edición' : 'Creación');
         });
-    });
 
-    //  PRE-LLENAR DATOS DEL ALUMNO
-    preLlenarDatosAlumno();
+        // ============================================
+        // PRE-LLENAR DATOS DEL ALUMNO
+        // ============================================
+        function preLlenarDatosAlumno() {
+            if (modoEdicion) return;
+            if (!usuario || !usuario.nombre) return;
 
-    console.log('Formulario de Estadía cargado');
-    console.log('Modo:', modoEdicion ? 'Edición' : 'Creación');
-});
-            // ============================================
-// PRE-LLENAR DATOS DEL ALUMNO (solo en modo creación)
-// ============================================
-function preLlenarDatosAlumno() {
-    if (modoEdicion) return;
-    if (!usuario || !usuario.nombre) return;
+            const partes = usuario.nombre.trim().split(/\s+/);
 
-    const partes = usuario.nombre.trim().split(/\s+/);
+            if (partes.length >= 2) {
+                const mitad = Math.ceil(partes.length / 2);
+                const nombre = partes.slice(0, mitad).join(' ');
+                const apellidos = partes.slice(mitad).join(' ');
 
-    if (partes.length >= 2) {
-        const mitad = Math.ceil(partes.length / 2);
-        const nombre = partes.slice(0, mitad).join(' ');
-        const apellidos = partes.slice(mitad).join(' ');
+                document.getElementById('nombre').value = nombre;
+                document.getElementById('apellidos').value = apellidos;
+            } else {
+                document.getElementById('nombre').value = usuario.nombre;
+            }
 
-        document.getElementById('nombre').value = nombre;
-        document.getElementById('apellidos').value = apellidos;
-    } else {
-        document.getElementById('nombre').value = usuario.nombre;
-    }
-
-    console.log('Datos pre-llenados:', usuario.nombre);
-}
+            console.log('Datos pre-llenados:', usuario.nombre);
+        }
     </script>
 </body>
 

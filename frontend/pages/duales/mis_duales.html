@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
 </head>
 <body class="menu-lateral">
     <div class="app-container">
@@ -52,13 +51,9 @@
         <!-- Contenido principal -->
         <main class="main-content">
             <div class="duales-container">
-                <!-- ========================================== -->
-                <!-- HEADER DE DUALES                          -->
-                <!-- ========================================== -->
                 <div class="header-duales">
                     <h2><i class="fas fa-briefcase"></i> Mis Duales</h2>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <!-- Botón solo visible para MAESTROS -->
                         <button id="btnCrearDual" class="btn primario" style="display: none;">
                             <i class="fas fa-plus-circle"></i> Registrar Dual
                         </button>
@@ -76,9 +71,7 @@
         </main>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR        -->
-    <!-- ========================================== -->
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR -->
     <div id="modalConfirmar" class="modal-confirmar" style="display: none;">
         <div class="modal-confirmar-contenido">
             <div class="modal-confirmar-header">
@@ -100,9 +93,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL DE DETALLE DEL DUAL                 -->
-    <!-- ========================================== -->
+    <!-- MODAL DE DETALLE DEL DUAL -->
     <div id="modalDetalleDual" class="modal-detalle-dual">
         <div class="modal-detalle-contenido">
             <div class="modal-detalle-header">
@@ -117,9 +108,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL DE FIRMA                             -->
-    <!-- ========================================== -->
+    <!-- MODAL DE FIRMA -->
     <div id="modalFirma" class="modal-firma">
         <div class="modal-firma-contenido">
             <div class="modal-firma-header">
@@ -146,6 +135,11 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- FORMATO IMPRIMIBLE (oculto en pantalla) -->
+    <div id="formatoImprimible" class="formato-imprimible">
+        <!-- Se genera dinámicamente desde JS -->
     </div>
 
     <script src="../../js/menu.js"></script>

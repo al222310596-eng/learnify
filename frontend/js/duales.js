@@ -36,7 +36,7 @@ function configurarBotonesPorRol() {
     if (!btnCrear) return;
 
     const esMaestro = usuario.rol === 'maestro';
-    
+
     if (esMaestro) {
         btnCrear.style.display = 'inline-flex';
         console.log('👨‍🏫 Usuario es MAESTRO - Mostrando botón "Registrar Dual"');
@@ -52,11 +52,11 @@ function configurarBotonesPorRol() {
 async function cargarDuales() {
     const container = document.getElementById('dualesContainer');
     container.innerHTML = '<div class="sin-duales"><i class="fas fa-spinner fa-pulse"></i> Cargando duales...</div>';
-    
+
     try {
         const respuesta = await fetch(`/api/duales/${usuario._id}`);
         const resultado = await respuesta.json();
-        
+
         if (resultado.exito) {
             dualesCache = resultado.duales || [];
             mostrarDuales(dualesCache);
@@ -90,7 +90,7 @@ async function cargarDuales() {
 // ============================================
 function mostrarDuales(duales) {
     const container = document.getElementById('dualesContainer');
-    
+
     if (duales.length === 0) {
         container.innerHTML = `
             <div class="sin-duales">
@@ -103,7 +103,6 @@ function mostrarDuales(duales) {
         `;
         const btnVacio = document.getElementById('btnCrearVacio');
         if (btnVacio) {
-            // Solo mostrar el botón si es maestro
             if (usuario.rol === 'maestro') {
                 btnVacio.style.display = 'inline-flex';
                 btnVacio.onclick = () => window.location.href = 'crear_dual.html';
@@ -113,37 +112,36 @@ function mostrarDuales(duales) {
         }
         return;
     }
-    
+
     const esMaestro = usuario.rol === 'maestro';
-    
+
     container.innerHTML = duales.map(dual => {
-        // ✅ ESTADOS AUTOMÁTICOS: activo, pendiente, inactivo
         let estadoClass = '', estadoText = '', estadoIcono = '';
-        switch(dual.estado) {
-            case 'activo': 
-                estadoClass = 'estado-activo'; 
-                estadoText = 'Activo'; 
-                estadoIcono = '<i class="fas fa-play-circle"></i>'; 
+        switch (dual.estado) {
+            case 'activo':
+                estadoClass = 'estado-activo';
+                estadoText = 'Activo';
+                estadoIcono = '<i class="fas fa-play-circle"></i>';
                 break;
-            case 'pendiente': 
-                estadoClass = 'estado-pendiente'; 
-                estadoText = 'Pendiente'; 
-                estadoIcono = '<i class="fas fa-clock"></i>'; 
+            case 'pendiente':
+                estadoClass = 'estado-pendiente';
+                estadoText = 'Pendiente';
+                estadoIcono = '<i class="fas fa-clock"></i>';
                 break;
-            case 'inactivo': 
-                estadoClass = 'estado-finalizado'; 
-                estadoText = 'Inactivo'; 
-                estadoIcono = '<i class="fas fa-stop-circle"></i>'; 
+            case 'inactivo':
+                estadoClass = 'estado-finalizado';
+                estadoText = 'Inactivo';
+                estadoIcono = '<i class="fas fa-stop-circle"></i>';
                 break;
-            default: 
-                estadoClass = 'estado-pendiente'; 
-                estadoText = dual.estado || 'Pendiente'; 
+            default:
+                estadoClass = 'estado-pendiente';
+                estadoText = dual.estado || 'Pendiente';
                 estadoIcono = '<i class="fas fa-clock"></i>';
         }
-        
+
         const totalFirmas = dual.asignaciones ? dual.asignaciones.length : 0;
         const firmasCompletadas = dual.asignaciones ? dual.asignaciones.filter(a => a.firmado).length : 0;
-        
+
         return `
             <div class="dual-card ${dual.estado === 'activo' ? 'activo' : ''}">
                 <div class="dual-titulo"><i class="fas fa-bullseye"></i> ${escapeHtml(dual.titulo)}</div>
@@ -194,20 +192,20 @@ function mostrarDuales(duales) {
 async function verDetalleDual(dualId) {
     const modal = document.getElementById('modalDetalleDual');
     const content = document.getElementById('detalleDualContent');
-    
+
     modal.classList.add('active');
     content.innerHTML = '<p><i class="fas fa-spinner fa-pulse"></i> Cargando detalles...</p>';
-    
+
     try {
         const respuesta = await fetch(`/api/duales/detalle/${dualId}`);
         const resultado = await respuesta.json();
-        
+
         if (resultado.exito) {
             dualActual = resultado.dual;
             const dual = dualActual;
             const esMaestro = usuario.rol === 'maestro';
             const esAlumno = usuario.rol === 'alumno';
-            
+
             let html = `
                 <div class="detalle-grid">
                     <div class="detalle-field full-width">
@@ -263,7 +261,7 @@ async function verDetalleDual(dualId) {
                         </div>
                     ` : ''}
                 </div>
-                
+
                 <div class="asignaciones-detalle">
                     <h4><i class="fas fa-file-signature"></i> Materias y Firmas</h4>
                     ${dual.asignaciones && dual.asignaciones.length > 0 ? dual.asignaciones.map((a, index) => `
@@ -273,8 +271,8 @@ async function verDetalleDual(dualId) {
                                 <span class="maestro"><i class="fas fa-chalkboard-teacher"></i> ${escapeHtml(a.maestro_nombre || 'No asignado')} ${a.maestro_email ? `(${escapeHtml(a.maestro_email)})` : ''}</span>
                             </div>
                             <div class="firma-status ${a.firmado ? 'firmado' : 'pendiente'}">
-                                ${a.firmado ? 
-                                    `<i class="fas fa-check-circle"></i> Firmado` : 
+                                ${a.firmado ?
+                                    `<i class="fas fa-check-circle"></i> Firmado` :
                                     `<i class="fas fa-clock"></i> Pendiente
                                     ${esMaestro ? `<button class="btn-firmar" onclick="abrirModalFirma('${dual._id}', ${index})"><i class="fas fa-pen"></i> Firmar</button>` : ''}
                                     `
@@ -283,7 +281,7 @@ async function verDetalleDual(dualId) {
                         </div>
                     `).join('') : '<p style="color: #94a3b8;">No hay materias asignadas.</p>'}
                 </div>
-                
+
                 <div class="modal-actions">
                     ${esMaestro ? `
                         <button class="btn btn-editar" onclick="editarDual('${dual._id}')">
@@ -300,7 +298,7 @@ async function verDetalleDual(dualId) {
                     </button>
                 </div>
             `;
-            
+
             content.innerHTML = html;
         } else {
             content.innerHTML = `<p style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> ${resultado.mensaje}</p>`;
@@ -324,8 +322,7 @@ function abrirModalFirma(dualId, asignacionIndex) {
     asignacionIndexParaFirma = asignacionIndex;
     const modal = document.getElementById('modalFirma');
     modal.classList.add('active');
-    
-    // Inicializar canvas después de un pequeño delay
+
     setTimeout(inicializarCanvas, 100);
 }
 
@@ -339,30 +336,23 @@ function inicializarCanvas() {
     const container = document.getElementById('canvasContainer');
     canvas = document.getElementById('firmaCanvas');
     const rect = container.getBoundingClientRect();
-    
-    // Ajustar tamaño del canvas al contenedor
+
     canvas.width = container.clientWidth || 400;
     canvas.height = container.clientHeight || 180;
-    
+
     ctx = canvas.getContext('2d');
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    
-    // ✅ DETECTAR MODO OSCURO Y AJUSTAR COLOR DE LA TINTA
+
     const isDarkMode = document.body.classList.contains('dark-mode');
     const inkColor = isDarkMode ? '#ffffff' : '#1e293b';
     ctx.strokeStyle = inkColor;
-    
-    // ✅ Fondo del canvas según modo
+
     const bgColor = isDarkMode ? '#1a1a2e' : '#ffffff';
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // ✅ Actualizar color de la tinta si cambia el modo mientras se dibuja
-    // (se actualiza en cada inicio de dibujo)
-    
-    // Eventos para mouse
+
     canvas.removeEventListener('mousedown', iniciarDibujo);
     canvas.removeEventListener('mousemove', dibujar);
     canvas.removeEventListener('mouseup', finalizarDibujo);
@@ -370,7 +360,7 @@ function inicializarCanvas() {
     canvas.removeEventListener('touchstart', iniciarDibujoTouch);
     canvas.removeEventListener('touchmove', dibujarTouch);
     canvas.removeEventListener('touchend', finalizarDibujo);
-    
+
     canvas.addEventListener('mousedown', iniciarDibujo);
     canvas.addEventListener('mousemove', dibujar);
     canvas.addEventListener('mouseup', finalizarDibujo);
@@ -378,13 +368,12 @@ function inicializarCanvas() {
     canvas.addEventListener('touchstart', iniciarDibujoTouch);
     canvas.addEventListener('touchmove', dibujarTouch);
     canvas.addEventListener('touchend', finalizarDibujo);
-    
-    // Ocultar placeholder
+
     const placeholder = document.getElementById('firmaPlaceholder');
     if (placeholder) {
         placeholder.style.display = 'block';
     }
-    
+
     console.log(`🖊️ Canvas inicializado - Modo: ${isDarkMode ? 'OSCURO' : 'CLARO'}, Tinta: ${inkColor}`);
 }
 
@@ -395,13 +384,11 @@ function iniciarDibujo(e) {
     const scaleY = canvas.height / rect.height;
     lastX = (e.clientX - rect.left) * scaleX;
     lastY = (e.clientY - rect.top) * scaleY;
-    
-    // ✅ Asegurar color correcto al empezar a dibujar
+
     const isDarkMode = document.body.classList.contains('dark-mode');
     ctx.strokeStyle = isDarkMode ? '#ffffff' : '#1e293b';
     ctx.lineWidth = 3;
-    
-    // Ocultar placeholder al dibujar
+
     const placeholder = document.getElementById('firmaPlaceholder');
     if (placeholder) {
         placeholder.style.display = 'none';
@@ -417,12 +404,11 @@ function iniciarDibujoTouch(e) {
     lastX = (touch.clientX - rect.left) * scaleX;
     lastY = (touch.clientY - rect.top) * scaleY;
     isDrawing = true;
-    
-    // ✅ Asegurar color correcto
+
     const isDarkMode = document.body.classList.contains('dark-mode');
     ctx.strokeStyle = isDarkMode ? '#ffffff' : '#1e293b';
     ctx.lineWidth = 3;
-    
+
     const placeholder = document.getElementById('firmaPlaceholder');
     if (placeholder) {
         placeholder.style.display = 'none';
@@ -436,12 +422,12 @@ function dibujar(e) {
     const scaleY = canvas.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-    
+
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-    
+
     lastX = x;
     lastY = y;
 }
@@ -455,12 +441,12 @@ function dibujarTouch(e) {
     const scaleY = canvas.height / rect.height;
     const x = (touch.clientX - rect.left) * scaleX;
     const y = (touch.clientY - rect.top) * scaleY;
-    
+
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-    
+
     lastX = x;
     lastY = y;
 }
@@ -471,13 +457,12 @@ function finalizarDibujo() {
 
 function limpiarFirma() {
     if (!ctx || !canvas) return;
-    
+
     const isDarkMode = document.body.classList.contains('dark-mode');
     const bgColor = isDarkMode ? '#1a1a2e' : '#ffffff';
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Mostrar placeholder
+
     const placeholder = document.getElementById('firmaPlaceholder');
     if (placeholder) {
         placeholder.style.display = 'block';
@@ -490,38 +475,32 @@ function guardarFirma() {
         mostrarMensaje('error', 'No se pudo capturar la firma');
         return;
     }
-    
-    // Verificar si hay algo dibujado
+
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
     let isEmpty = true;
-    // Verificar los píxeles (buscando colores que no sean el fondo)
+
     const isDarkMode = document.body.classList.contains('dark-mode');
-    const bgColor = isDarkMode ? '#1a1a2e' : '#ffffff';
     const bgR = isDarkMode ? 26 : 255;
     const bgG = isDarkMode ? 26 : 255;
     const bgB = isDarkMode ? 46 : 255;
-    
+
     for (let i = 0; i < pixels.length; i += 4) {
-        // Si el píxel es diferente al fondo (con margen de 20)
         const diffR = Math.abs(pixels[i] - bgR);
-        const diffG = Math.abs(pixels[i+1] - bgG);
-        const diffB = Math.abs(pixels[i+2] - bgB);
+        const diffG = Math.abs(pixels[i + 1] - bgG);
+        const diffB = Math.abs(pixels[i + 2] - bgB);
         if (diffR > 20 || diffG > 20 || diffB > 20) {
             isEmpty = false;
             break;
         }
     }
-    
+
     if (isEmpty) {
         mostrarMensaje('error', 'Por favor, firma en el recuadro antes de continuar');
         return;
     }
-    
-    // Guardar firma como imagen
+
     firmaData = canvas.toDataURL('image/png');
-    
-    // Enviar al servidor
     enviarFirma();
 }
 
@@ -537,13 +516,12 @@ async function enviarFirma() {
                 firma: firmaData
             })
         });
-        
+
         const resultado = await respuesta.json();
-        
+
         if (resultado.exito) {
             mostrarMensaje('exito', 'Firma registrada correctamente ✅');
             cerrarModalFirma();
-            // Recargar el detalle
             verDetalleDual(dualIdParaFirma);
             cargarDuales();
         } else {
@@ -555,106 +533,219 @@ async function enviarFirma() {
     }
 }
 
+
 // ============================================
-// GENERAR PDF (Alumno)
+// GENERAR PDF CON FORMATO OFICIAL
 // ============================================
 async function generarPDF(dualId) {
     try {
         const respuesta = await fetch(`/api/duales/detalle/${dualId}`);
         const resultado = await respuesta.json();
-        
-        if (resultado.exito) {
-            const dual = resultado.dual;
-            
-            // Crear el contenido HTML para el PDF
-            const contenidoHTML = `
-                <div style="font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #667eea; font-size: 28px;">Learnify</h1>
-                        <h2 style="color: #1e293b;">Reporte de Dual</h2>
-                        <p style="color: #94a3b8;">Generado: ${new Date().toLocaleString('es-MX')}</p>
-                    </div>
-                    
-                    <div style="border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                        <h3 style="color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Datos del Alumno</h3>
-                        <p><strong>Nombre:</strong> ${escapeHtml(dual.alumno?.nombre || 'No disponible')}</p>
-                        <p><strong>Correo:</strong> ${escapeHtml(dual.alumno?.email || 'No disponible')}</p>
-                    </div>
-                    
-                    <div style="border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                        <h3 style="color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Datos del Dual</h3>
-                        <p><strong>Título:</strong> ${escapeHtml(dual.titulo)}</p>
-                        <p><strong>Empresa:</strong> ${escapeHtml(dual.empresa)}</p>
-                        <p><strong>Descripción:</strong> ${escapeHtml(dual.descripcion || 'Sin descripción')}</p>
-                        <p><strong>Cuatrimestre:</strong> ${dual.cuatrimestre || 'No especificado'}</p>
-                        <p><strong>Curso:</strong> ${dual.curso || 'No especificado'}</p>
-                        <p><strong>Carrera:</strong> ${dual.carrera || 'No especificado'}</p>
-                        <p><strong>Tutor:</strong> ${escapeHtml(dual.tutor || 'No asignado')}</p>
-                        <p><strong>Horas:</strong> ${dual.horas}</p>
-                        <p><strong>Fecha Inicio:</strong> ${formatearFecha(dual.fecha_inicio)}</p>
-                        <p><strong>Fecha Fin:</strong> ${formatearFecha(dual.fecha_fin)}</p>
-                        <p><strong>Estado:</strong> ${dual.estado}</p>
-                    </div>
-                    
-                    <div style="border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-                        <h3 style="color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Materias y Firmas</h3>
-                        ${dual.asignaciones && dual.asignaciones.length > 0 ? 
-                            dual.asignaciones.map(a => `
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
-                                    <div>
-                                        <strong>${escapeHtml(a.materia || 'Sin materia')}</strong><br>
-                                        <span style="color: #94a3b8;">Maestro: ${escapeHtml(a.maestro_nombre || 'No asignado')}</span>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <span style="color: ${a.firmado ? '#10b981' : '#f59e0b'}; font-weight: 600;">
-                                            ${a.firmado ? '✅ FIRMADO' : '⏳ PENDIENTE'}
-                                        </span>
-                                    </div>
-                                </div>
-                            `).join('') : 
-                            '<p style="color: #94a3b8;">No hay materias asignadas.</p>'
-                        }
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
-                        <p style="color: #94a3b8; font-size: 12px;">Este documento fue generado automáticamente por Learnify</p>
-                    </div>
-                </div>
-            `;
-            
-            // Crear un elemento temporal para el PDF
-            const ventana = window.open('', '_blank');
-            ventana.document.write(`
-                <html>
-                    <head>
-                        <title>Reporte Dual - Learnify</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                            @media print {
-                                body { padding: 0; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${contenidoHTML}
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                setTimeout(function() { window.close(); }, 1000);
-                            };
-                        <\/script>
-                    </body>
-                </html>
-            `);
-            ventana.document.close();
-            
-            mostrarMensaje('exito', 'Reporte PDF generado correctamente');
-        } else {
-            mostrarMensaje('error', resultado.mensaje || 'Error al generar el reporte');
+
+        if (!resultado.exito) {
+            mostrarMensaje('error', resultado.mensaje || 'Error al cargar el dual');
+            return;
         }
+
+        dualActual = resultado.dual;
+
+        // ✅ Buscar el contenedor; si no existe, crearlo dinámicamente
+        let contenedor = document.getElementById('formatoImprimible');
+        
+        if (!contenedor) {
+            console.warn('⚠️ Contenedor "formatoImprimible" no encontrado. Creándolo dinámicamente...');
+            contenedor = document.createElement('div');
+            contenedor.id = 'formatoImprimible';
+            contenedor.className = 'formato-imprimible';
+            document.body.appendChild(contenedor);
+            console.log('✅ Contenedor creado:', contenedor);
+        }
+
+        contenedor.innerHTML = generarFormatoImprimibleDual(dualActual);
+
+        // Esperar a que se renderice y lanzar impresión
+        setTimeout(() => {
+            window.print();
+        }, 300);
+
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al generar PDF:', error);
         mostrarMensaje('error', 'Error de conexión al generar el PDF');
+    }
+}
+
+// ============================================
+// GENERAR EL HTML DEL FORMATO OFICIAL
+// ============================================
+function generarFormatoImprimibleDual(d) {
+    const fechaInicio = formatearFechaLarga(d.fecha_inicio);
+    const fechaFin = formatearFechaLarga(d.fecha_fin);
+    const hoy = new Date().toLocaleDateString('es-MX', {
+        day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    let asignacionesHTML = '<p style="color: #94a3b8;">Sin materias asignadas.</p>';
+    if (d.asignaciones && d.asignaciones.length > 0) {
+        asignacionesHTML = `
+            <table class="formato-tabla">
+                <thead>
+                    <tr>
+                        <td class="formato-label" style="width: 40%;">Materia</td>
+                        <td class="formato-label" style="width: 35%;">Maestro</td>
+                        <td class="formato-label" style="width: 25%;">Estado</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${d.asignaciones.map(a => `
+                        <tr>
+                            <td class="formato-valor">${escapeHtml(a.materia || 'Sin materia')}</td>
+                            <td class="formato-valor">
+                                ${escapeHtml(a.maestro_nombre || 'No asignado')}
+                                ${a.maestro_email ? `<br><span style="font-size: 7.5pt; color:#64748b;">${escapeHtml(a.maestro_email)}</span>` : ''}
+                            </td>
+                            <td class="formato-valor" style="color: ${a.firmado ? '#059669' : '#d97706'}; font-weight: 700;">
+                                ${a.firmado ? '✅ FIRMADO' : '⏳ PENDIENTE'}
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    return `
+        <div class="formato-pagina">
+            <header class="formato-header">
+                <div class="formato-logo formato-logo-izq">
+                    <img src="../../img/logo_escuela.png" alt="Logo Escuela"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>ESCUELA</div>';">
+                </div>
+                <div class="formato-titulo">
+                    <h1>FORMATO DE PROGRAMA DUAL</h1>
+                    <p class="formato-subtitulo">Registro y Control de Programas Duales</p>
+                </div>
+                <div class="formato-logo formato-logo-der">
+                    <img src="../../img/logo_tecnm.png" alt="Logo Institución"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>TECNM</div>';">
+                </div>
+            </header>
+
+            <div class="formato-info-doc">
+                <span><strong>Folio:</strong> DUAL-${String(d._id).slice(-6).toUpperCase()}</span>
+                <span><strong>Fecha de emisión:</strong> ${hoy}</span>
+            </div>
+
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">1. DATOS DEL ALUMNO</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Nombre completo</td>
+                        <td class="formato-valor">${escapeHtml(d.alumno?.nombre || 'No asignado')}</td>
+                        <td class="formato-label">Correo</td>
+                        <td class="formato-valor">${escapeHtml(d.alumno?.email || 'No especificado')}</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">2. DATOS DE LA EMPRESA</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Empresa</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(d.empresa || 'No especificada')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Título del proyecto</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(d.titulo || 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Tutor</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(d.tutor || 'No asignado')}</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">3. DATOS ACADÉMICOS</h2>
+                <table class="formato-tabla">
+                    <tr>
+                        <td class="formato-label">Carrera</td>
+                        <td class="formato-valor">${escapeHtml(d.carrera || 'No especificada')}</td>
+                        <td class="formato-label">Cuatrimestre</td>
+                        <td class="formato-valor">${escapeHtml(d.cuatrimestre || 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Curso</td>
+                        <td class="formato-valor">${escapeHtml(d.curso || 'No especificado')}</td>
+                        <td class="formato-label">Horas</td>
+                        <td class="formato-valor">${parseInt(d.horas) || 0} hrs</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Fecha de inicio</td>
+                        <td class="formato-valor">${fechaInicio || 'No especificada'}</td>
+                        <td class="formato-label">Fecha de término</td>
+                        <td class="formato-valor">${fechaFin || 'No especificada'}</td>
+                    </tr>
+                    <tr>
+                        <td class="formato-label">Estado</td>
+                        <td class="formato-valor" colspan="3" style="text-transform: capitalize;">${escapeHtml(d.estado || 'pendiente')}</td>
+                    </tr>
+                </table>
+            </section>
+
+            ${d.descripcion ? `
+                <section class="formato-seccion">
+                    <h2 class="formato-seccion-titulo">4. DESCRIPCIÓN DEL PROYECTO</h2>
+                    <table class="formato-tabla">
+                        <tr>
+                            <td class="formato-valor formato-descripcion" colspan="4">
+                                ${escapeHtml(d.descripcion)}
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+            ` : ''}
+
+            <section class="formato-seccion">
+                <h2 class="formato-seccion-titulo">${d.descripcion ? '5' : '4'}. MATERIAS Y FIRMAS</h2>
+                ${asignacionesHTML}
+            </section>
+
+            <section class="formato-firmas">
+                <div class="formato-firma">
+                    <div class="firma-linea"></div>
+                    <p><strong>${escapeHtml(d.alumno?.nombre || '___________________')}</strong></p>
+                    <p class="firma-rol">Alumno</p>
+                </div>
+                <div class="formato-firma">
+                    <div class="firma-linea"></div>
+                    <p><strong>${escapeHtml(d.tutor || '___________________')}</strong></p>
+                    <p class="firma-rol">Tutor </p>
+                </div>
+            </section>
+
+            <footer class="formato-pie">
+                <p>Documento generado por <strong>Learnify</strong> · ${hoy}</p>
+            </footer>
+        </div>
+    `;
+}
+
+// ============================================
+// HELPERS
+// ============================================
+function formatearFechaLarga(fecha) {
+    if (!fecha) return null;
+    try {
+        const d = new Date(fecha);
+        if (isNaN(d.getTime())) return fecha;
+        return d.toLocaleDateString('es-MX', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    } catch {
+        return fecha;
     }
 }
 
@@ -664,12 +755,12 @@ async function generarPDF(dualId) {
 function mostrarMensaje(tipo, texto) {
     const mensajeDiv = document.getElementById('mensaje');
     if (!mensajeDiv) return;
-    
+
     const icono = tipo === 'exito' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
     mensajeDiv.className = `mensaje ${tipo}`;
     mensajeDiv.innerHTML = `${icono} ${texto}`;
     mensajeDiv.style.display = 'block';
-    
+
     setTimeout(() => {
         mensajeDiv.style.display = 'none';
     }, 5000);
@@ -694,16 +785,16 @@ function cerrarModalEliminar() {
 
 async function eliminarDualConfirmado() {
     if (!dualIdAEliminar) return;
-    
+
     try {
         const respuesta = await fetch(`/api/duales/eliminar/${dualIdAEliminar}`, {
             method: 'DELETE'
         });
-        
+
         const resultado = await respuesta.json();
-        
+
         cerrarModalEliminar();
-        
+
         if (resultado.exito) {
             mostrarMensaje('exito', 'Dual eliminado correctamente');
             cargarDuales();
@@ -751,20 +842,15 @@ function cerrarSesion() {
 // ============================================
 // INICIALIZAR
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Configurar botones según rol
+document.addEventListener('DOMContentLoaded', function () {
     configurarBotonesPorRol();
-    
-    // 2. Cargar duales
     cargarDuales();
-    
-    // 3. Evento del botón crear
+
     const btnCrear = document.getElementById('btnCrearDual');
     if (btnCrear) {
         btnCrear.onclick = crearDual;
     }
-    
-    // 4. Eventos del modal de confirmación
+
     if (btnCancelarEliminar) {
         btnCancelarEliminar.onclick = cerrarModalEliminar;
     }
@@ -772,25 +858,23 @@ document.addEventListener('DOMContentLoaded', function() {
         btnConfirmarEliminar.onclick = eliminarDualConfirmado;
     }
     if (modalConfirmar) {
-        modalConfirmar.onclick = function(e) {
+        modalConfirmar.onclick = function (e) {
             if (e.target === modalConfirmar) {
                 cerrarModalEliminar();
             }
         };
     }
-    
-    // 5. Cerrar modal de detalle con click fuera
+
     if (modalDetalle) {
-        modalDetalle.onclick = function(e) {
+        modalDetalle.onclick = function (e) {
             if (e.target === modalDetalle) {
                 cerrarDetalleDual();
             }
         };
     }
-    
-    // 6. Cerrar modal de firma con click fuera
+
     if (modalFirma) {
-        modalFirma.onclick = function(e) {
+        modalFirma.onclick = function (e) {
             if (e.target === modalFirma) {
                 cerrarModalFirma();
             }
