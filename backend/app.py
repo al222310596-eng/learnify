@@ -1855,7 +1855,6 @@ def firmar_dual():
 # ============================================
 # 9. ESTADÍAS
 # ============================================
-
 @app.route('/api/estadias/crear', methods=['POST'])
 def crear_estadia():
     try:
@@ -1873,8 +1872,24 @@ def crear_estadia():
         
         nombre_completo = f"{datos.get('nombre', '').strip()} {datos.get('apellidos', '').strip()}".strip()
         
+        # ✅ NUEVO: buscar el maestro por ID (si se envió)
+        maestro_id = datos.get('maestro_id')
+        maestro = None
+        if maestro_id:
+            try:
+                maestro = db.usuarios.find_one({
+                    "_id": ObjectId(maestro_id),
+                    "rol": "maestro"
+                })
+            except:
+                maestro = None
+        
         nueva_estadia = {
             "usuario_id": ObjectId(usuario_id),
+            # ✅ NUEVO: maestro asignado
+            "maestro_id": ObjectId(maestro_id) if maestro else None,
+            "maestro_nombre": maestro["nombre"] if maestro else datos.get('asesor_academico', '').strip(),
+            "maestro_email": maestro["email"] if maestro else None,
             # Datos del alumno
             "nombre": datos.get('nombre', '').strip(),
             "apellidos": datos.get('apellidos', '').strip(),
@@ -1920,12 +1935,11 @@ def listar_estadias(usuario_id):
         estadias = []
         
         if usuario['rol'] == 'maestro':
-            # MAESTRO: buscar estadías de los alumnos que están en SUS equipos
+            # ✅ MAESTRO ve:
+            # 1. Estadías asignadas directamente a él (maestro_id)
+            # 2. Estadías de alumnos en sus equipos (compatibilidad)
             
-            # 1. Obtener los equipos donde el maestro es líder
             equipos = list(db.equipos.find({"lider_id": ObjectId(usuario_id)}))
-            
-            # 2. Recolectar IDs de todos los alumnos miembros de esos equipos
             alumnos_ids = []
             for eq in equipos:
                 for m in eq.get("miembros", []):
@@ -1934,14 +1948,14 @@ def listar_estadias(usuario_id):
             
             print(f"👨‍🏫 Maestro {usuario['nombre']}: equipos={len(equipos)}, alumnos={len(alumnos_ids)}")
             
-            # 3. Buscar estadías creadas por esos alumnos
-            if alumnos_ids:
-                cursor = db.estadias.find({
-                    "usuario_id": {"$in": alumnos_ids}
-                }).sort("fecha_creacion", -1)
-            else:
-                cursor = []
-            
+            # ✅ Unir ambas fuentes con $or
+            cursor = db.estadias.find({
+                "$or": [
+                    {"maestro_id": ObjectId(usuario_id)},
+                    {"usuario_id": {"$in": alumnos_ids}}
+                ]
+            }).sort("fecha_creacion", -1)
+        
         else:
             # ✅ ALUMNO: solo sus estadías
             cursor = db.estadias.find({
@@ -1956,6 +1970,11 @@ def listar_estadias(usuario_id):
                 "usuario_id": str(estadia["usuario_id"]),
                 "alumno_creador_nombre": alumno_creador["nombre"] if alumno_creador else "Desconocido",
                 "alumno_creador_email": alumno_creador["email"] if alumno_creador else "",
+                # ✅ NUEVO: maestro asignado
+                "maestro_id": str(estadia["maestro_id"]) if estadia.get("maestro_id") else None,
+                "maestro_nombre": estadia.get("maestro_nombre", ""),
+                "maestro_email": estadia.get("maestro_email", ""),
+                # Resto igual
                 "nombre": estadia.get("nombre", ""),
                 "apellidos": estadia.get("apellidos", ""),
                 "titulo": estadia.get("titulo", ""),
@@ -1977,7 +1996,6 @@ def listar_estadias(usuario_id):
             })
         
         print(f"📊 {usuario['rol']} {usuario['nombre']}: {len(estadias)} estadías encontradas")
-        
         return jsonify({"exito": True, "estadias": estadias})
     except Exception as error:
         print(f"Error en listar_estadias: {error}")
@@ -2334,6 +2352,202 @@ def handle_disconnect():
             participantes = [{"usuario_id": str(p["usuario_id"]), "nombre": p["nombre"]} for p in sala_actualizada.get("participantes", [])]
             emit('participantes_actualizados', {'participantes': participantes, 'total': len(participantes)}, room=sala_id)
 
+
+# ============================================
+# 13. REGISTRO DE HORAS Y ACTIVIDADES
+# ============================================
+
+@app.route('/api/estadias/<string:estadia_id>/registros', methods=['POST'])
+def crear_registro_horas(estadia_id):
+    try:
+        datos = request.json
+        alumno_id = datos.get('alumno_id')
+        
+        if not alumno_id:
+            return jsonify({"exito": False, "mensaje": "Alumno no identificado"}), 400
+        
+        estadia = db.estadias.find_one({"_id": ObjectId(estadia_id)})
+        if not estadia:
+            return jsonify({"exito": False, "mensaje": "Estadía no encontrada"}), 404
+        
+        if str(estadia["usuario_id"]) != alumno_id:
+            return jsonify({"exito": False, "mensaje": "No tienes permiso para registrar en esta estadía"}), 403
+        
+        if not datos.get('horas') or not datos.get('actividad'):
+            return jsonify({"exito": False, "mensaje": "Horas y actividad son obligatorios"}), 400
+        
+        try:
+            horas = float(datos.get('horas', 0))
+        except:
+            return jsonify({"exito": False, "mensaje": "Las horas deben ser un número"}), 400
+        
+        if horas <= 0 or horas > 24:
+            return jsonify({"exito": False, "mensaje": "Las horas deben estar entre 0.5 y 24"}), 400
+        
+        nuevo_registro = {
+            "estadia_id": ObjectId(estadia_id),
+            "alumno_id": ObjectId(alumno_id),
+            "fecha": datetime.strptime(datos.get('fecha'), '%Y-%m-%d') if datos.get('fecha') else datetime.now(),
+            "horas": horas,
+            "actividad": datos.get('actividad', '').strip(),
+            "descripcion": datos.get('descripcion', '').strip(),
+            "fecha_creacion": datetime.now()
+        }
+        
+        resultado = db.registros_horas.insert_one(nuevo_registro)
+        registrar_actividad(alumno_id, "registro_horas", f"Registró {horas}h en estadía {estadia_id}")
+        
+        return jsonify({
+            "exito": True,
+            "mensaje": "Registro creado correctamente",
+            "registro_id": str(resultado.inserted_id)
+        })
+    except Exception as error:
+        print(f"Error en crear_registro_horas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/estadias/<string:estadia_id>/registros', methods=['GET'])
+def listar_registros_horas(estadia_id):
+    try:
+        registros = list(db.registros_horas.find({
+            "estadia_id": ObjectId(estadia_id)
+        }).sort("fecha", -1))
+        
+        total_horas = sum(r.get("horas", 0) for r in registros)
+        
+        resultado = []
+        for r in registros:
+            resultado.append({
+                "_id": str(r["_id"]),
+                "estadia_id": str(r["estadia_id"]),
+                "alumno_id": str(r["alumno_id"]),
+                "fecha": r["fecha"].strftime('%Y-%m-%d') if r.get("fecha") else None,
+                "horas": r.get("horas", 0),
+                "actividad": r.get("actividad", ""),
+                "descripcion": r.get("descripcion", ""),
+                "fecha_creacion": r["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if r.get("fecha_creacion") else None
+            })
+        
+        return jsonify({
+            "exito": True,
+            "registros": resultado,
+            "total_horas": round(total_horas, 1),
+            "total_registros": len(resultado)
+        })
+    except Exception as error:
+        print(f"Error en listar_registros_horas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/estadias/<string:estadia_id>/progreso', methods=['GET'])
+def progreso_estadia(estadia_id):
+    try:
+        estadia = db.estadias.find_one({"_id": ObjectId(estadia_id)})
+        if not estadia:
+            return jsonify({"exito": False, "mensaje": "Estadía no encontrada"}), 404
+        
+        registros = list(db.registros_horas.find({"estadia_id": ObjectId(estadia_id)}))
+        total_horas = sum(r.get("horas", 0) for r in registros)
+        horas_requeridas = estadia.get("horas", 0)
+        porcentaje = (total_horas / horas_requeridas * 100) if horas_requeridas > 0 else 0
+        
+        return jsonify({
+            "exito": True,
+            "total_horas": round(total_horas, 1),
+            "horas_requeridas": horas_requeridas,
+            "porcentaje": round(porcentaje, 1),
+            "total_registros": len(registros)
+        })
+    except Exception as error:
+        print(f"Error en progreso_estadia: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/registros/<string:registro_id>', methods=['PUT'])
+def actualizar_registro_horas(registro_id):
+    try:
+        datos = request.json
+        actualizacion = {}
+        
+        if 'horas' in datos:
+            try:
+                horas = float(datos['horas'])
+                if horas <= 0 or horas > 24:
+                    return jsonify({"exito": False, "mensaje": "Las horas deben estar entre 0.5 y 24"}), 400
+                actualizacion['horas'] = horas
+            except:
+                return jsonify({"exito": False, "mensaje": "Horas inválidas"}), 400
+        
+        if 'actividad' in datos:
+            actualizacion['actividad'] = datos['actividad'].strip()
+        if 'descripcion' in datos:
+            actualizacion['descripcion'] = datos['descripcion'].strip()
+        if 'fecha' in datos and datos['fecha']:
+            actualizacion['fecha'] = datetime.strptime(datos['fecha'], '%Y-%m-%d')
+        
+        if actualizacion:
+            actualizacion['fecha_actualizacion'] = datetime.now()
+            db.registros_horas.update_one(
+                {"_id": ObjectId(registro_id)},
+                {"$set": actualizacion}
+            )
+        
+        return jsonify({"exito": True, "mensaje": "Registro actualizado correctamente"})
+    except Exception as error:
+        print(f"Error en actualizar_registro_horas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/registros/<string:registro_id>', methods=['DELETE'])
+def eliminar_registro_horas(registro_id):
+    try:
+        resultado = db.registros_horas.delete_one({"_id": ObjectId(registro_id)})
+        if resultado.deleted_count == 0:
+            return jsonify({"exito": False, "mensaje": "Registro no encontrado"}), 404
+        return jsonify({"exito": True, "mensaje": "Registro eliminado correctamente"})
+    except Exception as error:
+        print(f"Error en eliminar_registro_horas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+# ============================================
+# 14. BÚSQUEDA DE MAESTROS (autocompletado)
+# ============================================
+@app.route('/api/usuarios/maestros', methods=['GET'])
+def buscar_maestros():
+    """
+    Busca maestros por nombre o email.
+    Query params:
+      - q: texto a buscar (opcional, si vacío devuelve todos)
+      - limite: máximo de resultados (por defecto 10)
+    """
+    try:
+        q = request.args.get('q', '').strip()
+        limite = int(request.args.get('limite', 10))
+        
+        filtro = {"rol": "maestro"}
+        
+        if q:
+            # Búsqueda por nombre o email, case-insensitive
+            filtro["$or"] = [
+                {"nombre": {"$regex": q, "$options": "i"}},
+                {"email": {"$regex": q, "$options": "i"}}
+            ]
+        
+        maestros = list(
+            db.usuarios.find(filtro, {"nombre": 1, "email": 1})
+            .limit(limite)
+        )
+        
+        resultado = [{
+            "_id": str(m["_id"]),
+            "nombre": m["nombre"],
+            "email": m["email"]
+        } for m in maestros]
+        
+        return jsonify({"exito": True, "maestros": resultado})
+    except Exception as error:
+        print(f"Error en buscar_maestros: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
 # ============================================
 # INICIAR SERVIDOR
 # ============================================
