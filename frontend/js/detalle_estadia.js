@@ -1,6 +1,6 @@
 // ============================================
 // ARCHIVO: detalle_estadia.js
-// Lógica para la vista de detalle de una Estadía
+// Detalle de una Estadía + Imprimir Formato
 // ============================================
 
 // ============================================
@@ -21,7 +21,6 @@ if (!estadiaId) {
 
 let estadiaActual = null;
 
-// Elementos del modal
 const modalConfirmar = document.getElementById('modalConfirmarEstadia');
 const btnCancelarEliminar = document.getElementById('btnCancelarEliminarEstadia');
 const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminarEstadia');
@@ -123,12 +122,6 @@ function renderizarDetalle(e) {
     const fechaFin = formatearFechaLarga(e.fecha_fin);
     const esPropietario = e.usuario_id === usuario._id;
 
-    // Progreso de horas (meta por defecto 600)
-    const metaHoras = 600;
-    const horasActuales = parseInt(e.horas) || 0;
-    const porcentajeHoras = Math.min(100, Math.round((horasActuales / metaHoras) * 100));
-
-    // Equipo como chips
     let equipoHTML = '<span class="detalle-item-valor vacio">Sin equipo asignado</span>';
     if (e.equipo && e.equipo.trim()) {
         const miembros = e.equipo.split(',').map(m => m.trim()).filter(Boolean);
@@ -140,7 +133,6 @@ function renderizarDetalle(e) {
     }
 
     const html = `
-        <!-- Header con acciones -->
         <div class="detalle-header">
             <h2>
                 <i class="fas fa-building"></i>
@@ -150,9 +142,9 @@ function renderizarDetalle(e) {
                 <a href="mis_estadias.html" class="btn secundario">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
-    <button class="btn imprimir" onclick="imprimirFormato()">
-        <i class="fas fa-print"></i> Imprimir Formato
-    </button>
+                <button class="btn imprimir" onclick="imprimirFormato()">
+                    <i class="fas fa-print"></i> Imprimir Formato
+                </button>
                 ${esPropietario ? `
                     <a href="crear_estadia.html?id=${e._id}" class="btn primario">
                         <i class="fas fa-edit"></i> Editar
@@ -164,7 +156,6 @@ function renderizarDetalle(e) {
             </div>
         </div>
 
-        <!-- Tarjeta hero -->
         <div class="detalle-card">
             <div class="detalle-hero">
                 <div class="detalle-hero-icono">
@@ -183,7 +174,6 @@ function renderizarDetalle(e) {
                 </div>
             </div>
 
-            <!-- SECCIÓN: Datos del Alumno -->
             <div class="detalle-seccion">
                 <div class="detalle-seccion-titulo">
                     <i class="fas fa-user-graduate"></i> Datos del Alumno
@@ -213,7 +203,6 @@ function renderizarDetalle(e) {
                 </div>
             </div>
 
-            <!-- SECCIÓN: Empresa y Asesores -->
             <div class="detalle-seccion">
                 <div class="detalle-seccion-titulo">
                     <i class="fas fa-briefcase"></i> Empresa y Asesores
@@ -250,7 +239,6 @@ function renderizarDetalle(e) {
                 </div>
             </div>
 
-            <!-- SECCIÓN: Proyecto -->
             <div class="detalle-seccion">
                 <div class="detalle-seccion-titulo">
                     <i class="fas fa-project-diagram"></i> Proyecto
@@ -276,7 +264,6 @@ function renderizarDetalle(e) {
                 </div>
             </div>
 
-            <!-- SECCIÓN: Periodo y Fechas -->
             <div class="detalle-seccion">
                 <div class="detalle-seccion-titulo">
                     <i class="fas fa-calendar-alt"></i> Periodo y Fechas
@@ -303,18 +290,6 @@ function renderizarDetalle(e) {
                             ${fechaFin || 'No especificada'}
                         </span>
                     </div>
-                    <div class="detalle-item">
-                        <span class="detalle-item-label">Horas totales</span>
-                        <span class="detalle-item-valor">
-                            <i class="fas fa-hourglass-half"></i>
-                            ${horasActuales} / ${metaHoras} hrs
-                        </span>
-                        <div class="progreso-horas">
-                            <div class="progreso-barra">
-                                <div class="progreso-barra-fill" style="width: ${porcentajeHoras}%"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -324,7 +299,7 @@ function renderizarDetalle(e) {
 }
 
 // ============================================
-// 5. MODAL ELIMINAR (vista detalle)
+// 5. MODAL ELIMINAR
 // ============================================
 function abrirModalEliminarDetalle() {
     if (modalConfirmar) modalConfirmar.style.display = 'flex';
@@ -369,9 +344,8 @@ async function eliminarEstadiaDesdeDetalle() {
     }
 }
 
-
 // ============================================
-// 5.5 IMPRIMIR FORMATO OFICIAL DE ESTADÍA
+// 5.5 IMPRIMIR FORMATO
 // ============================================
 function generarFormatoImprimible(e) {
     const fechaInicio = formatearFechaLarga(e.fecha_inicio);
@@ -382,7 +356,6 @@ function generarFormatoImprimible(e) {
         day: '2-digit', month: 'long', year: 'numeric'
     });
 
-    // Equipo como texto
     let equipoTexto = 'Proyecto individual';
     if (e.equipo && e.equipo.trim()) {
         const miembros = e.equipo.split(',').map(m => m.trim()).filter(Boolean);
@@ -391,7 +364,6 @@ function generarFormatoImprimible(e) {
 
     return `
         <div class="formato-pagina">
-            <!-- ENCABEZADO CON LOGOS -->
             <header class="formato-header">
                 <div class="formato-logo formato-logo-izq">
                     <img src="../../img/logo_escuela.png" alt="Logo Escuela"
@@ -412,7 +384,6 @@ function generarFormatoImprimible(e) {
                 <span><strong>Fecha de emisión:</strong> ${hoy}</span>
             </div>
 
-            <!-- SECCIÓN 1: DATOS DEL ALUMNO -->
             <section class="formato-seccion">
                 <h2 class="formato-seccion-titulo">1. DATOS DEL ALUMNO</h2>
                 <table class="formato-tabla">
@@ -429,7 +400,6 @@ function generarFormatoImprimible(e) {
                 </table>
             </section>
 
-            <!-- SECCIÓN 2: EMPRESA Y ASESORES -->
             <section class="formato-seccion">
                 <h2 class="formato-seccion-titulo">2. EMPRESA Y ASESORES</h2>
                 <table class="formato-tabla">
@@ -450,7 +420,6 @@ function generarFormatoImprimible(e) {
                 </table>
             </section>
 
-            <!-- SECCIÓN 3: PROYECTO -->
             <section class="formato-seccion">
                 <h2 class="formato-seccion-titulo">3. PROYECTO</h2>
                 <table class="formato-tabla">
@@ -471,15 +440,12 @@ function generarFormatoImprimible(e) {
                 </table>
             </section>
 
-            <!-- SECCIÓN 4: PERIODO Y FECHAS -->
             <section class="formato-seccion">
                 <h2 class="formato-seccion-titulo">4. PERIODO Y FECHAS</h2>
                 <table class="formato-tabla">
                     <tr>
                         <td class="formato-label">Periodo</td>
-                        <td class="formato-valor">${escapeHtml(e.periodo || 'No especificado')}</td>
-                        <td class="formato-label">Horas totales</td>
-                        <td class="formato-valor">${parseInt(e.horas) || 0} / 600 hrs</td>
+                        <td class="formato-valor" colspan="3">${escapeHtml(e.periodo || 'No especificado')}</td>
                     </tr>
                     <tr>
                         <td class="formato-label">Fecha de inicio</td>
@@ -494,7 +460,6 @@ function generarFormatoImprimible(e) {
                 </table>
             </section>
 
-            <!-- FIRMAS -->
             <section class="formato-firmas">
                 <div class="formato-firma">
                     <div class="firma-linea"></div>
@@ -529,7 +494,6 @@ function imprimirFormato() {
     const contenedor = document.getElementById('formatoImprimible');
     contenedor.innerHTML = generarFormatoImprimible(estadiaActual);
 
-    // Esperar a que carguen las imágenes y lanzar impresión
     setTimeout(() => {
         window.print();
     }, 300);
@@ -539,7 +503,6 @@ function imprimirFormato() {
 // 6. INICIALIZAR
 // ============================================
 document.addEventListener('DOMContentLoaded', function () {
-    // Datos del usuario en el sidebar
     if (usuario) {
         const info = document.getElementById('userInfoSidebar');
         if (info) {
@@ -551,7 +514,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Eventos del modal
     if (btnCancelarEliminar) btnCancelarEliminar.onclick = cerrarModalEliminar;
     if (btnConfirmarEliminar) btnConfirmarEliminar.onclick = eliminarEstadiaDesdeDetalle;
     if (modalConfirmar) {
@@ -560,7 +522,5 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Cargar el detalle
     cargarDetalle();
-    console.log('🔍 Vista de detalle cargada para ID:', estadiaId);
 });

@@ -12,7 +12,6 @@ if (!usuario) {
 let estadiasCache = [];
 let estadiaIdAEliminar = null;
 
-// Elementos del modal
 const modalConfirmar = document.getElementById('modalConfirmarEstadia');
 const btnCancelarEliminar = document.getElementById('btnCancelarEliminarEstadia');
 const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminarEstadia');
@@ -27,16 +26,14 @@ function configurarPorRol() {
     if (usuario.rol === 'alumno') {
         btnCrear.style.display = 'inline-flex';
         if (titulo) titulo.textContent = 'Mis Estadías';
-        console.log('🎓 Alumno: Mostrando botón "Solicitar Estadía"');
     } else {
         btnCrear.style.display = 'none';
         if (titulo) titulo.textContent = 'Solicitudes de Estadía de mis Alumnos';
-        console.log('👨‍🏫 Maestro: Mostrando solicitudes de alumnos');
     }
 }
 
 // ============================================
-// CARGAR ESTADÍAS (según rol)
+// CARGAR ESTADÍAS
 // ============================================
 async function cargarEstadias() {
     const container = document.getElementById('estadiasContainer');
@@ -57,16 +54,8 @@ async function cargarEstadias() {
 
             if (filtroEstado) filtroEstado.addEventListener('change', filtrarEstadias);
             if (filtroBusqueda) filtroBusqueda.addEventListener('input', filtrarEstadias);
-
-             // Filtro por fecha de inicio
-            if (filtroFechaInicio) {
-                filtroFechaInicio.addEventListener('change', filtrarEstadias);
-            }
-
-            // Filtro por fecha de fin
-            if (filtroFechaFin) {
-                filtroFechaFin.addEventListener('change', filtrarEstadias);
-            }
+            if (filtroFechaInicio) filtroFechaInicio.addEventListener('change', filtrarEstadias);
+            if (filtroFechaFin) filtroFechaFin.addEventListener('change', filtrarEstadias);
         } else {
             container.innerHTML = `<div class="sin-estadias"><i class="fas fa-exclamation-triangle"></i> ${resultado.mensaje}</div>`;
         }
@@ -98,78 +87,43 @@ function filtrarEstadias() {
         );
     }
 
-    // Filtro por rango de fechas
-if (fechaInicioFiltro || fechaFinFiltro) {
-    filtrados = filtrados.filter(e => {
+    if (fechaInicioFiltro || fechaFinFiltro) {
+        filtrados = filtrados.filter(e => {
+            if (!e.fecha_inicio || !e.fecha_fin) return false;
 
-        if (!e.fecha_inicio || !e.fecha_fin) {
-            return false;
-        }
+            const inicioEstadia = new Date(e.fecha_inicio);
+            const finEstadia = new Date(e.fecha_fin);
 
-        const inicioEstadia = new Date(e.fecha_inicio);
-        const finEstadia = new Date(e.fecha_fin);
+            const inicioFiltro = fechaInicioFiltro ? new Date(fechaInicioFiltro + 'T00:00:00') : null;
+            const finFiltro = fechaFinFiltro ? new Date(fechaFinFiltro + 'T23:59:59') : null;
 
-        const inicioFiltro = fechaInicioFiltro
-            ? new Date(fechaInicioFiltro + 'T00:00:00')
-            : null;
-
-        const finFiltro = fechaFinFiltro
-            ? new Date(fechaFinFiltro + 'T23:59:59')
-            : null;
-
-        // Solo "Desde"
-        if (inicioFiltro && !finFiltro) {
-            return finEstadia >= inicioFiltro;
-        }
-
-        // Solo "Hasta"
-        if (!inicioFiltro && finFiltro) {
-            return inicioEstadia <= finFiltro;
-        }
-
-        // "Desde" y "Hasta"
-        return inicioEstadia <= finFiltro &&
-               finEstadia >= inicioFiltro;
-    });
-}
+            if (inicioFiltro && !finFiltro) return finEstadia >= inicioFiltro;
+            if (!inicioFiltro && finFiltro) return inicioEstadia <= finFiltro;
+            return inicioEstadia <= finFiltro && finEstadia >= inicioFiltro;
+        });
+    }
 
     mostrarEstadias(filtrados);
 }
-
 
 // ============================================
 // LIMPIAR FILTROS
 // ============================================
 function limpiarFiltros() {
-
-    // Restablecer estado
     const filtroEstado = document.getElementById('filtroEstado');
-    if (filtroEstado) {
-        filtroEstado.value = 'todos';
-    }
+    if (filtroEstado) filtroEstado.value = 'todos';
 
-    // Limpiar búsqueda
     const filtroBusqueda = document.getElementById('filtroBusqueda');
-    if (filtroBusqueda) {
-        filtroBusqueda.value = '';
-    }
+    if (filtroBusqueda) filtroBusqueda.value = '';
 
-    // Limpiar fecha de inicio
     const filtroFechaInicio = document.getElementById('filtroFechaInicio');
-    if (filtroFechaInicio) {
-        filtroFechaInicio.value = '';
-    }
+    if (filtroFechaInicio) filtroFechaInicio.value = '';
 
-    // Limpiar fecha de fin
     const filtroFechaFin = document.getElementById('filtroFechaFin');
-    if (filtroFechaFin) {
-        filtroFechaFin.value = '';
-    }
+    if (filtroFechaFin) filtroFechaFin.value = '';
 
-    // Mostrar nuevamente todas las estadías
     mostrarEstadias(estadiasCache);
 }
-
 
 // ============================================
 // MOSTRAR ESTADÍAS
@@ -179,10 +133,10 @@ function mostrarEstadias(estadias) {
     const esMaestro = usuario.rol === 'maestro';
 
     if (estadias.length === 0) {
-        const mensaje = esMaestro 
-            ? 'No hay solicitudes de estadía de tus alumnos.' 
+        const mensaje = esMaestro
+            ? 'No hay solicitudes de estadía de tus alumnos.'
             : 'No hay estadías registradas.';
-        
+
         const boton = !esMaestro ? `
             <button onclick="crearEstadia()" class="btn primario" style="margin-top: 1rem;">
                 <i class="fas fa-plus-circle"></i> Solicitar mi primera estadía
@@ -233,7 +187,6 @@ function mostrarEstadias(estadias) {
 
         const diasRestantes = calcularDiasRestantes(estadia.fecha_fin);
 
-        // ✅ SOLO PARA MAESTRO: mostrar nombre del alumno de su cuenta
         const alumnoCreadorHtml = esMaestro ? `
             <div class="estadia-alumno-creador" style="
                 background: #f0f0ff;
@@ -253,7 +206,6 @@ function mostrarEstadias(estadias) {
             </div>
         ` : '';
 
-        // ✅ CAMPO PROYECTO (visible para ambos roles)
         const proyectoHtml = estadia.proyecto ? `
     <div class="estadia-info" style="margin-top: 0.3rem;">
         <i class="fas fa-lightbulb"></i>
@@ -261,7 +213,6 @@ function mostrarEstadias(estadias) {
     </div>
 ` : '';
 
-// ✅ CAMPO EQUIPO DE TRABAJO (visible para ambos roles)
         const equipoTrabajoHtml = estadia.equipo ? `
             <div class="estadia-info" style="margin-top: 0.3rem;">
                 <i class="fas fa-users"></i>
@@ -269,7 +220,13 @@ function mostrarEstadias(estadias) {
             </div>
         ` : '';
 
-        // ✅ SELECTOR DE ESTADO (solo para maestro)
+        const maestroAsignadoHtml = estadia.maestro_nombre ? `
+            <div class="estadia-info" style="margin-top: 0.3rem;">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Asesor: <strong>${escapeHtml(estadia.maestro_nombre)}</strong></span>
+            </div>
+        ` : '';
+
         const selectorEstadoHtml = esMaestro ? `
             <div style="margin-top: 0.75rem;">
                 <label style="font-size:0.75rem; color:#64748b; font-weight:600; display:block; margin-bottom:4px;">
@@ -294,9 +251,6 @@ function mostrarEstadias(estadias) {
             </div>
         ` : '';
 
-        // ✅ BOTONES SEGÚN ROL
-        // - ALUMNO: solo Ver y Eliminar (una vez enviada, no puede editar)
-        // - MAESTRO: Ver, Editar y Eliminar
         const botonesHtml = esMaestro ? `
             <div class="estadia-acciones">
                 <button onclick="verDetalleEstadia('${estadia._id}')" class="btn-ver-estadia">
@@ -313,6 +267,21 @@ function mostrarEstadias(estadias) {
             <div class="estadia-acciones">
                 <button onclick="verDetalleEstadia('${estadia._id}')" class="btn-ver-estadia">
                     <i class="fas fa-eye"></i> Ver detalles
+                </button>
+                <button onclick="irARegistrarHoras('${estadia._id}')" class="btn-registrar-horas" style="
+                    background: #6366f1;
+                    color: white;
+                    border: none;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    <i class="fas fa-clock"></i> Registrar horas
                 </button>
                 <button onclick="mostrarModalEliminarEstadia('${estadia._id}')" class="btn-eliminar-estadia">
                     <i class="fas fa-trash-alt"></i> Eliminar
@@ -335,6 +304,7 @@ function mostrarEstadias(estadias) {
         </div>
         ${proyectoHtml}         
         ${equipoTrabajoHtml}
+        ${maestroAsignadoHtml}
         ${estadia.estado === 'en-curso' && diasRestantes > 0 ?
             `<div class="estadia-duracion"><i class="fas fa-hourglass-half"></i> ${diasRestantes} días restantes</div>` : ''}
         <span class="estadia-estado ${estadoClass}">${estadoIcono} ${estadoText}</span>
@@ -462,36 +432,28 @@ function crearEstadia() {
     window.location.href = 'crear_estadia.html';
 }
 
+function irARegistrarHoras(estadiaId) {
+    window.location.href = `registrar_horas.html?estadia_id=${estadiaId}`;
+}
+
 // ============================================
 // INICIALIZAR
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Configurar según rol
+document.addEventListener('DOMContentLoaded', function () {
     configurarPorRol();
-
-    // Cargar estadías
     cargarEstadias();
 
     const btnCrear = document.getElementById('btnCrearEstadia');
-    if (btnCrear) {
-        btnCrear.onclick = crearEstadia;
-    }
+    if (btnCrear) btnCrear.onclick = crearEstadia;
 
     if (btnCancelarEliminar) btnCancelarEliminar.onclick = cerrarModalEliminar;
     if (btnConfirmarEliminar) btnConfirmarEliminar.onclick = eliminarEstadiaConfirmado;
     if (modalConfirmar) {
-        modalConfirmar.onclick = function(e) {
+        modalConfirmar.onclick = function (e) {
             if (e.target === modalConfirmar) cerrarModalEliminar();
         };
     }
 
     const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
-
-if (btnLimpiarFiltros) {
-    btnLimpiarFiltros.onclick = limpiarFiltros;
-}
-
-if (btnCancelarEliminar) {
-    btnCancelarEliminar.onclick = cerrarModalEliminar;
-}
+    if (btnLimpiarFiltros) btnLimpiarFiltros.onclick = limpiarFiltros;
 });
