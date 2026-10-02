@@ -2075,6 +2075,199 @@ def eliminar_estadia(estadia_id):
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
 # ============================================
+# RUTA: Generar formato HTML imprimible
+# ============================================
+@app.route('/api/estadias/formato/<string:estadia_id>', methods=['GET'])
+def formato_estadia(estadia_id):
+    try:
+        estadia = db.estadias.find_one({"_id": ObjectId(estadia_id)})
+        if not estadia:
+            return jsonify({"exito": False, "mensaje": "Estadía no encontrada"}), 404
+        
+        # Base URL para los logos (IP del servidor)
+        base_url = request.host_url.rstrip('/')
+        
+        # Formatear fechas
+        def formatear_fecha(fecha):
+            if not fecha:
+                return 'No especificada'
+            return fecha.strftime('%d de %B de %Y').replace(
+                'January', 'enero').replace('February', 'febrero').replace(
+                'March', 'marzo').replace('April', 'abril').replace(
+                'May', 'mayo').replace('June', 'junio').replace(
+                'July', 'julio').replace('August', 'agosto').replace(
+                'September', 'septiembre').replace('October', 'octubre').replace(
+                'November', 'noviembre').replace('December', 'diciembre')
+        
+        fecha_inicio = formatear_fecha(estadia.get('fecha_inicio'))
+        fecha_fin = formatear_fecha(estadia.get('fecha_fin'))
+        hoy = datetime.now().strftime('%d/%m/%Y')
+        
+        nombre_completo = f"{estadia.get('nombre', '')} {estadia.get('apellidos', '')}".strip()
+        equipo = estadia.get('equipo', 'Proyecto individual')
+        if not equipo or equipo.strip() == '':
+            equipo = 'Proyecto individual'
+        
+        folio = str(estadia['_id'])[-6:].upper()
+        
+        html = f"""
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formato de Estadía - {estadia.get('proyecto', 'Sin nombre')}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1e293b; padding: 20px; background: white; }}
+        .formato-header {{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 3px double #1e293b; margin-bottom: 1rem; }}
+        .formato-logo {{ width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }}
+        .formato-logo img {{ max-width: 100%; max-height: 100%; object-fit: contain; }}
+        .logo-placeholder {{ width: 70px; height: 70px; border: 2px dashed #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9pt; color: #64748b; font-weight: 700; }}
+        .formato-titulo {{ flex: 1; text-align: center; }}
+        .formato-titulo h1 {{ font-size: 15pt; margin-bottom: 0.3rem; }}
+        .formato-subtitulo {{ font-size: 10pt; color: #64748b; font-style: italic; }}
+        .formato-info-doc {{ display: flex; justify-content: space-between; font-size: 9pt; color: #475569; margin-bottom: 1.2rem; padding: 0.5rem 0.8rem; background: #f8fafc; border-radius: 6px; }}
+        .formato-seccion {{ margin-bottom: 1.2rem; }}
+        .formato-seccion-titulo {{ font-size: 11pt; background: #e2e8f0; padding: 6px 10px; margin-bottom: 0.6rem; border-left: 4px solid #667eea; }}
+        .formato-tabla {{ width: 100%; border-collapse: collapse; font-size: 10pt; }}
+        .formato-tabla td {{ border: 1px solid #cbd5e1; padding: 8px 10px; vertical-align: top; }}
+        .formato-label {{ background: #f1f5f9; font-weight: 700; color: #334155; width: 20%; text-transform: uppercase; font-size: 8.5pt; }}
+        .formato-valor {{ width: 30%; }}
+        .formato-descripcion {{ white-space: pre-wrap; line-height: 1.5; min-height: 50px; }}
+        .formato-firmas {{ display: flex; justify-content: space-around; gap: 1.5rem; margin-top: 3rem; }}
+        .formato-firma {{ flex: 1; text-align: center; }}
+        .firma-linea {{ border-top: 1px solid #1e293b; margin-bottom: 0.4rem; height: 40px; }}
+        .formato-firma p {{ font-size: 9pt; }}
+        .firma-rol {{ font-size: 8pt; color: #64748b; font-style: italic; }}
+        .formato-pie {{ margin-top: 2rem; padding-top: 0.8rem; border-top: 1px solid #cbd5e1; text-align: center; font-size: 8pt; color: #94a3b8; }}
+    </style>
+</head>
+<body>
+    <div class="formato-pagina">
+        <header class="formato-header">
+            <div class="formato-logo">
+                <img src="{base_url}/img/logo_escuela.png" 
+                     onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>ESCUELA</div>';" />
+            </div>
+            <div class="formato-titulo">
+                <h1>FORMATO DE ESTADÍA PROFESIONAL</h1>
+                <p class="formato-subtitulo">Registro y Control de Estadías</p>
+            </div>
+            <div class="formato-logo">
+                <img src="{base_url}/img/logo_tecnm.png" 
+                     onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>TECNM</div>';" />
+            </div>
+        </header>
+
+        <div class="formato-info-doc">
+            <span><strong>Folio:</strong> EST-{folio}</span>
+            <span><strong>Fecha de emisión:</strong> {hoy}</span>
+        </div>
+
+        <section class="formato-seccion">
+            <h2 class="formato-seccion-titulo">1. DATOS DEL ALUMNO</h2>
+            <table class="formato-tabla">
+                <tr>
+                    <td class="formato-label">Nombre completo</td>
+                    <td class="formato-valor">{nombre_completo or 'No especificado'}</td>
+                    <td class="formato-label">Grupo</td>
+                    <td class="formato-valor">{estadia.get('grupo', 'No especificado') or 'No especificado'}</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Carrera</td>
+                    <td class="formato-valor" colspan="3">{estadia.get('carrera', 'No especificada') or 'No especificada'}</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="formato-seccion">
+            <h2 class="formato-seccion-titulo">2. EMPRESA Y ASESORES</h2>
+            <table class="formato-tabla">
+                <tr>
+                    <td class="formato-label">Empresa</td>
+                    <td class="formato-valor" colspan="3">{estadia.get('empresa', 'No especificada') or 'No especificada'}</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Lugar</td>
+                    <td class="formato-valor" colspan="3">{estadia.get('ubicacion', 'No especificado') or 'No especificado'}</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Asesor Académico</td>
+                    <td class="formato-valor">{estadia.get('asesor_academico', 'No especificado') or 'No especificado'}</td>
+                    <td class="formato-label">Asesor Externo</td>
+                    <td class="formato-valor">{estadia.get('asesor_externo', 'No especificado') or 'No especificado'}</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="formato-seccion">
+            <h2 class="formato-seccion-titulo">3. PROYECTO</h2>
+            <table class="formato-tabla">
+                <tr>
+                    <td class="formato-label">Proyecto</td>
+                    <td class="formato-valor" colspan="3">{estadia.get('proyecto', 'No especificado') or 'No especificado'}</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Equipo</td>
+                    <td class="formato-valor" colspan="3">{equipo}</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Descripción</td>
+                    <td class="formato-valor formato-descripcion" colspan="3">{estadia.get('descripcion', 'Sin descripción') or 'Sin descripción'}</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="formato-seccion">
+            <h2 class="formato-seccion-titulo">4. PERIODO Y FECHAS</h2>
+            <table class="formato-tabla">
+                <tr>
+                    <td class="formato-label">Periodo</td>
+                    <td class="formato-valor">{estadia.get('periodo', 'No especificado') or 'No especificado'}</td>
+                    <td class="formato-label">Horas</td>
+                    <td class="formato-valor">{estadia.get('horas', 0)} / 600 hrs</td>
+                </tr>
+                <tr>
+                    <td class="formato-label">Inicio</td>
+                    <td class="formato-valor">{fecha_inicio}</td>
+                    <td class="formato-label">Término</td>
+                    <td class="formato-valor">{fecha_fin}</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="formato-firmas">
+            <div class="formato-firma">
+                <div class="firma-linea"></div>
+                <p><strong>{nombre_completo or '___________________'}</strong></p>
+                <p class="firma-rol">Alumno</p>
+            </div>
+            <div class="formato-firma">
+                <div class="firma-linea"></div>
+                <p><strong>{estadia.get('asesor_academico', '___________________') or '___________________'}</strong></p>
+                <p class="firma-rol">Asesor Académico</p>
+            </div>
+            <div class="formato-firma">
+                <div class="firma-linea"></div>
+                <p><strong>{estadia.get('asesor_externo', '___________________') or '___________________'}</strong></p>
+                <p class="firma-rol">Asesor Externo</p>
+            </div>
+        </section>
+
+        <footer class="formato-pie">
+            <p>Documento generado por <strong>Learnify</strong> · {hoy}</p>
+        </footer>
+    </div>
+</body>
+</html>
+        """
+        
+        return Response(html, mimetype='text/html')
+    except Exception as error:
+        print(f"Error en formato_estadia: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+# ============================================
 # 10. VIDEOLLAMADA (JITSI MEET)
 # ============================================
 
