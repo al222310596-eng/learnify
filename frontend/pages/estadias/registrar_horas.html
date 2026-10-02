@@ -1,0 +1,371 @@
+<!-- ============================================
+     ARCHIVO: registrar_horas.html
+     Registro de horas y actividades de estadía
+     ============================================ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Registrar Horas</title>
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/menu.css">
+    <link rel="stylesheet" href="../../css/estadias.css">
+    <link rel="stylesheet" href="../../css/temas_oscuro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        .registro-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .registro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .registro-header h2 {
+            font-size: 1.5rem;
+            color: var(--texto-principal, #1e293b);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .progreso-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .progreso-card .info h3 {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .progreso-card .info .valor {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .progreso-barra {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progreso-barra-inner {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .form-registro {
+            background: var(--bg-card, white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .form-registro h3 {
+            margin-bottom: 1rem;
+            color: var(--texto-principal, #1e293b);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--texto-secundario, #64748b);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--texto-principal, #1e293b);
+            background: var(--bg-input, white);
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        .btn-primario {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .btn-primario:hover {
+            background: #4f46e5;
+        }
+        .btn-secundario {
+            background: var(--bg-hover, #f1f5f9);
+            color: var(--texto-principal, #334155);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .btn-secundario:hover {
+            background: var(--border-color, #e2e8f0);
+        }
+        .btn-peligro {
+            background: var(--bg-peligro, #fee2e2);
+            color: #b91c1c;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .btn-peligro:hover {
+            background: #fecaca;
+        }
+        .btn-editar {
+            background: var(--bg-editar, #e0e7ff);
+            color: #4338ca;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .btn-editar:hover {
+            background: #c7d2fe;
+        }
+        .tabla-registros {
+            background: var(--bg-card, white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .tabla-registros table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabla-registros th {
+            background: var(--bg-tabla-header, #f8fafc);
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--texto-secundario, #64748b);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+        }
+        .tabla-registros td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color, #f1f5f9);
+            font-size: 0.9rem;
+            color: var(--texto-principal, #334155);
+        }
+        .tabla-registros tr:hover {
+            background: var(--bg-hover, #f8fafc);
+        }
+        .sin-registros {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--texto-secundario, #94a3b8);
+        }
+        .sin-registros i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: var(--texto-secundario, #cbd5e1);
+        }
+        .mensaje {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+        .mensaje.exito {
+            background: var(--bg-exito, #dcfce7);
+            color: #166534;
+            border: 1px solid var(--border-exito, #bbf7d0);
+        }
+        .mensaje.error {
+            background: var(--bg-error, #fee2e2);
+            color: #991b1b;
+            border: 1px solid var(--border-error, #fecaca);
+        }
+        @media (max-width: 600px) {
+            .tabla-registros { overflow-x: auto; }
+            .tabla-registros table { min-width: 600px; }
+            .progreso-card { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body class="menu-lateral">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../../dashboard.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i><span> Dashboard</span>
+                </a>
+                <a href="../../pages/mis_equipos.html" class="menu-item">
+                    <i class="fas fa-users"></i><span> Mis Equipos</span>
+                </a>
+                <a href="../../pages/analisis/analisis_alumnos.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="../../pages/duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="../../pages/estadias/mis_estadias.html" class="menu-item active">
+                    <i class="fas fa-building"></i><span> Estadías</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-sidebar" id="userInfoSidebar"></div>
+                <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="registro-container">
+                <div class="registro-header">
+                    <h2>
+                        <i class="fas fa-clock"></i>
+                        <span>Registro de Horas y Actividades</span>
+                    </h2>
+                    <button class="btn-secundario" onclick="window.location.href='mis_estadias.html'">
+                        <i class="fas fa-arrow-left"></i> Volver a Estadías
+                    </button>
+                </div>
+
+                <div id="nombreEstadia" style="margin-bottom: 1rem; color:var(--texto-secundario, #64748b); font-size: 0.9rem;"></div>
+
+                <div id="mensaje" class="mensaje"></div>
+
+                <div class="progreso-card">
+                    <div class="info">
+                        <h3>Horas acumuladas</h3>
+                        <div class="valor"><span id="totalHoras">0</span> h</div>
+                    </div>
+                    <div class="info" style="min-width: 200px;">
+                        <h3>Progreso de <span id="horasRequeridas">0</span> h requeridas</h3>
+                        <div class="valor" id="porcentajeTexto">0%</div>
+                        <div class="progreso-barra">
+                            <div class="progreso-barra-inner" id="progresoBarra" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-registro">
+                    <h3><i class="fas fa-plus-circle"></i> <span id="tituloForm">Nuevo registro</span></h3>
+                    <form id="formRegistro" onsubmit="guardarRegistro(event)">
+                        <input type="hidden" id="registroId" value="">
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="fecha">Fecha *</label>
+                                <input type="date" id="fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="horas">Horas trabajadas *</label>
+                                <input type="number" id="horas" step="0.5" min="0.5" max="24" required placeholder="Ej: 4.5">
+                            </div>
+                            <div class="form-group full">
+                                <label for="actividad">Actividad realizada *</label>
+                                <input type="text" id="actividad" required maxlength="120" placeholder="Ej: Desarrollo de módulo de login">
+                            </div>
+                            <div class="form-group full">
+                                <label for="descripcion">Descripción / Detalles</label>
+                                <textarea id="descripcion" rows="3" maxlength="500" placeholder="Describe brevemente lo que hiciste..."></textarea>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            <button type="submit" class="btn-primario">
+                                <i class="fas fa-save"></i> <span id="btnTexto">Guardar registro</span>
+                            </button>
+                            <button type="button" class="btn-secundario" onclick="cancelarEdicion()" id="btnCancelarEdicion" style="display: none;">
+                                <i class="fas fa-times"></i> Cancelar edición
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tabla-registros">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Horas</th>
+                                <th>Actividad</th>
+                                <th>Descripción</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody">
+                            <tr>
+                                <td colspan="5" class="sin-registros">
+                                    <i class="fas fa-spinner fa-pulse"></i>
+                                    Cargando registros...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/menu.js"></script>
+    <script src="../../js/registro_horas.js"></script>
+</body>
+</html>
