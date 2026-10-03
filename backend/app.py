@@ -2082,6 +2082,81 @@ def eliminar_estadia(estadia_id):
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
 # ============================================
+# NOTIFICACIONES: ESTADÍAS NUEVAS PARA EL MAESTRO
+# ============================================
+
+def filtro_estadias_maestro(usuario_id):
+    """Mismo criterio que listar_estadias: estadías asignadas al maestro
+    o creadas por alumnos de sus equipos."""
+    equipos = list(db.equipos.find({"lider_id": ObjectId(usuario_id)}))
+    alumnos_ids = []
+    for eq in equipos:
+        for m in eq.get("miembros", []):
+            if m not in alumnos_ids:
+                alumnos_ids.append(m)
+    return {
+        "$or": [
+            {"maestro_id": ObjectId(usuario_id)},
+            {"usuario_id": {"$in": alumnos_ids}}
+        ]
+    }
+
+
+@app.route('/api/estadias/nuevas/<string:usuario_id>', methods=['GET'])
+def estadias_nuevas(usuario_id):
+    try:
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+
+        if usuario.get('rol') != 'maestro':
+            return jsonify({"exito": True, "total_nuevas": 0, "estadias": []})
+
+        filtro = filtro_estadias_maestro(usuario_id)
+
+        # Solo las creadas después de la última revisión del maestro
+        ultima_revision = usuario.get("ultima_revision_estadias")
+        if ultima_revision:
+            filtro = {"$and": [filtro, {"fecha_creacion": {"$gt": ultima_revision}}]}
+
+        total = db.estadias.count_documents(filtro)
+        cursor = db.estadias.find(filtro).sort("fecha_creacion", -1).limit(5)
+
+        estadias = []
+        for e in cursor:
+            alumno = db.usuarios.find_one({"_id": e["usuario_id"]})
+            estadias.append({
+                "_id": str(e["_id"]),
+                "alumno_nombre": alumno["nombre"] if alumno else "Desconocido",
+                "empresa": e.get("empresa", ""),
+                "proyecto": e.get("proyecto", ""),
+                "fecha_creacion": e["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if e.get("fecha_creacion") else None
+            })
+
+        return jsonify({"exito": True, "total_nuevas": total, "estadias": estadias})
+    except Exception as error:
+        print(f"Error en estadias_nuevas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/estadias/marcar-vistas', methods=['POST'])
+def marcar_estadias_vistas():
+    try:
+        datos = request.json
+        usuario_id = datos.get('usuario_id')
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+
+        db.usuarios.update_one(
+            {"_id": ObjectId(usuario_id)},
+            {"$set": {"ultima_revision_estadias": datetime.now()}}
+        )
+        return jsonify({"exito": True, "mensaje": "Estadías marcadas como vistas"})
+    except Exception as error:
+        print(f"Error en marcar_estadias_vistas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+# ============================================
 # RUTA: Generar formato HTML imprimible
 # ============================================
 @app.route('/api/estadias/formato/<string:estadia_id>', methods=['GET'])
