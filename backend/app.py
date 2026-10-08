@@ -250,31 +250,57 @@ def test():
 def registrar_usuario():
     try:
         datos = request.json
-        nombre = datos['nombre']
-        email = datos['email']
-        password = datos['password']
-        rol = datos['rol']
-        
+        nombre = datos.get('nombre', '').strip()
+        email = datos.get('email', '').strip().lower()
+        password = datos.get('password', '')
+        rol = datos.get('rol')
+        telefono = datos.get('telefono')  # opcional
+
+        # Validaciones básicas
+        if not nombre or not email or not password or not rol:
+            return jsonify({"exito": False, "mensaje": "Todos los campos son obligatorios"}), 400
+
+        import re
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$', nombre):
+            return jsonify({"exito": False, "mensaje": "Nombre no válido"}), 400
+
+        if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+            return jsonify({"exito": False, "mensaje": "Correo no válido"}), 400
+
+        if len(password) < 6:
+            return jsonify({"exito": False, "mensaje": "La contraseña debe tener al menos 6 caracteres"}), 400
+
+        if telefono:
+            telefono = str(telefono).strip()
+            if not re.match(r'^\d{10}$', telefono):
+                return jsonify({"exito": False, "mensaje": "El teléfono debe tener 10 dígitos"}), 400
+
         if db.usuarios.find_one({"email": email}):
             return jsonify({"exito": False, "mensaje": "El email ya está registrado"}), 400
-        
+
         nuevo_usuario = {
             "nombre": nombre,
             "email": email,
+            "telefono": telefono if telefono else None,
             "password": password,
             "rol": rol,
             "fecha_registro": datetime.now()
         }
         resultado = db.usuarios.insert_one(nuevo_usuario)
-        return jsonify({"exito": True, "mensaje": "Usuario registrado correctamente", "usuario_id": str(resultado.inserted_id)})
+        return jsonify({
+            "exito": True,
+            "mensaje": "Usuario registrado correctamente",
+            "usuario_id": str(resultado.inserted_id)
+        })
     except Exception as error:
+        print(f" Error en registrar_usuario: {error}")
         return jsonify({"exito": False, "mensaje": f"Error: {str(error)}"}), 400
 
 @app.route('/api/iniciar-sesion', methods=['POST'])
 def iniciar_sesion():
     try:
         id_cliente = obtener_id_cliente()
-        print(f"🔐 Login desde IP: {id_cliente}")
+        print(f" Login desde IP: {id_cliente}")
         
         # Verificar bloqueo
         bloqueado, minutos, segundos = verificar_bloqueo(id_cliente)
@@ -336,7 +362,7 @@ def iniciar_sesion():
             }), 401
             
     except Exception as error:
-        print(f"❌ Error: {error}")
+        print(f" Error: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
     
 @app.route('/api/estado-intentos', methods=['GET'])
@@ -462,29 +488,63 @@ def actualizar_usuario():
     try:
         datos = request.json
         usuario_id = datos.get('usuario_id')
-        nombre = datos.get('nombre')
-        email = datos.get('email')
+        nombre = datos.get('nombre', '').strip()
+        email = datos.get('email', '').strip().lower()
+        telefono = datos.get('telefono')
         password = datos.get('password')
-        
+
+        #  Validaciones backend
         if not usuario_id or not nombre or not email:
-            return jsonify({"exito": False, "mensaje": "Datos incompletos"}), 400
-        
+            return jsonify({"exito": False, "mensaje": "Nombre y correo son obligatorios"}), 400
+
+        import re
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$', nombre):
+            return jsonify({"exito": False, "mensaje": "Nombre no válido"}), 400
+
+        if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+            return jsonify({"exito": False, "mensaje": "Correo no válido"}), 400
+
+        if telefono:
+            telefono = str(telefono).strip()
+            if not re.match(r'^\d{10}$', telefono):
+                return jsonify({"exito": False, "mensaje": "El teléfono debe tener 10 dígitos"}), 400
+
+        # Verificar email duplicado
         existe = db.usuarios.find_one({"email": email, "_id": {"$ne": ObjectId(usuario_id)}})
         if existe:
             return jsonify({"exito": False, "mensaje": "El correo ya está registrado"}), 400
-        
-        actualizacion = {"nombre": nombre, "email": email}
+
+        # Construir actualización
+        actualizacion = {
+            "nombre": nombre,
+            "email": email
+        }
+
+        if telefono:
+            actualizacion["telefono"] = telefono
+        elif telefono == "" or telefono is None:
+            actualizacion["telefono"] = None
+
         if password:
+            if len(password) < 6:
+                return jsonify({"exito": False, "mensaje": "La contraseña debe tener al menos 6 caracteres"}), 400
             actualizacion["password"] = password
-        
+
         db.usuarios.update_one({"_id": ObjectId(usuario_id)}, {"$set": actualizacion})
+
         usuario_actualizado = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
         usuario_actualizado["_id"] = str(usuario_actualizado["_id"])
-        del usuario_actualizado["password"]
-        return jsonify({"exito": True, "mensaje": "Perfil actualizado", "usuario": usuario_actualizado})
-    except Exception as error:
-        return jsonify({"exito": False, "mensaje": str(error)}), 400
+        usuario_actualizado.pop("password", None)
 
+        return jsonify({
+            "exito": True,
+            "mensaje": "Perfil actualizado correctamente",
+            "usuario": usuario_actualizado
+        })
+    except Exception as error:
+        print(f" Error en actualizar_usuario: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+    
 @app.route('/api/usuarios/subir-foto', methods=['POST'])
 def subir_foto_perfil():
     try:
@@ -499,6 +559,43 @@ def subir_foto_perfil():
         db.usuarios.update_one({"_id": ObjectId(usuario_id)}, {"$set": {"foto_url": foto_url, "foto_id": str(archivo_id)}})
         return jsonify({"exito": True, "mensaje": "Foto actualizada", "foto_url": foto_url})
     except Exception as error:
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+@app.route('/api/usuarios/eliminar-foto', methods=['DELETE'])
+def eliminar_foto_perfil():
+    try:
+        datos = request.json
+        usuario_id = datos.get('usuario_id')
+        
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+        
+        # Buscar usuario
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+        
+        # Eliminar archivo de GridFS si existe
+        foto_id = usuario.get("foto_id")
+        if foto_id:
+            try:
+                fs.delete(ObjectId(foto_id))
+                print(f" Foto eliminada de GridFS: {foto_id}")
+            except Exception as e:
+                print(f" No se pudo eliminar de GridFS: {e}")
+        
+        # Actualizar usuario en MongoDB
+        db.usuarios.update_one(
+            {"_id": ObjectId(usuario_id)},
+            {"$set": {"foto_url": None, "foto_id": None}}
+        )
+        
+        return jsonify({
+            "exito": True,
+            "mensaje": "Foto eliminada correctamente"
+        })
+    except Exception as error:
+        print(f"Error en eliminar_foto_perfil: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
 # ============================================
