@@ -1,98 +1,16 @@
-name: CI Learnify - Pruebas Unitarias (Estefanía)
+name: CI Learnify
 
+# Cuándo se ejecuta: en cada push a estas ramas y en cada pull request hacia main o develop
 on:
   push:
-    branches: [ pruebas_unit, feature/* ]
+    branches: [main, develop, facture/pipeline]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
-  # ============================================
-  # JOB 1: BUILD (Tu pipeline - pruebas_unit)
-  # ============================================
+  # ETAPA 1: BUILD
   build:
-    name: Build - Preparar proyecto
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-      
-      - name: Configurar Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Verificar que la app se puede importar
-        run: |
-          cd backend
-          python -c "import app; print('App importada correctamente')"
-
-  # ============================================
-  # JOB 2: TEST (Tu pipeline - pruebas_unit)
-  # ============================================
-  test:
-    name: Test - Ejecutar pruebas
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-      
-      - name: Configurar Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: Ejecutar pruebas con Pytest
-        run: |
-          pytest tests/ -v --tb=short
-
-  # ============================================
-  # JOB 3: RESULTS (Tu pipeline - pruebas_unit)
-  # ============================================
-  results:
-    name: Results - Reportar resultado
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    if: always()
-    
-    steps:
-      - name: Verificar resultado del pipeline
-        run: |
-          echo "=========================================="
-          echo "RESULTADO DEL PIPELINE - LEARNIFY"
-          echo "=========================================="
-          echo "Build: ${{ needs.build.result }}"
-          echo "Test: ${{ needs.test.result }}"
-          echo "=========================================="
-          
-          if [ "${{ needs.build.result }}" == "success" ] && [ "${{ needs.test.result }}" == "success" ]; then
-            echo "PIPELINE EXITOSO - Todas las etapas pasaron"
-            echo "El codigo esta listo para hacer merge"
-            exit 0
-          else
-            echo "PIPELINE FALLIDO"
-            echo "Revisa los logs de los jobs anteriores para mas informacion"
-            exit 1
-          fi
-
-  # ============================================
-  # PIPELINE DE DEVELOP (Conservado como evidencia)
-  # ============================================
-  build-develop:
-    name: Build (Develop)
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Obtener código del repositorio
@@ -117,11 +35,13 @@ jobs:
         working-directory: backend
         run: python -c "import app; print('Servidor importado correctamente')"
 
-  test-develop:
-    name: Pruebas (Develop)
+  # ETAPA 2: PRUEBAS (solo corre si el Build fue exitoso)
+  test:
+    name: Pruebas
     runs-on: ubuntu-latest
-    needs: build-develop
+    needs: build
 
+    # MongoDB temporal que GitHub enciende solo para esta etapa
     services:
       mongodb:
         image: mongo:7
@@ -165,25 +85,26 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: resultados-pruebas-develop
+          name: resultados-pruebas
           path: backend/resultados-*.xml
           if-no-files-found: ignore
 
-  reporte-develop:
-    name: Reporte de resultados (Develop)
+  # ETAPA 3: REPORTE DE RESULTADOS (siempre se ejecuta)
+  reporte:
+    name: Reporte de resultados
     runs-on: ubuntu-latest
-    needs: [build-develop, test-develop]
+    needs: [build, test]
     if: always()
     steps:
       - name: Mostrar resumen
         run: |
-          echo "## Resultado del pipeline (Develop)" >> $GITHUB_STEP_SUMMARY
-          echo "- Build: ${{ needs.build-develop.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Pruebas: ${{ needs.test-develop.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Resultado del pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "- Build: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Pruebas: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Pipeline fallido (reportar error)
-        if: needs.build-develop.result != 'success' || needs.test-develop.result != 'success'
+        if: needs.build.result != 'success' || needs.test.result != 'success'
         run: |
           echo "El pipeline falló o no pudo ejecutar las pruebas."
-          echo "Build: ${{ needs.build-develop.result }} | Pruebas: ${{ needs.test-develop.result }}"
+          echo "Build: ${{ needs.build.result }} | Pruebas: ${{ needs.test.result }}"
           exit 1
