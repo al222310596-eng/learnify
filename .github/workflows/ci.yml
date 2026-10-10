@@ -2,7 +2,7 @@ name: CI Pipeline - Learnify
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
+    branches: [ main, develop, pruebas_unit, feature/* ]
   pull_request:
     branches: [ main, develop ]
 
