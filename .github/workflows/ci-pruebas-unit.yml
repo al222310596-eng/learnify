@@ -1,8 +1,8 @@
-name: CI Learnify - Pruebas Unitarias (Estefanía)
+name: CI Pipeline - Learnify
 
 on:
   push:
-    branches: [ pruebas_unit, feature/* ]
+    branches: [ main, develop, pruebas_unit, feature/* ]
   pull_request:
     branches: [ main, develop ]
 
