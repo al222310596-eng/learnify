@@ -86,4 +86,4 @@ jobs:
             echo "PIPELINE FALLIDO"
             echo "Revisa los logs de los jobs anteriores para mas informacion"
             exit 1
-          fiss
+          fi
