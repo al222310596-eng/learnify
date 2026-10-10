@@ -249,55 +249,6 @@
         </main>
     </div>
 
-    <!-- Modal Editar Perfil -->
-    <div id="modalEditarPerfil" class="modal-overlay" style="display: none;">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-edit"></i> Editar Perfil</h3>
-                <button class="modal-close" onclick="cerrarModalPerfil()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="perfil-foto">
-                    <div id="avatarPreview" class="perfil-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <button id="btnSubirFoto" class="btn-subir-foto">
-                        <i class="fas fa-camera"></i> Cambiar foto
-                    </button>
-                    <input type="file" id="inputFoto" accept="image/*" style="display: none;">
-                </div>
-
-                <div class="form-grupo">
-                    <label><i class="fas fa-user"></i> Nombre completo</label>
-                    <input type="text" id="editNombre" class="form-control" placeholder="Tu nombre">
-                </div>
-                <div class="form-grupo">
-                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
-                    <input type="email" id="editEmail" class="form-control" placeholder="tu@email.com">
-                </div>
-                <div class="form-grupo">
-                    <label><i class="fas fa-lock"></i> Nueva contraseña</label>
-                    <input type="password" id="editPassword" class="form-control" placeholder="Dejar en blanco para no cambiar">
-                    <small class="form-help">Mínimo 6 caracteres</small>
-                </div>
-                <div class="form-grupo">
-                    <label><i class="fas fa-check-circle"></i> Confirmar contraseña</label>
-                    <input type="password" id="confirmPassword" class="form-control" placeholder="Repite la nueva contraseña">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="cerrarModalPerfil()" class="btn btn-secundario">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button onclick="guardarCambiosPerfil()" class="btn btn-primario">
-                    <i class="fas fa-save"></i> Guardar cambios
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script src="js/menu.js"></script>
     <script src="js/dashboard.js"></script>
 </html>

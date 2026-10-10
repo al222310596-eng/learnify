@@ -12,3 +12,5 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+intentos_fallidos.json
+backend/intentos_fallidos.json
