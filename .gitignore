@@ -13,6 +13,10 @@ __pycache__/
 .vscode/
 .idea/
 
+# Intentos fallidos de login
+intentos_fallidos.json
+backend/intentos_fallidos.json
+
 # Pytest
 .pytest_cache/
 .coverage

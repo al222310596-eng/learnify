@@ -8,43 +8,67 @@
             </button>
         </div>
         <div class="modal-body">
-            <!-- Foto de perfil -->
+            <!-- Foto de perfil con avatar -->
             <div class="perfil-foto">
                 <div id="avatarPreview" class="perfil-avatar">
                     <i class="fas fa-user"></i>
                 </div>
-                <button id="btnSubirFoto" class="btn-subir-foto">
-                    <i class="fas fa-camera"></i> Cambiar foto
-                </button>
-                <input type="file" id="inputFoto" accept="image/*" style="display: none;">
+                <div class="perfil-foto-botones">
+                    <button id="btnSubirFoto" class="btn-subir-foto">
+                        <i class="fas fa-camera"></i> Cambiar foto
+                    </button>
+                    <button id="btnQuitarFoto" class="btn-quitar-foto" style="display: none;">
+                        <i class="fas fa-trash"></i> Quitar
+                    </button>
+                </div>
+                <input type="file" id="inputFoto" accept="image/png, image/jpeg, image/webp" style="display: none;">
+                <small class="form-help-foto">Formatos: JPG, PNG, WEBP · Máximo 2 MB</small>
             </div>
 
+            <!-- Nombre -->
             <div class="form-grupo">
-                <label><i class="fas fa-user"></i> Nombre completo</label>
-                <input type="text" id="editNombre" class="form-control" placeholder="Tu nombre">
+                <label><i class="fas fa-user"></i> Nombre completo <span class="required">*</span></label>
+                <input type="text" id="editNombre" class="form-control" placeholder="Tu nombre completo" maxlength="60">
+                <small class="form-error" id="errorNombre"></small>
             </div>
 
+            <!-- Email -->
             <div class="form-grupo">
-                <label><i class="fas fa-envelope"></i> Correo electrónico</label>
-                <input type="email" id="editEmail" class="form-control" placeholder="tu@email.com">
+                <label><i class="fas fa-envelope"></i> Correo electrónico <span class="required">*</span></label>
+                <input type="email" id="editEmail" class="form-control" placeholder="tu@email.com" maxlength="80">
+                <small class="form-error" id="errorEmail"></small>
             </div>
 
+            <!-- Teléfono (NUEVO) -->
             <div class="form-grupo">
-                <label><i class="fas fa-lock"></i> Nueva contraseña</label>
+                <label><i class="fas fa-phone"></i> Teléfono <span class="opcional">(opcional)</span></label>
+                <input type="tel" id="editTelefono" class="form-control" placeholder="10 dígitos (ej. 7221234567)" maxlength="10" inputmode="numeric">
+                <small class="form-help">Solo números, 10 dígitos</small>
+                <small class="form-error" id="errorTelefono"></small>
+            </div>
+
+            <hr class="form-divisor">
+
+            <!-- Contraseña -->
+            <div class="form-grupo">
+                <label><i class="fas fa-lock"></i> Nueva contraseña <span class="opcional">(opcional)</span></label>
                 <input type="password" id="editPassword" class="form-control" placeholder="Dejar en blanco para no cambiar">
                 <small class="form-help">Mínimo 6 caracteres</small>
+                <small class="form-error" id="errorPassword"></small>
             </div>
 
+            <!-- Confirmar contraseña -->
             <div class="form-grupo">
                 <label><i class="fas fa-check-circle"></i> Confirmar contraseña</label>
                 <input type="password" id="confirmPassword" class="form-control" placeholder="Repite la nueva contraseña">
+                <small class="form-error" id="errorConfirm"></small>
             </div>
         </div>
         <div class="modal-footer">
-            <button onclick="cerrarModalPerfil()" class="btn btn-secundario">
+            <button onclick="cerrarModalPerfil()" class="btn btn-secundario" id="btnCancelarPerfil">
                 <i class="fas fa-times"></i> Cancelar
             </button>
-            <button onclick="guardarCambiosPerfil()" class="btn btn-primario">
+            <button onclick="guardarCambiosPerfil()" class="btn btn-primario" id="btnGuardarPerfil">
                 <i class="fas fa-save"></i> Guardar cambios
             </button>
         </div>

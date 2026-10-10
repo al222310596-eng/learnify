@@ -9,3 +9,9 @@ Flask==2.3.3           # Framework web para Python
 flask-cors==4.0.0      # Permite conexiones desde el frontend
 mysql-connector-python==8.1.0  # Conector para MySQL (ya lo tienes)
 python-dotenv==1.0.0   # Para variables de entorno (lo usaremos después)
+pytest
+numpy
+pytest-flask
+pymongo
+flask-socketio
+eventlet

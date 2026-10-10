@@ -2,7 +2,6 @@
      MODAL DE EDICIÓN DE PERFIL
      ============================================ */
 
-/* Overlay (fondo oscuro) */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -17,12 +16,11 @@
     z-index: 9999;
 }
 
-/* Contenedor del modal */
 .modal-container {
     background: white;
     border-radius: 24px;
     width: 90%;
-    max-width: 480px;
+    max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -30,17 +28,10 @@
 }
 
 @keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
-/* Cabecera del modal */
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -72,14 +63,10 @@
     padding: 0;
 }
 
-.modal-close:hover {
-    color: #ef4444;
-}
+.modal-close:hover { color: #ef4444; }
 
 /* Cuerpo del modal */
-.modal-body {
-    padding: 1.5rem;
-}
+.modal-body { padding: 1.5rem; }
 
 /* Foto de perfil */
 .perfil-foto {
@@ -88,8 +75,8 @@
 }
 
 .perfil-avatar {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 50%;
     display: flex;
@@ -100,41 +87,82 @@
     color: white;
     background-size: cover;
     background-position: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    border: 4px solid #fff;
+    transition: all 0.3s ease;
 }
 
-.btn-subir-foto {
+.perfil-avatar:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.perfil-foto-botones {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.btn-subir-foto,
+.btn-quitar-foto {
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
-    padding: 6px 12px;
+    padding: 8px 14px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.2s;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .btn-subir-foto:hover {
-    background: #e2e8f0;
+    background: #e0e7ff;
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-quitar-foto {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.btn-quitar-foto:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+}
+
+.form-help-foto {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
 }
 
 /* Campos del formulario */
 .form-grupo {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.1rem;
 }
 
 .form-grupo label {
     display: block;
     font-weight: 500;
     color: #1e293b;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     font-size: 0.85rem;
 }
 
 .form-grupo label i {
     color: #667eea;
-    width: 20px;
+    width: 18px;
     margin-right: 0.25rem;
 }
+
+.form-grupo label .required { color: #ef4444; font-weight: 700; }
+.form-grupo label .opcional  { color: #94a3b8; font-weight: 400; font-size: 0.75rem; }
 
 .form-grupo input {
     width: 100%;
@@ -143,6 +171,7 @@
     border-radius: 12px;
     font-size: 0.9rem;
     transition: all 0.2s;
+    font-family: inherit;
 }
 
 .form-grupo input:focus {
@@ -151,11 +180,37 @@
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-grupo input.input-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.form-grupo input.input-success {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
 .form-help {
     display: block;
     font-size: 0.7rem;
     color: #94a3b8;
     margin-top: 0.25rem;
+}
+
+.form-error {
+    display: none;
+    font-size: 0.72rem;
+    color: #ef4444;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.form-error.visible { display: block; }
+
+.form-divisor {
+    border: none;
+    border-top: 1px dashed #e2e8f0;
+    margin: 1.25rem 0;
 }
 
 /* Pie del modal */
@@ -169,33 +224,99 @@
     border-radius: 0 0 24px 24px;
 }
 
-.btn-secundario {
-    background: #f1f5f9;
-    color: #475569;
+.btn-secundario,
+.btn-primario {
     border: none;
     padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.btn-secundario:hover {
-    background: #e2e8f0;
+.btn-secundario {
+    background: #f1f5f9;
+    color: #475569;
 }
+
+.btn-secundario:hover { background: #e2e8f0; }
 
 .btn-primario {
     background: #667eea;
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
 }
 
 .btn-primario:hover {
     background: #5a67d8;
     transform: translateY(-1px);
+}
+
+.btn-primario:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+body.dark-mode .modal-container { background: #1a1a2e; }
+
+body.dark-mode .modal-header {
+    background: #12121e;
+    border-bottom-color: #2a2a3e;
+}
+
+body.dark-mode .modal-header h3 { color: #ececf0; }
+
+body.dark-mode .modal-body { background: #1a1a2e; }
+
+body.dark-mode .form-grupo label { color: #a8a8c0; }
+body.dark-mode .form-help       { color: #6a6a82; }
+body.dark-mode .form-help-foto  { color: #6a6a82; }
+
+body.dark-mode .form-grupo input {
+    background: #0a0a0f;
+    border-color: #2a2a3e;
+    color: #ececf0;
+}
+
+body.dark-mode .form-grupo input:focus {
+    border-color: #7c6df0;
+    box-shadow: 0 0 0 3px rgba(124, 109, 240, 0.15);
+}
+
+body.dark-mode .btn-subir-foto {
+    background: rgba(255,255,255,0.05);
+    border-color: #2a2a3e;
+    color: #a8a8c0;
+}
+
+body.dark-mode .btn-quitar-foto {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+body.dark-mode .modal-footer {
+    background: #12121e;
+    border-top-color: #2a2a3e;
+}
+
+body.dark-mode .btn-secundario {
+    background: rgba(255,255,255,0.06);
+    color: #a8a8c0;
+}
+
+body.dark-mode .form-divisor { border-top-color: #2a2a3e; }
+
+@media (max-width: 480px) {
+    .modal-container { width: 95%; max-height: 95vh; }
+    .modal-body { padding: 1rem; }
+    .perfil-avatar { width: 90px; height: 90px; font-size: 2rem; }
+    .modal-footer { flex-direction: column-reverse; }
+    .modal-footer .btn { width: 100%; justify-content: center; }
 }
