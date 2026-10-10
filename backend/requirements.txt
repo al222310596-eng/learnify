@@ -12,7 +12,6 @@ python-dotenv==1.0.0   # Para variables de entorno (lo usaremos después)
 pytest
 numpy
 pytest-flask
-mongomock
 pymongo
 flask-socketio
 eventlet

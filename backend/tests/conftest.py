@@ -1,40 +1,35 @@
 import os
+import sys
+
 import pytest
-import mongomock
-from unittest.mock import patch, MagicMock
+
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, BACKEND_DIR)
+os.chdir(BACKEND_DIR)
+
+os.environ.setdefault(
+    "MONGO_URI", "mongodb://localhost:27017/?serverSelectionTimeoutMS=3000"
+)
+os.environ["MONGO_DB_NAME"] = "learnify_test"
 
 
 @pytest.fixture
-def mock_db():
-    client = mongomock.MongoClient()
-    return client["learnify_test"]
+def client(tmp_path, monkeypatch):
+    import app as app_module
+    monkeypatch.setattr(app_module, "ARCHIVO_INTENTOS", str(tmp_path / "intentos.json"))
+    app_module.app.config["TESTING"] = True
+    with app_module.app.test_client() as c:
+        yield c
 
 
 @pytest.fixture
-def app(mock_db):
-    # Mockeamos GridFS completo porque pymongo no acepta mongomock
-    fake_fs = MagicMock()
+def db():
+    import app as app_module
+    try:
+        app_module.db.client.admin.command("ping")
+    except Exception:
+        pytest.skip("MongoDB no está disponible para las pruebas de integración")
 
-    with patch("mongo_config.get_mongo_connection", return_value=mock_db), \
-         patch("gridfs.GridFS", return_value=fake_fs):
-
-        import app as app_module
-        app_module.db = mock_db
-        app_module.fs = fake_fs
-        app_module.app.config["TESTING"] = True
-        yield app_module.app
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture(autouse=True)
-def limpiar_intentos():
-    archivo = "intentos_fallidos.json"
-    if os.path.exists(archivo):
-        os.remove(archivo)
-    yield
-    if os.path.exists(archivo):
-        os.remove(archivo)
+    app_module.db.client.drop_database("learnify_test")
+    yield app_module.db
+    app_module.db.client.drop_database("learnify_test")

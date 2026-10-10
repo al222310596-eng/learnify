@@ -12,5 +12,23 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Intentos fallidos de login
 intentos_fallidos.json
 backend/intentos_fallidos.json
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entorno virtual
+venv/
+.venv/
+env/
+ENV/
+
+# Build
+build/
+dist/
+*.egg-info/
