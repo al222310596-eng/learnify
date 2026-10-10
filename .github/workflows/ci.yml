@@ -18,7 +18,7 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
       
-      - name: Configurar Python 3.11
+      - name: Configurar Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
       
-      - name: Configurar Python 3.11
+      - name: Configurar Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -86,4 +86,4 @@ jobs:
             echo "PIPELINE FALLIDO"
             echo "Revisa los logs de los jobs anteriores para mas informacion"
             exit 1
-          fi
+          fiss
