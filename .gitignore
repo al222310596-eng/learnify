@@ -12,3 +12,19 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entorno virtual
+venv/
+.venv/
+env/
+ENV/
+
+# Build
+build/
+dist/
+*.egg-info/
