@@ -1,6 +1,6 @@
 // ============================================
 // ARCHIVO: duales.js
-// Lógica para gestionar Duales (VERSIÓN COMPLETA CON FIRMA Y PDF)
+// Lógica para gestionar Duales (Firma por código de email)
 // ============================================
 
 const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -12,12 +12,6 @@ if (!usuario) {
 let dualesCache = [];
 let dualIdAEliminar = null;
 let dualActual = null;
-let firmaData = null;
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let canvas = null;
-let ctx = null;
 let dualIdParaFirma = null;
 let asignacionIndexParaFirma = null;
 
@@ -39,10 +33,10 @@ function configurarBotonesPorRol() {
 
     if (esMaestro) {
         btnCrear.style.display = 'inline-flex';
-        console.log('👨‍🏫 Usuario es MAESTRO - Mostrando botón "Registrar Dual"');
+        console.log('👨‍🏫 Usuario es MAESTRO');
     } else {
         btnCrear.style.display = 'none';
-        console.log('🎓 Usuario es ALUMNO - Ocultando botón "Registrar Dual"');
+        console.log('🎓 Usuario es ALUMNO');
     }
 }
 
@@ -76,7 +70,7 @@ async function cargarDuales() {
         container.innerHTML = `
             <div class="sin-duales">
                 <i class="fas fa-wifi" style="color: #dc2626;"></i>
-                <p>Error de conexión. Verifica que el servidor esté corriendo.</p>
+                <p>Error de conexión.</p>
                 <button onclick="cargarDuales()" class="btn primario" style="margin-top: 1rem;">
                     <i class="fas fa-sync-alt"></i> Reintentar
                 </button>
@@ -315,199 +309,106 @@ function cerrarDetalleDual() {
 }
 
 // ============================================
-// FIRMA DIGITAL (Canvas)
+// FIRMA POR CÓDIGO DE EMAIL
 // ============================================
+
 function abrirModalFirma(dualId, asignacionIndex) {
     dualIdParaFirma = dualId;
     asignacionIndexParaFirma = asignacionIndex;
+
+    // Resetear el modal
+    document.getElementById('paso1Codigo').style.display = 'block';
+    document.getElementById('paso2Codigo').style.display = 'none';
+    document.getElementById('inputCodigoFirma').value = '';
+    document.getElementById('inputPasswordFirma').value = '';
+    document.getElementById('mensajeCodigo').style.display = 'none';
+
+    const btn = document.getElementById('btnSolicitarCodigo');
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar código a mi correo';
+        btn.disabled = false;
+    }
+
     const modal = document.getElementById('modalFirma');
     modal.classList.add('active');
-
-    setTimeout(inicializarCanvas, 100);
 }
 
 function cerrarModalFirma() {
     const modal = document.getElementById('modalFirma');
     modal.classList.remove('active');
-    limpiarFirma();
 }
 
-function inicializarCanvas() {
-    const container = document.getElementById('canvasContainer');
-    canvas = document.getElementById('firmaCanvas');
-    const rect = container.getBoundingClientRect();
+async function solicitarCodigoFirma() {
+    const btn = document.getElementById('btnSolicitarCodigo');
+    const textoOriginal = btn.innerHTML;
 
-    canvas.width = container.clientWidth || 400;
-    canvas.height = container.clientHeight || 180;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    btn.disabled = true;
 
-    ctx = canvas.getContext('2d');
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const inkColor = isDarkMode ? '#ffffff' : '#1e293b';
-    ctx.strokeStyle = inkColor;
-
-    const bgColor = isDarkMode ? '#1a1a2e' : '#ffffff';
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    canvas.removeEventListener('mousedown', iniciarDibujo);
-    canvas.removeEventListener('mousemove', dibujar);
-    canvas.removeEventListener('mouseup', finalizarDibujo);
-    canvas.removeEventListener('mouseleave', finalizarDibujo);
-    canvas.removeEventListener('touchstart', iniciarDibujoTouch);
-    canvas.removeEventListener('touchmove', dibujarTouch);
-    canvas.removeEventListener('touchend', finalizarDibujo);
-
-    canvas.addEventListener('mousedown', iniciarDibujo);
-    canvas.addEventListener('mousemove', dibujar);
-    canvas.addEventListener('mouseup', finalizarDibujo);
-    canvas.addEventListener('mouseleave', finalizarDibujo);
-    canvas.addEventListener('touchstart', iniciarDibujoTouch);
-    canvas.addEventListener('touchmove', dibujarTouch);
-    canvas.addEventListener('touchend', finalizarDibujo);
-
-    const placeholder = document.getElementById('firmaPlaceholder');
-    if (placeholder) {
-        placeholder.style.display = 'block';
-    }
-
-    console.log(`🖊️ Canvas inicializado - Modo: ${isDarkMode ? 'OSCURO' : 'CLARO'}`);
-}
-
-function iniciarDibujo(e) {
-    isDrawing = true;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    lastX = (e.clientX - rect.left) * scaleX;
-    lastY = (e.clientY - rect.top) * scaleY;
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    ctx.strokeStyle = isDarkMode ? '#ffffff' : '#1e293b';
-    ctx.lineWidth = 3;
-
-    const placeholder = document.getElementById('firmaPlaceholder');
-    if (placeholder) placeholder.style.display = 'none';
-}
-
-function iniciarDibujoTouch(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    lastX = (touch.clientX - rect.left) * scaleX;
-    lastY = (touch.clientY - rect.top) * scaleY;
-    isDrawing = true;
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    ctx.strokeStyle = isDarkMode ? '#ffffff' : '#1e293b';
-    ctx.lineWidth = 3;
-
-    const placeholder = document.getElementById('firmaPlaceholder');
-    if (placeholder) placeholder.style.display = 'none';
-}
-
-function dibujar(e) {
-    if (!isDrawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    lastX = x;
-    lastY = y;
-}
-
-function dibujarTouch(e) {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-
-    lastX = x;
-    lastY = y;
-}
-
-function finalizarDibujo() {
-    isDrawing = false;
-}
-
-function limpiarFirma() {
-    if (!ctx || !canvas) return;
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const bgColor = isDarkMode ? '#1a1a2e' : '#ffffff';
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const placeholder = document.getElementById('firmaPlaceholder');
-    if (placeholder) placeholder.style.display = 'block';
-    firmaData = null;
-}
-
-function guardarFirma() {
-    if (!canvas || !ctx) {
-        mostrarMensaje('error', 'No se pudo capturar la firma');
-        return;
-    }
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let isEmpty = true;
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const bgR = isDarkMode ? 26 : 255;
-    const bgG = isDarkMode ? 26 : 255;
-    const bgB = isDarkMode ? 46 : 255;
-
-    for (let i = 0; i < pixels.length; i += 4) {
-        const diffR = Math.abs(pixels[i] - bgR);
-        const diffG = Math.abs(pixels[i + 1] - bgG);
-        const diffB = Math.abs(pixels[i + 2] - bgB);
-        if (diffR > 20 || diffG > 20 || diffB > 20) {
-            isEmpty = false;
-            break;
-        }
-    }
-
-    if (isEmpty) {
-        mostrarMensaje('error', 'Por favor, firma en el recuadro antes de continuar');
-        return;
-    }
-
-    firmaData = canvas.toDataURL('image/png');
-    enviarFirma();
-}
-
-async function enviarFirma() {
     try {
-        const respuesta = await fetch('/api/duales/firmar', {
+        const respuesta = await fetch('/api/duales/solicitar-codigo-firma', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dual_id: dualIdParaFirma,
+                asignacion_index: asignacionIndexParaFirma,
+                usuario_id: usuario._id
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (resultado.exito) {
+            // Cambiar al paso 2
+            document.getElementById('paso1Codigo').style.display = 'none';
+            document.getElementById('paso2Codigo').style.display = 'block';
+            document.getElementById('mensajeCodigoEnviado').textContent = resultado.mensaje;
+            document.getElementById('inputCodigoFirma').focus();
+
+            console.log('✅ Código solicitado correctamente');
+        } else {
+            mostrarMensajeCodigo('error', resultado.mensaje || 'Error al enviar código');
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensajeCodigo('error', 'Error de conexión');
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+async function verificarCodigoFirma() {
+    const codigo = document.getElementById('inputCodigoFirma').value.trim();
+    const password = document.getElementById('inputPasswordFirma').value;
+    const btn = document.getElementById('btnFirmar');
+
+    // Validaciones
+    if (!codigo || codigo.length !== 6) {
+        mostrarMensajeCodigo('error', 'El código debe tener 6 dígitos');
+        return;
+    }
+
+    if (!password) {
+        mostrarMensajeCodigo('error', 'Ingresa tu contraseña');
+        return;
+    }
+
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Firmando...';
+    btn.disabled = true;
+
+    try {
+        const respuesta = await fetch('/api/duales/verificar-codigo-firma', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 dual_id: dualIdParaFirma,
                 asignacion_index: asignacionIndexParaFirma,
                 usuario_id: usuario._id,
-                firma: firmaData
+                codigo: codigo,
+                password: password
             })
         });
 
@@ -519,11 +420,47 @@ async function enviarFirma() {
             verDetalleDual(dualIdParaFirma);
             cargarDuales();
         } else {
-            mostrarMensaje('error', resultado.mensaje || 'Error al registrar la firma');
+            mostrarMensajeCodigo('error', resultado.mensaje || 'Error al verificar');
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
         }
     } catch (error) {
         console.error('Error:', error);
-        mostrarMensaje('error', 'Error de conexión');
+        mostrarMensajeCodigo('error', 'Error de conexión');
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+function mostrarMensajeCodigo(tipo, texto) {
+    const div = document.getElementById('mensajeCodigo');
+    if (!div) return;
+
+    if (tipo === 'exito') {
+        div.style.background = '#dcfce7';
+        div.style.color = '#166534';
+        div.style.border = '1px solid #bbf7d0';
+        div.innerHTML = `<i class="fas fa-check-circle"></i> ${texto}`;
+    } else {
+        div.style.background = '#fee2e2';
+        div.style.color = '#991b1b';
+        div.style.border = '1px solid #fecaca';
+        div.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${texto}`;
+    }
+    div.style.display = 'block';
+}
+
+function volverPaso1Codigo() {
+    document.getElementById('paso1Codigo').style.display = 'block';
+    document.getElementById('paso2Codigo').style.display = 'none';
+    document.getElementById('inputCodigoFirma').value = '';
+    document.getElementById('inputPasswordFirma').value = '';
+    document.getElementById('mensajeCodigo').style.display = 'none';
+
+    const btn = document.getElementById('btnSolicitarCodigo');
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar código a mi correo';
+        btn.disabled = false;
     }
 }
 
@@ -542,7 +479,6 @@ async function generarPDF(dualId) {
 
         dualActual = resultado.dual;
 
-        // ✅ Si el contenedor no existe, lo creamos dinámicamente
         let contenedor = document.getElementById('formatoImprimible');
         if (!contenedor) {
             console.warn('⚠️ Contenedor no encontrado. Creándolo dinámicamente...');
@@ -615,7 +551,7 @@ function generarFormatoImprimibleDual(d) {
                     <p class="formato-subtitulo">Registro y Control de Programas Duales</p>
                 </div>
                 <div class="formato-logo formato-logo-der">
-                    <img src="../../img/logo_tecnm.png" alt="Logo Institución"
+                    <img src="../../img/tecnm.png" alt="Logo Institución"
                          onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;logo-placeholder&quot;>LOGO<br>TECNM</div>';">
                 </div>
             </header>

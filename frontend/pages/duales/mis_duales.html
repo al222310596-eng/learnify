@@ -1,6 +1,6 @@
 <!-- ============================================
      ARCHIVO: mis_duales.html
-     Gestión de Duales (VERSIÓN COMPLETA CON FIRMA Y PDF)
+     Gestión de Duales (VERSIÓN COMPLETA CON FIRMA POR CÓDIGO DE EMAIL Y PDF)
      ============================================ -->
 
 <!DOCTYPE html>
@@ -118,32 +118,170 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL DE FIRMA                             -->
+    <!-- MODAL DE FIRMA POR CÓDIGO DE EMAIL        -->
     <!-- ========================================== -->
     <div id="modalFirma" class="modal-firma">
         <div class="modal-firma-contenido">
             <div class="modal-firma-header">
-                <h3><i class="fas fa-pen-fancy"></i> Firmar Dual</h3>
+                <h3><i class="fas fa-shield-alt"></i> Firmar Dual</h3>
                 <button class="close-btn" onclick="cerrarModalFirma()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-firma-body">
-                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0.75rem;">
-                    <i class="fas fa-info-circle"></i> Firma en el recuadro para confirmar tu aceptación
-                </p>
-                <div class="canvas-container" id="canvasContainer">
-                    <canvas id="firmaCanvas"></canvas>
-                    <div class="firma-placeholder" id="firmaPlaceholder">Firma aquí</div>
+
+                <!-- AVISO INICIAL -->
+                <div id="avisoInicialFirma" style="
+                    background: #eef2ff;
+                    border-left: 4px solid #6366f1;
+                    padding: 12px 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    font-size: 0.85rem;
+                    color: #4338ca;
+                ">
+                    <i class="fas fa-info-circle"></i>
+                    Por seguridad, enviaremos un <strong>código de 6 dígitos</strong> a tu correo electrónico. Deberás ingresarlo junto con tu contraseña para firmar.
                 </div>
-                <div class="firma-buttons">
-                    <button class="btn btn-limpiar" onclick="limpiarFirma()">
-                        <i class="fas fa-eraser"></i> Limpiar
-                    </button>
-                    <button class="btn btn-guardar-firma" onclick="guardarFirma()">
-                        <i class="fas fa-check"></i> Firmar
+
+                <!-- PASO 1: SOLICITAR CÓDIGO -->
+                <div id="paso1Codigo">
+                    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
+                        <i class="fas fa-envelope"></i>
+                        Recibirás el código en el correo asociado a tu cuenta de maestro.
+                    </p>
+                    <button onclick="solicitarCodigoFirma()" id="btnSolicitarCodigo" style="
+                        width: 100%;
+                        padding: 14px;
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        transition: transform 0.2s, box-shadow 0.2s;
+                    ">
+                        <i class="fas fa-paper-plane"></i> Enviar código a mi correo
                     </button>
                 </div>
+
+                <!-- PASO 2: INGRESAR CÓDIGO Y CONTRASEÑA -->
+                <div id="paso2Codigo" style="display: none;">
+                    <div style="
+                        background: #dcfce7;
+                        border-left: 4px solid #10b981;
+                        padding: 12px 15px;
+                        border-radius: 8px;
+                        margin-bottom: 20px;
+                        font-size: 0.85rem;
+                        color: #166534;
+                    ">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="mensajeCodigoEnviado">Código enviado a tu correo</span>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <label for="inputCodigoFirma" style="
+                            font-size: 0.85rem;
+                            color: #475569;
+                            font-weight: 600;
+                            display: block;
+                            margin-bottom: 8px;
+                        ">
+                            <i class="fas fa-key"></i> Código de 6 dígitos
+                        </label>
+                        <input type="text" id="inputCodigoFirma" maxlength="6" placeholder="000000" autocomplete="off" style="
+                            width: 100%;
+                            padding: 16px;
+                            font-size: 1.8rem;
+                            text-align: center;
+                            letter-spacing: 10px;
+                            font-weight: 700;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 12px;
+                            font-family: 'Courier New', monospace;
+                            outline: none;
+                            transition: border-color 0.2s;
+                        ">
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <label for="inputPasswordFirma" style="
+                            font-size: 0.85rem;
+                            color: #475569;
+                            font-weight: 600;
+                            display: block;
+                            margin-bottom: 8px;
+                        ">
+                            <i class="fas fa-lock"></i> Tu contraseña
+                        </label>
+                        <input type="password" id="inputPasswordFirma" placeholder="Ingresa tu contraseña" style="
+                            width: 100%;
+                            padding: 14px;
+                            font-size: 1rem;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 12px;
+                            outline: none;
+                            transition: border-color 0.2s;
+                        ">
+                    </div>
+
+                    <div id="mensajeCodigo" style="
+                        display: none;
+                        padding: 12px;
+                        border-radius: 8px;
+                        margin-bottom: 18px;
+                        font-size: 0.85rem;
+                    "></div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="verificarCodigoFirma()" id="btnFirmar" style="
+                            flex: 2;
+                            padding: 14px;
+                            background: linear-gradient(135deg, #10b981, #059669);
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            font-weight: 700;
+                            font-size: 1rem;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-check-circle"></i> Firmar ahora
+                        </button>
+                        <button onclick="volverPaso1Codigo()" style="
+                            flex: 1;
+                            padding: 14px;
+                            background: #f1f5f9;
+                            color: #475569;
+                            border: none;
+                            border-radius: 10px;
+                            font-weight: 600;
+                            font-size: 0.95rem;
+                            cursor: pointer;
+                        ">
+                            Cancelar
+                        </button>
+                    </div>
+
+                    <p style="
+                        text-align: center;
+                        font-size: 0.75rem;
+                        color: #94a3b8;
+                        margin-top: 15px;
+                    ">
+                        <i class="fas fa-clock"></i> El código expira en 10 minutos
+                    </p>
+                </div>
+
             </div>
         </div>
     </div>
