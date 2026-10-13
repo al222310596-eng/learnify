@@ -12,6 +12,9 @@ import os
 import random
 import string
 import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from datetime import datetime, timedelta
 
@@ -21,7 +24,21 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 
+from dotenv import load_dotenv
 from mongo_config import get_mongo_connection
+
+
+# ============================================
+# CARGAR VARIABLES DE ENTORNO (.env)
+# ============================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
+MAIL_USER = os.getenv('MAIL_USER', '')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
+MAIL_FROM_NAME = os.getenv('MAIL_FROM_NAME', 'Learnify')
 
 # ============================================
 # CONFIGURACIÓN DEL SERVIDOR
@@ -236,6 +253,81 @@ def registrar_actividad_decorator(tipo_accion):
             return response
         return decorated_function
     return decorator
+
+# ============================================
+# FUNCIÓN PARA ENVIAR CÓDIGO DE FIRMA POR EMAIL
+# ============================================
+def enviar_codigo_email(destinatario, codigo, nombre_usuario):
+    """
+    Envía el código de firma al correo del maestro.
+    Devuelve True si se envió, False si falló.
+    """
+    if not MAIL_USER or not MAIL_PASSWORD:
+        print(" No hay configuración de email. Código NO enviado.")
+        return False
+    
+    try:
+        # Crear mensaje
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = ' Código de firma - Learnify'
+        msg['From'] = f'{MAIL_FROM_NAME} <{MAIL_USER}>'
+        msg['To'] = destinatario
+        
+        # Cuerpo del mensaje (HTML bonito)
+        html = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; padding: 20px; }}
+                .container {{ max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }}
+                .logo {{ text-align: center; margin-bottom: 20px; }}
+                .logo h1 {{ color: #667eea; font-size: 24px; margin: 0; }}
+                .titulo {{ color: #1e293b; font-size: 18px; margin-bottom: 10px; }}
+                .texto {{ color: #64748b; font-size: 14px; line-height: 1.6; }}
+                .codigo {{ background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-size: 32px; font-weight: 700; letter-spacing: 8px; text-align: center; padding: 20px; border-radius: 10px; margin: 20px 0; font-family: monospace; }}
+                .aviso {{ background: #fef3c7; color: #92400e; padding: 12px; border-radius: 8px; font-size: 12px; margin-top: 20px; border-left: 4px solid #f59e0b; }}
+                .footer {{ text-align: center; color: #94a3b8; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="logo">
+                    <h1> Learnify</h1>
+                </div>
+                <h2 class="titulo">Hola {nombre_usuario},</h2>
+                <p class="texto">
+                    Recibimos una solicitud para firmar un programa dual. Usa el siguiente código para completar tu firma:
+                </p>
+                <div class="codigo">{codigo}</div>
+                <p class="texto">
+                    Este código es válido por <strong>10 minutos</strong> y solo puede usarse una vez.
+                </p>
+                <div class="aviso">
+                     <strong>Si no fuiste tú</strong>, ignora este mensaje. Alguien pudo haber intentado firmar en tu nombre.
+                </div>
+                <div class="footer">
+                    <p>Documento generado por <strong>Learnify</strong></p>
+                    <p>Este es un mensaje automático, no responder.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        parte_html = MIMEText(html, 'html', 'utf-8')
+        msg.attach(parte_html)
+        
+        # Conectar al servidor SMTP
+        with smtplib.SMTP(MAIL_SERVER, MAIL_PORT) as server:
+            server.starttls()
+            server.login(MAIL_USER, MAIL_PASSWORD)
+            server.send_message(msg)
+        
+        print(f" Código enviado a {destinatario}")
+        return True
+    except Exception as e:
+        print(f" Error al enviar email: {e}")
+        return False
 
 # ============================================
 # ============================================
@@ -1908,6 +2000,168 @@ def eliminar_dual(dual_id):
         print(f"Error en eliminar_dual: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
+# ============================================
+# FIRMA POR CÓDIGO DE EMAIL (DUALES)
+# ============================================
+
+@app.route('/api/duales/solicitar-codigo-firma', methods=['POST'])
+def solicitar_codigo_firma():
+    """Genera un código de 6 dígitos y lo envía al correo del maestro."""
+    try:
+        datos = request.json
+        dual_id = datos.get('dual_id')
+        asignacion_index = datos.get('asignacion_index')
+        usuario_id = datos.get('usuario_id')
+        
+        if not dual_id or asignacion_index is None or not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Datos incompletos"}), 400
+        
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+        
+        dual = db.duales.find_one({"_id": ObjectId(dual_id)})
+        if not dual:
+            return jsonify({"exito": False, "mensaje": "Dual no encontrado"}), 404
+        
+        asignaciones = dual.get('asignaciones', [])
+        if asignacion_index >= len(asignaciones):
+            return jsonify({"exito": False, "mensaje": "Asignación no encontrada"}), 404
+        
+        asignacion = asignaciones[asignacion_index]
+        
+        if asignacion.get('maestro_email') != usuario['email'] and str(dual['usuario_id']) != usuario_id:
+            return jsonify({"exito": False, "mensaje": "No tienes permiso para firmar"}), 403
+        
+        if asignacion.get('firmado'):
+            return jsonify({"exito": False, "mensaje": "Esta asignación ya está firmada"}), 400
+        
+        # Generar código
+        codigo = ''.join(random.choices(string.digits, k=6))
+        expira_en = datetime.now() + timedelta(minutes=10)
+        
+        # Eliminar códigos anteriores
+        db.codigos_firma.delete_many({
+            "usuario_id": ObjectId(usuario_id),
+            "dual_id": ObjectId(dual_id),
+            "asignacion_index": asignacion_index
+        })
+        
+        # Guardar nuevo código
+        db.codigos_firma.insert_one({
+            "usuario_id": ObjectId(usuario_id),
+            "dual_id": ObjectId(dual_id),
+            "asignacion_index": asignacion_index,
+            "codigo": codigo,
+            "fecha_creacion": datetime.now(),
+            "expira_en": expira_en,
+            "usado": False
+        })
+        
+        # Enviar por email
+        enviado = enviar_codigo_email(
+            destinatario=usuario['email'],
+            codigo=codigo,
+            nombre_usuario=usuario['nombre']
+        )
+        
+        if not enviado:
+            return jsonify({
+                "exito": False,
+                "mensaje": "No se pudo enviar el código. Contacta al administrador."
+            }), 500
+        
+        return jsonify({
+            "exito": True,
+            "mensaje": f"Código enviado a {usuario['email']}. Válido por 10 minutos."
+        })
+        
+    except Exception as error:
+        print(f"❌ Error en solicitar_codigo_firma: {error}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/duales/verificar-codigo-firma', methods=['POST'])
+def verificar_codigo_firma():
+    """Valida código + contraseña y registra la firma."""
+    try:
+        datos = request.json
+        dual_id = datos.get('dual_id')
+        asignacion_index = datos.get('asignacion_index')
+        usuario_id = datos.get('usuario_id')
+        codigo_ingresado = datos.get('codigo', '').strip()
+        password = datos.get('password', '')
+        
+        if not dual_id or asignacion_index is None or not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Datos incompletos"}), 400
+        
+        if not codigo_ingresado or not password:
+            return jsonify({"exito": False, "mensaje": "Código y contraseña son obligatorios"}), 400
+        
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+        
+        # Validar contraseña
+        if usuario['password'] != password:
+            return jsonify({"exito": False, "mensaje": "Contraseña incorrecta"}), 401
+        
+        # Buscar código
+        registro_codigo = db.codigos_firma.find_one({
+            "usuario_id": ObjectId(usuario_id),
+            "dual_id": ObjectId(dual_id),
+            "asignacion_index": asignacion_index,
+            "codigo": codigo_ingresado,
+            "usado": False
+        })
+        
+        if not registro_codigo:
+            return jsonify({"exito": False, "mensaje": "Código inválido o ya usado"}), 400
+        
+        # Verificar expiración
+        if datetime.now() > registro_codigo['expira_en']:
+            db.codigos_firma.delete_one({"_id": registro_codigo['_id']})
+            return jsonify({"exito": False, "mensaje": "El código ha expirado. Solicita uno nuevo."}), 400
+        
+        # Buscar dual
+        dual = db.duales.find_one({"_id": ObjectId(dual_id)})
+        if not dual:
+            return jsonify({"exito": False, "mensaje": "Dual no encontrado"}), 404
+        
+        # Registrar firma con timestamp
+        asignaciones = dual.get('asignaciones', [])
+        asignaciones[asignacion_index]['firmado'] = True
+        asignaciones[asignacion_index]['metodo_firma'] = 'codigo_email'
+        asignaciones[asignacion_index]['fecha_firma'] = datetime.now().isoformat()
+        asignaciones[asignacion_index]['ip_firma'] = request.remote_addr
+        asignaciones[asignacion_index]['firmado_por'] = usuario['email']
+        
+        db.duales.update_one(
+            {"_id": ObjectId(dual_id)},
+            {"$set": {"asignaciones": asignaciones}}
+        )
+        
+        # Marcar código como usado
+        db.codigos_firma.update_one(
+            {"_id": registro_codigo['_id']},
+            {"$set": {"usado": True, "fecha_uso": datetime.now()}}
+        )
+        
+        registrar_actividad(usuario_id, "firma_dual", f"Firmó dual {dual_id} con código de email")
+        print(f" Firma registrada: {usuario['email']} → dual {dual_id}")
+        
+        return jsonify({
+            "exito": True,
+            "mensaje": "Firma registrada correctamente"
+        })
+        
+    except Exception as error:
+        print(f" Error en verificar_codigo_firma: {error}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
 @app.route('/api/duales/firmar', methods=['POST'])
 def firmar_dual():
     try:
