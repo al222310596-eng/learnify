@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Crear Minuta</title>
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="stylesheet" href="../../css/menu.css">
+    <link rel="stylesheet" href="../../css/minutas.css">
+    <link rel="stylesheet" href="../../css/temas_oscuro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="menu-lateral">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i><span> Learnify</span></h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../../dashboard.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i><span> Dashboard</span>
+                </a>
+                <a href="../mis_equipos.html" class="menu-item">
+                    <i class="fas fa-users"></i><span> Mis Equipos</span>
+                </a>
+                <a href="../analisis/analisis_alumnos.html" class="menu-item">
+                    <i class="fas fa-chart-pie"></i><span> Análisis</span>
+                </a>
+                <a href="../duales/mis_duales.html" class="menu-item">
+                    <i class="fas fa-briefcase"></i><span> Duales</span>
+                </a>
+                <a href="../estadias/mis_estadias.html" class="menu-item">
+                    <i class="fas fa-building"></i><span> Estadías</span>
+                </a>
+                <a href="mis_minutas.html" class="menu-item active">
+                    <i class="fas fa-file-alt"></i><span> Minutas</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-sidebar" id="userInfoSidebar"></div>
+                <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i><span> Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="minutas-container">
+                <div class="header-minutas">
+                    <div>
+                        <h2><i class="fas fa-file-signature"></i> Nueva Minuta</h2>
+                        <p class="subtitulo">Formato oficial 2-R-COM-04</p>
+                    </div>
+                    <div class="acciones-header">
+                        <a href="mis_minutas.html" class="btn secundario">
+                            <i class="fas fa-arrow-left"></i> Regresar
+                        </a>
+                        <button onclick="imprimirMinuta()" class="btn imprimir">
+                            <i class="fas fa-print"></i> Imprimir / PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mensaje" class="mensaje"></div>
+
+                <form id="formMinuta" class="form-minuta">
+                    <!-- Información general -->
+                    <div class="seccion-form">
+                        <h3 class="seccion-form-titulo"><i class="fas fa-info-circle"></i> Información General</h3>
+
+                        <div class="form-row">
+                            <div class="form-grupo">
+                                <label><i class="fas fa-calendar"></i> Fecha <span class="required">*</span></label>
+                                <input type="date" id="inputFecha" required>
+                            </div>
+                            <div class="form-grupo">
+                                <label><i class="fas fa-clock"></i> Hora</label>
+                                <input type="time" id="inputHora">
+                            </div>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label><i class="fas fa-graduation-cap"></i> Área o Carrera</label>
+                            <input type="text" id="inputArea" placeholder="Ej. Ingeniería en Desarrollo y Gestión de Software">
+                        </div>
+
+                        <div class="form-grupo">
+                            <label><i class="fas fa-tag"></i> Asunto <span class="required">*</span></label>
+                            <input type="text" id="inputAsunto" placeholder="Tema principal de la reunión" required>
+                        </div>
+                    </div>
+
+                    <!-- Asistentes -->
+                    <div class="seccion-form">
+                        <div class="seccion-form-header">
+                            <h3 class="seccion-form-titulo"><i class="fas fa-users"></i> Asistentes</h3>
+                            <button type="button" onclick="agregarAsistente()" class="btn-agregar">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </div>
+                        <div id="listaAsistentes" class="lista-dinamica"></div>
+                    </div>
+
+                    <!-- Acuerdos -->
+                    <div class="seccion-form">
+                        <div class="seccion-form-header">
+                            <h3 class="seccion-form-titulo"><i class="fas fa-clipboard-check"></i> Agenda y Acuerdos</h3>
+                            <button type="button" onclick="agregarAcuerdo()" class="btn-agregar">
+                                <i class="fas fa-plus"></i> Agregar
+                            </button>
+                        </div>
+                        <div id="listaAcuerdos" class="lista-dinamica"></div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="botones-form">
+                        <button type="button" onclick="history.back()" class="btn secundario">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn primario">
+                            <i class="fas fa-save"></i> Guardar Minuta
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Formato imprimible -->
+            <div id="formatoImprimible" class="formato-imprimible"></div>
+        </main>
+    </div>
+
+    <script src="../../js/menu.js"></script>
+    <script src="../../js/minutas.js"></script>
+</body>
+</html>
