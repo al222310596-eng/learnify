@@ -69,6 +69,7 @@ def test_solo_el_lider_puede_crear_tareas(client, db):
     ).get_json()["usuario_id"]
 
     equipo_id = client.post(
+        
         "/api/equipos/crear",
         json={"nombre": "Equipo Alfa", "lider_id": lider_id},
     ).get_json()["equipo_id"]

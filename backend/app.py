@@ -2431,6 +2431,239 @@ def eliminar_estadia(estadia_id):
     except Exception as error:
         print(f"Error en eliminar_estadia: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
+# ============================================
+# 15. MINUTAS
+# ============================================
+
+@app.route('/api/minutas/crear', methods=['POST'])
+def crear_minuta():
+    try:
+        datos = request.json
+        usuario_id = datos.get('usuario_id')
+
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+
+        if not datos.get('asunto'):
+            return jsonify({"exito": False, "mensaje": "El asunto es obligatorio"}), 400
+
+        # Parsear fecha
+        fecha_minuta = None
+        if datos.get('fecha'):
+            try:
+                fecha_minuta = datetime.strptime(datos['fecha'], '%Y-%m-%d')
+            except:
+                fecha_minuta = datetime.now()
+        else:
+            fecha_minuta = datetime.now()
+
+        # Asistentes: lista de {nombre, firma}
+        asistentes = []
+        for a in datos.get('asistentes', []):
+            if a.get('nombre', '').strip():
+                asistentes.append({
+                    "nombre": a.get('nombre', '').strip(),
+                    "firma": a.get('firma', '').strip() or None
+                })
+
+        # Acuerdos: lista de {agenda, acuerdo, responsable, fecha_compromiso}
+        acuerdos = []
+        for ac in datos.get('acuerdos', []):
+            if ac.get('agenda', '').strip() or ac.get('acuerdo', '').strip():
+                fecha_comp = None
+                if ac.get('fecha_compromiso'):
+                    try:
+                        fecha_comp = datetime.strptime(ac['fecha_compromiso'], '%Y-%m-%d')
+                    except:
+                        fecha_comp = None
+
+                acuerdos.append({
+                    "agenda": ac.get('agenda', '').strip(),
+                    "acuerdo": ac.get('acuerdo', '').strip(),
+                    "responsable": ac.get('responsable', '').strip(),
+                    "fecha_compromiso": fecha_comp
+                })
+
+        nueva_minuta = {
+            "usuario_id": ObjectId(usuario_id),
+            "usuario_nombre": usuario["nombre"],
+            "usuario_email": usuario["email"],
+            "usuario_rol": usuario["rol"],
+            "fecha": fecha_minuta,
+            "hora": datos.get('hora', '').strip(),
+            "area_carrera": datos.get('area_carrera', '').strip(),
+            "asunto": datos.get('asunto', '').strip(),
+            "asistentes": asistentes,
+            "acuerdos": acuerdos,
+            "fecha_creacion": datetime.now()
+        }
+
+        resultado = db.minutas.insert_one(nueva_minuta)
+
+        return jsonify({
+            "exito": True,
+            "mensaje": "Minuta creada correctamente",
+            "minuta_id": str(resultado.inserted_id)
+        })
+    except Exception as error:
+        print(f" Error en crear_minuta: {error}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/minutas/<string:usuario_id>', methods=['GET'])
+def listar_minutas(usuario_id):
+    try:
+        usuario = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not usuario:
+            return jsonify({"exito": False, "mensaje": "Usuario no encontrado"}), 404
+
+        # Alumnos y maestros ven todas las minutas que ellos crearon
+        cursor = db.minutas.find({
+            "usuario_id": ObjectId(usuario_id)
+        }).sort("fecha_creacion", -1)
+
+        minutas = []
+        for m in cursor:
+            minutas.append({
+                "_id": str(m["_id"]),
+                "usuario_id": str(m["usuario_id"]),
+                "usuario_nombre": m.get("usuario_nombre", ""),
+                "usuario_rol": m.get("usuario_rol", ""),
+                "fecha": m["fecha"].strftime('%Y-%m-%d') if m.get("fecha") else None,
+                "hora": m.get("hora", ""),
+                "area_carrera": m.get("area_carrera", ""),
+                "asunto": m.get("asunto", ""),
+                "total_asistentes": len(m.get("asistentes", [])),
+                "total_acuerdos": len(m.get("acuerdos", [])),
+                "fecha_creacion": m["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if m.get("fecha_creacion") else None
+            })
+
+        return jsonify({"exito": True, "minutas": minutas})
+    except Exception as error:
+        print(f" Error en listar_minutas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/minutas/detalle/<string:minuta_id>', methods=['GET'])
+def detalle_minuta(minuta_id):
+    try:
+        m = db.minutas.find_one({"_id": ObjectId(minuta_id)})
+        if not m:
+            return jsonify({"exito": False, "mensaje": "Minuta no encontrada"}), 404
+
+        asistentes = []
+        for a in m.get("asistentes", []):
+            asistentes.append({
+                "nombre": a.get("nombre", ""),
+                "firma": a.get("firma")
+            })
+
+        acuerdos = []
+        for ac in m.get("acuerdos", []):
+            acuerdos.append({
+                "agenda": ac.get("agenda", ""),
+                "acuerdo": ac.get("acuerdo", ""),
+                "responsable": ac.get("responsable", ""),
+                "fecha_compromiso": ac["fecha_compromiso"].strftime('%Y-%m-%d') if ac.get("fecha_compromiso") else None
+            })
+
+        return jsonify({
+            "exito": True,
+            "minuta": {
+                "_id": str(m["_id"]),
+                "usuario_id": str(m["usuario_id"]),
+                "usuario_nombre": m.get("usuario_nombre", ""),
+                "usuario_email": m.get("usuario_email", ""),
+                "usuario_rol": m.get("usuario_rol", ""),
+                "fecha": m["fecha"].strftime('%Y-%m-%d') if m.get("fecha") else None,
+                "hora": m.get("hora", ""),
+                "area_carrera": m.get("area_carrera", ""),
+                "asunto": m.get("asunto", ""),
+                "asistentes": asistentes,
+                "acuerdos": acuerdos,
+                "fecha_creacion": m["fecha_creacion"].strftime('%Y-%m-%d %H:%M:%S') if m.get("fecha_creacion") else None
+            }
+        })
+    except Exception as error:
+        print(f" Error en detalle_minuta: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/minutas/actualizar/<string:minuta_id>', methods=['PUT'])
+def actualizar_minuta(minuta_id):
+    try:
+        datos = request.json
+        existente = db.minutas.find_one({"_id": ObjectId(minuta_id)})
+        if not existente:
+            return jsonify({"exito": False, "mensaje": "Minuta no encontrada"}), 404
+
+        actualizacion = {}
+
+        if "fecha" in datos and datos["fecha"]:
+            try:
+                actualizacion["fecha"] = datetime.strptime(datos["fecha"], '%Y-%m-%d')
+            except:
+                pass
+
+        for campo in ["hora", "area_carrera", "asunto"]:
+            if campo in datos:
+                actualizacion[campo] = datos[campo].strip() if isinstance(datos[campo], str) else datos[campo]
+
+        if "asistentes" in datos:
+            asistentes = []
+            for a in datos["asistentes"]:
+                if a.get('nombre', '').strip():
+                    asistentes.append({
+                        "nombre": a.get('nombre', '').strip(),
+                        "firma": a.get('firma', '').strip() or None
+                    })
+            actualizacion["asistentes"] = asistentes
+
+        if "acuerdos" in datos:
+            acuerdos = []
+            for ac in datos["acuerdos"]:
+                if ac.get('agenda', '').strip() or ac.get('acuerdo', '').strip():
+                    fecha_comp = None
+                    if ac.get('fecha_compromiso'):
+                        try:
+                            fecha_comp = datetime.strptime(ac['fecha_compromiso'], '%Y-%m-%d')
+                        except:
+                            fecha_comp = None
+                    acuerdos.append({
+                        "agenda": ac.get('agenda', '').strip(),
+                        "acuerdo": ac.get('acuerdo', '').strip(),
+                        "responsable": ac.get('responsable', '').strip(),
+                        "fecha_compromiso": fecha_comp
+                    })
+            actualizacion["acuerdos"] = acuerdos
+
+        actualizacion["fecha_actualizacion"] = datetime.now()
+
+        if actualizacion:
+            db.minutas.update_one({"_id": ObjectId(minuta_id)}, {"$set": actualizacion})
+
+        return jsonify({"exito": True, "mensaje": "Minuta actualizada correctamente"})
+    except Exception as error:
+        print(f" Error en actualizar_minuta: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/minutas/eliminar/<string:minuta_id>', methods=['DELETE'])
+def eliminar_minuta(minuta_id):
+    try:
+        resultado = db.minutas.delete_one({"_id": ObjectId(minuta_id)})
+        if resultado.deleted_count == 0:
+            return jsonify({"exito": False, "mensaje": "Minuta no encontrada"}), 404
+        return jsonify({"exito": True, "mensaje": "Minuta eliminada correctamente"})
+    except Exception as error:
+        print(f" Error en eliminar_minuta: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
 
 # ============================================
 # NOTIFICACIONES: ESTADÍAS NUEVAS PARA EL MAESTRO
