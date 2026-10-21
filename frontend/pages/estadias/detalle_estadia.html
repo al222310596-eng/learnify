@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="../../css/estadias.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../css/compartir.css"> <!-- archivo aparte -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="menu-lateral">
     <div class="app-container">
@@ -52,34 +55,14 @@
             <div class="estadias-container detalle-container">
                 <div id="mensaje" class="mensaje"></div>
 
-                <div id="detalleContenido">
-                    <div class="detalle-cargando">
-                        <i class="fas fa-spinner fa-pulse"></i>
-                        <p>Cargando información de la estadía...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="modalConfirmarEstadia" class="modal-confirmar" style="display: none;">
-                <div class="modal-confirmar-contenido">
-                    <div class="modal-confirmar-header">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Confirmar eliminación</h3>
-                    </div>
-                    <div class="modal-confirmar-body">
-                        <p>¿Estás seguro de que quieres eliminar esta estadía?</p>
-                        <p class="modal-advertencia">Esta acción no se puede deshacer.</p>
-                    </div>
-                    <div class="modal-confirmar-footer">
-                        <button id="btnCancelarEliminarEstadia" class="btn secundario">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button id="btnConfirmarEliminarEstadia" class="btn-danger">
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
+                                <div id="detalleContenido">
+                                    <div class="detalle-cargando">
+                                        <i class="fas fa-spinner fa-pulse"></i>
+                                        <p>Cargando información de la estadía...</p>
+                                    </div>
+                                </div>
+                                
+                                
 <!-- ============================================ -->
 <!-- FORMATO IMPRIMIBLE (solo visible al imprimir) -->
 <!-- ============================================ -->

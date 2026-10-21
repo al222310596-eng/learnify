@@ -1673,3 +1673,331 @@ body.dark-mode .modal-firma .firma-placeholder {
     object-fit: contain;
     margin-bottom: 4px;
 }
+
+.btn-compartir-dual {
+    background: #06b6d4;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.btn-compartir-dual:hover {
+    background: #0891b2;
+}
+/* ============================================
+   MODAL COMPARTIR
+   ============================================ */
+.modal-compartir {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+    animation: fadeInCompartir 0.2s ease;
+}
+
+.modal-compartir.active {
+    display: flex;
+}
+
+@keyframes fadeInCompartir {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-compartir-contenido {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    animation: slideUpCompartir 0.25s ease;
+}
+
+@keyframes slideUpCompartir {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-compartir-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-compartir-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-compartir-header h3 i {
+    color: #06b6d4;
+}
+
+/* Tabs */
+.tabs-compartir {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.75rem 1.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.tab-btn:hover {
+    color: #06b6d4;
+    background: #f1f5f9;
+}
+
+.tab-btn.active {
+    color: #06b6d4;
+    border-bottom-color: #06b6d4;
+    background: #ecfeff;
+}
+
+.tab-content {
+    padding: 1.5rem;
+}
+
+/* Formulario */
+.form-grupo-compartir {
+    margin-bottom: 1.25rem;
+}
+
+.form-grupo-compartir label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+}
+
+.form-grupo-compartir input[type="text"],
+.form-grupo-compartir select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #1e293b;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.form-grupo-compartir input[type="text"]:focus,
+.form-grupo-compartir select:focus {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+}
+
+/* Botón de acción */
+.btn-compartir-accion {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.btn-compartir-accion:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(6, 182, 212, 0.35);
+}
+
+.btn-compartir-accion:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Contenedor del enlace generado */
+.enlace-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.enlace-container input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: 0.85rem;
+    color: #475569;
+    font-family: 'Courier New', monospace;
+    box-sizing: border-box;
+}
+
+.btn-copiar {
+    padding: 0 1rem;
+    background: #06b6d4;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-copiar:hover {
+    background: #0891b2;
+}
+
+/* Historial */
+.historial-lista {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.historial-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border-radius: 10px;
+    background: #f8fafc;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.historial-icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.historial-icono.correo {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.historial-icono.enlace {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+.historial-detalle {
+    flex: 1;
+    min-width: 0;
+}
+
+.historial-detalle p {
+    margin: 0 0 0.15rem 0;
+    font-size: 0.88rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.historial-detalle span {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .modal-compartir-contenido {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    .modal-compartir-header,
+    .tab-content {
+        padding: 1rem;
+    }
+    .tab-btn {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Tema oscuro (opcional, si usas temas_oscuro.css) */
+body.dark .modal-compartir-contenido,
+body[data-theme="dark"] .modal-compartir-contenido {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+body.dark .modal-compartir-header,
+body[data-theme="dark"] .modal-compartir-header,
+body.dark .tabs-compartir,
+body[data-theme="dark"] .tabs-compartir {
+    border-bottom-color: #334155;
+}
+body.dark .modal-compartir-header h3,
+body[data-theme="dark"] .modal-compartir-header h3 {
+    color: #e2e8f0;
+}
+body.dark .form-grupo-compartir label,
+body[data-theme="dark"] .form-grupo-compartir label {
+    color: #cbd5e1;
+}
+body.dark .form-grupo-compartir input,
+body[data-theme="dark"] .form-grupo-compartir input,
+body.dark .form-grupo-compartir select,
+body[data-theme="dark"] .form-grupo-compartir select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+body.dark .enlace-container input,
+body[data-theme="dark"] .enlace-container input {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-color: #334155;
+}
+body.dark .historial-item,
+body[data-theme="dark"] .historial-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+body.dark .historial-detalle p,
+body[data-theme="dark"] .historial-detalle p {
+    color: #e2e8f0;
+}

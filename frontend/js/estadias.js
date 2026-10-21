@@ -256,6 +256,10 @@ function mostrarEstadias(estadias) {
                 <button onclick="verDetalleEstadia('${estadia._id}')" class="btn-ver-estadia">
                     <i class="fas fa-eye"></i> Ver detalles
                 </button>
+                <!-- NUEVO BOTÓN COMPARTIR -->
+                <button onclick="window.location.href='detalle_estadia.html?id=${estadia._id}&compartir=true'" class="btn-compartir-estadia" style="background: #06b6d4; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
                 <button onclick="editarEstadia('${estadia._id}')" class="btn-editar-estadia">
                     <i class="fas fa-edit"></i> Editar
                 </button>
