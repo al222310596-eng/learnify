@@ -13,16 +13,23 @@ import random
 import string
 import json
 import smtplib
+import uuid
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from datetime import datetime, timedelta
+from email.mime.base import MIMEBase
+from email import encoders
+from io import BytesIO
 
 from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from werkzeug.utils import secure_filename
 from bson import ObjectId
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
 
 from dotenv import load_dotenv
 from mongo_config import get_mongo_connection
@@ -303,7 +310,7 @@ def enviar_codigo_email(destinatario, codigo, nombre_usuario):
                     Este código es válido por <strong>10 minutos</strong> y solo puede usarse una vez.
                 </p>
                 <div class="aviso">
-                     <strong>Si no fuiste tú</strong>, ignora este mensaje. Alguien pudo haber intentado firmar en tu nombre.
+                    <strong>Si no fuiste tú</strong>, ignora este mensaje. Alguien pudo haber intentado firmar en tu nombre.
                 </div>
                 <div class="footer">
                     <p>Documento generado por <strong>Learnify</strong></p>
@@ -3383,6 +3390,362 @@ def buscar_maestros():
     except Exception as error:
         print(f"Error en buscar_maestros: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
+    
+
+# ============================================
+# 16. COMPARTIR DOCUMENTOS POR CORREO
+# ============================================
+import uuid
+
+@app.route('/api/compartir/crear', methods=['POST'])
+def crear_compartido():
+    try:
+        # 1. Recibimos el archivo PDF y los datos del formulario
+        archivo_pdf = request.files.get('pdf_file')
+        correos_str = request.form.get('correos', '')
+        tipo_documento = request.form.get('tipo_documento', 'minuta')
+        documento_id = request.form.get('documento_id')
+        creador_id = request.form.get('creador_id')
+
+        if not archivo_pdf or not correos_str:
+            return jsonify({"exito": False, "mensaje": "Faltan datos o el PDF"}), 400
+
+        correos = [c.strip() for c in correos_str.split(',') if c.strip()]
+
+        # 2. Guardamos el registro en la base de datos
+        token = uuid.uuid4().hex
+        nuevo_compartido = {
+            "tipo_documento": tipo_documento,
+            "documento_id": ObjectId(documento_id),
+            "creador_id": ObjectId(creador_id),
+            "token": token,
+            "permisos": "descargar",
+            "destinatarios": correos,
+            "fecha_creacion": datetime.now(),
+            "historial": [{"accion": "creado", "fecha": datetime.now(), "ip": request.remote_addr}]
+        }
+        db.compartidos.insert_one(nuevo_compartido)
+
+        # 3. Enviamos el correo con el PDF adjunto
+        pdf_bytes = archivo_pdf.read()
+        
+        for correo_destino in correos:
+            try:
+                msg = MIMEMultipart()
+                msg['Subject'] = f'Documento Compartido - Learnify ({tipo_documento.capitalize()})'
+                msg['From'] = f'{MAIL_FROM_NAME} <{MAIL_USER}>'
+                msg['To'] = correo_destino
+                
+                cuerpo = f"""
+                <html><body>
+                <h2>Hola,</h2>
+                <p>Se ha compartido un documento contigo desde <strong>Learnify</strong>.</p>
+                <p><strong>Tipo de documento:</strong> {tipo_documento.capitalize()}</p>
+                <p>El archivo PDF con el diseño oficial está adjunto a este correo.</p>
+                </body></html>
+                """
+                msg.attach(MIMEText(cuerpo, 'html', 'utf-8'))
+
+                adjunto = MIMEBase('application', 'pdf')
+                adjunto.set_payload(pdf_bytes)
+                encoders.encode_base64(adjunto)
+                adjunto.add_header('Content-Disposition', f'attachment; filename="documento_{tipo_documento}.pdf"')
+                msg.attach(adjunto)
+
+                with smtplib.SMTP(MAIL_SERVER, MAIL_PORT) as server:
+                    server.starttls()
+                    server.login(MAIL_USER, MAIL_PASSWORD)
+                    server.send_message(msg)
+                
+                print(f"📧 Correo enviado a {correo_destino}")
+            except Exception as e:
+                print(f"❌ Error al enviar correo a {correo_destino}: {e}")
+
+        return jsonify({
+            "exito": True,
+            "mensaje": "Correo enviado correctamente",
+            "token": token
+        })
+
+    except Exception as error:
+        print(f"Error en crear_compartido: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+        # ============================================
+# 17. GENERAR ENLACE Y VER DOCUMENTO (PÚBLICO)
+# ============================================
+import uuid
+
+@app.route('/api/compartir/generar-enlace', methods=['POST'])
+def generar_enlace():
+    try:
+        datos = request.json
+        documento_id = datos.get('documento_id')
+        tipo_documento = datos.get('tipo_documento')
+        creador_id = datos.get('creador_id')
+        dias_expiracion = datos.get('dias_expiracion', 7)
+        permisos = datos.get('permisos', 'ver')  #  Recibimos los permisos
+        correos = datos.get('correos', [])       #  Recibimos los correos (por si acaso)
+
+        if not documento_id or not tipo_documento or not creador_id:
+            return jsonify({"exito": False, "mensaje": "Faltan datos obligatorios"}), 400
+
+        token = uuid.uuid4().hex
+        fecha_expiracion = None
+        if dias_expiracion > 0:
+            fecha_expiracion = datetime.now() + timedelta(days=dias_expiracion)
+
+        nuevo_compartido = {
+            "tipo_documento": tipo_documento,
+            "documento_id": ObjectId(documento_id),
+            "creador_id": ObjectId(creador_id),
+            "token": token,
+            "permisos": permisos,          #  Guardamos los permisos reales
+            "destinatarios": correos,      #  Guardamos los correos
+            "fecha_creacion": datetime.now(),
+            "fecha_expiracion": fecha_expiracion,
+            "historial": [{"accion": "creado", "fecha": datetime.now(), "ip": request.remote_addr}]
+        }
+        db.compartidos.insert_one(nuevo_compartido)
+
+        return jsonify({
+            "exito": True,
+            "token": token,
+            "enlace": f"{request.host_url}pages/compartido/ver_compartido.html?token={token}"
+        })
+
+    except Exception as error:
+        print(f"Error en generar_enlace: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/compartir/validar/<string:token>', methods=['GET'])
+def validar_compartido(token):
+    try:
+        compartido = db.compartidos.find_one({"token": token})
+        if not compartido:
+            return jsonify({"exito": False, "mensaje": "Enlace no válido"}), 404
+
+        if compartido.get('fecha_expiracion') and datetime.now() > compartido['fecha_expiracion']:
+            return jsonify({"exito": False, "mensaje": "Este enlace ha expirado"}), 410
+
+        # Registrar vista en historial
+        db.compartidos.update_one(
+            {"_id": compartido["_id"]},
+            {"$push": {"historial": {"accion": "visto", "fecha": datetime.now(), "ip": request.remote_addr}}}
+        )
+
+        tipo = compartido['tipo_documento']
+        doc = None
+        if tipo == 'minuta': doc = db.minutas.find_one({"_id": compartido['documento_id']})
+        elif tipo == 'estadia': doc = db.estadias.find_one({"_id": compartido['documento_id']})
+        elif tipo == 'dual': doc = db.duales.find_one({"_id": compartido['documento_id']})
+
+        if not doc:
+            return jsonify({"exito": False, "mensaje": "El documento ya no existe"}), 404
+
+        return jsonify({
+            "exito": True,
+            "tipo_documento": tipo,
+            "documento": convertir_objectid(doc)
+        })
+
+    except Exception as error:
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+@app.route('/api/compartir/historial/<string:documento_id>', methods=['GET'])
+def historial_compartido(documento_id):
+    try:
+        compartidos = list(db.compartidos.find({"documento_id": ObjectId(documento_id)}))
+        historial_total = []
+        for c in compartidos:
+            for h in c.get('historial', []):
+                h['token'] = c['token']
+                h['fecha'] = h['fecha'].strftime('%Y-%m-%d %H:%M:%S')
+                historial_total.append(h)
+        
+        historial_total.sort(key=lambda x: x['fecha'], reverse=True)
+        return jsonify({"exito": True, "historial": historial_total})
+    except Exception as error:
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+    
+@app.route('/api/compartir/generar-html/<string:token>', methods=['GET'])
+def generar_html_compartido(token):
+    try:
+        compartido = db.compartidos.find_one({"token": token})
+        if not compartido: return "<h1>Enlace no válido</h1>", 404
+        
+        tipo = compartido['tipo_documento']
+        doc = None
+        if tipo == 'minuta': doc = db.minutas.find_one({"_id": ObjectId(compartido['documento_id'])})
+        elif tipo == 'estadia': doc = db.estadias.find_one({"_id": ObjectId(compartido['documento_id'])})
+        elif tipo == 'dual': doc = db.duales.find_one({"_id": ObjectId(compartido['documento_id'])})
+        
+        if not doc: return "<h1>No encontrado</h1>", 404
+
+        base_url = request.host_url.rstrip('/')
+        
+        if tipo == 'minuta':
+            filas_asistentes = "".join([f"<tr><td>{a.get('nombre','')}</td><td>{a.get('firma','') or ''}</td></tr>" for a in doc.get('asistentes', [])])
+            filas_acuerdos = "".join([f"<tr><td>{ac.get('agenda','')}</td><td>{ac.get('acuerdo','')}</td><td>{ac.get('responsable','')}</td><td>{ac.get('fecha_compromiso').strftime('%d/%m/%Y') if ac.get('fecha_compromiso') else ''}</td></tr>" for ac in doc.get('acuerdos', [])])
+            
+            return f"""
+            <html><head><style>
+                body {{ font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; }}
+                .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #1e293b; padding-bottom: 10px; margin-bottom: 20px; }}
+                .header img {{ max-height: 70px; }}
+                .titulo-centro {{ text-align: center; flex: 1; }}
+                .titulo-centro h1 {{ margin: 0; font-size: 18pt; }}
+                table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10pt; }}
+                th, td {{ border: 1px solid #cbd5e1; padding: 8px; text-align: left; }}
+                th {{ background: #f1f5f9; }}
+                .seccion-titulo {{ background: #e2e8f0; padding: 6px 10px; font-weight: bold; border-left: 4px solid #667eea; margin: 15px 0 10px; }}
+            </style></head><body>
+            <div class="header">
+                <img src="{base_url}/img/logo_escuela.png" onerror="this.style.display='none'">
+                <div class="titulo-centro"><h1>MINUTA</h1><p>Registro formal de reunión</p></div>
+                <img src="{base_url}/img/logo_tecnm.png" onerror="this.style.display='none'">
+            </div>
+            <table>
+                <tr><td style="width:15%;background:#f1f5f9;"><b>FECHA:</b></td><td>{doc.get('fecha').strftime('%d/%m/%Y') if doc.get('fecha') else ''}</td><td style="width:15%;background:#f1f5f9;"><b>HORA:</b></td><td>{doc.get('hora','')}</td></tr>
+                <tr><td style="background:#f1f5f9;"><b>ÁREA:</b></td><td colspan="3">{doc.get('area_carrera','')}</td></tr>
+            </table>
+            <div class="seccion-titulo">ASUNTO</div>
+            <p style="border:1px solid #cbd5e1; padding:10px;">{doc.get('asunto','')}</p>
+            <div class="seccion-titulo">ASISTENTES</div>
+            <table><tr><th>Nombre</th><th>Firma</th></tr>{filas_asistentes}</table>
+            <div class="seccion-titulo">ACUERDOS</div>
+            <table><tr><th>Agenda</th><th>Acuerdo</th><th>Responsable</th><th>Fecha</th></tr>{filas_acuerdos}</table>
+            <p style="text-align:center; font-size:8pt; color:#94a3b8; margin-top:30px;">Documento generado por Learnify - R-COM-04</p>
+            </body></html>
+            """
+        elif tipo == 'estadia':
+            return formato_estadia(str(doc['_id']))
+        elif tipo == 'dual':
+            fecha_inicio = doc.get('fecha_inicio').strftime('%d/%m/%Y') if doc.get('fecha_inicio') else 'No especificada'
+            fecha_fin = doc.get('fecha_fin').strftime('%d/%m/%Y') if doc.get('fecha_fin') else 'No especificada'
+            hoy = datetime.now().strftime('%d/%m/%Y')
+            folio = str(doc['_id'])[-6:].upper()
+            
+            alumno_nombre = "No asignado"
+            alumno_email = doc.get('alumno_email', 'No especificado')
+            if doc.get('alumno_id'):
+                alumno = db.usuarios.find_one({"_id": doc['alumno_id']})
+                if alumno:
+                    alumno_nombre = alumno.get('nombre', 'No asignado')
+                    alumno_email = alumno.get('email', 'No especificado')
+            elif alumno_email:
+                alumno = db.usuarios.find_one({"email": alumno_email})
+                if alumno:
+                    alumno_nombre = alumno.get('nombre', 'No asignado')
+
+            filas_asignaciones = ""
+            for a in doc.get('asignaciones', []):
+                estado = "✅ FIRMADO" if a.get('firmado') else "⏳ PENDIENTE"
+                color = "#059669" if a.get('firmado') else "#d97706"
+                filas_asignaciones += f"""
+                <tr>
+                    <td>{a.get('materia', 'Sin materia')}</td>
+                    <td>{a.get('maestro_nombre', 'No asignado')}<br><small style="color:#64748b;">{a.get('maestro_email', '')}</small></td>
+                    <td style="color: {color}; font-weight: bold;">{estado}</td>
+                </tr>
+                """
+
+            return f"""
+            <html><head><style>
+                body {{ font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; color: #1e293b; background: white; }}
+                .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #1e293b; padding-bottom: 10px; margin-bottom: 20px; }}
+                .header img {{ max-height: 70px; }}
+                .titulo-centro {{ text-align: center; flex: 1; }}
+                .titulo-centro h1 {{ margin: 0; font-size: 18pt; }}
+                .info-doc {{ display: flex; justify-content: space-between; background: #f1f5f9; padding: 10px 15px; border-radius: 6px; font-size: 10pt; margin-bottom: 20px; }}
+                .seccion-titulo {{ background: #e2e8f0; padding: 6px 10px; font-weight: bold; border-left: 4px solid #667eea; margin: 15px 0 10px; }}
+                table {{ width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 10pt; }}
+                th, td {{ border: 1px solid #cbd5e1; padding: 8px; text-align: left; }}
+                th {{ background: #f8fafc; }}
+                .firmas {{ display: flex; justify-content: space-around; margin-top: 40px; text-align: center; }}
+                .firma {{ width: 30%; }}
+                .linea-firma {{ border-top: 1px solid #1e293b; margin-bottom: 5px; height: 30px; }}
+                .firma p {{ margin: 5px 0; font-size: 10pt; }}
+            </style></head><body>
+                <div class="header">
+                    <img src="{base_url}/img/logo_escuela.png" onerror="this.style.display='none'">
+                    <div class="titulo-centro"><h1>FORMATO DE PROGRAMA DUAL</h1><p>Registro y Control</p></div>
+                    <img src="{base_url}/img/tecnm.png" onerror="this.style.display='none'">
+                </div>
+                
+                <div class="info-doc">
+                    <span><strong>Folio:</strong> DUAL-{folio}</span>
+                    <span><strong>Fecha de emisión:</strong> {hoy}</span>
+                </div>
+
+                <div class="seccion-titulo">1. DATOS DEL ALUMNO</div>
+                <table>
+                    <tr><td style="width:20%;background:#f8fafc;"><b>Nombre completo</b></td><td>{alumno_nombre}</td><td style="width:20%;background:#f8fafc;"><b>Correo</b></td><td>{alumno_email}</td></tr>
+                </table>
+
+                <div class="seccion-titulo">2. DATOS DE LA EMPRESA</div>
+                <table>
+                    <tr><td style="width:20%;background:#f8fafc;"><b>Empresa</b></td><td colspan="3">{doc.get('empresa', 'No especificada')}</td></tr>
+                    <tr><td style="background:#f8fafc;"><b>Título del proyecto</b></td><td colspan="3">{doc.get('titulo', 'No especificado')}</td></tr>
+                    <tr><td style="background:#f8fafc;"><b>Tutor</b></td><td colspan="3">{doc.get('tutor', 'No asignado')}</td></tr>
+                </table>
+
+                <div class="seccion-titulo">3. DATOS ACADÉMICOS</div>
+                <table>
+                    <tr>
+                        <td style="width:20%;background:#f8fafc;"><b>Carrera</b></td><td>{doc.get('carrera', 'No especificada')}</td>
+                        <td style="width:20%;background:#f8fafc;"><b>Cuatrimestre</b></td><td>{doc.get('cuatrimestre', 'No especificado')}</td>
+                    </tr>
+                    <tr>
+                        <td style="background:#f8fafc;"><b>Curso</b></td><td>{doc.get('curso', 'No especificado')}</td>
+                        <td style="background:#f8fafc;"><b>Horas</b></td><td>{doc.get('horas', 0)} hrs</td>
+                    </tr>
+                    <tr>
+                        <td style="background:#f8fafc;"><b>Fecha inicio</b></td><td>{fecha_inicio}</td>
+                        <td style="background:#f8fafc;"><b>Fecha término</b></td><td>{fecha_fin}</td>
+                    </tr>
+                    <tr>
+                        <td style="background:#f8fafc;"><b>Estado</b></td><td colspan="3">{doc.get('estado', 'pendiente').capitalize()}</td>
+                    </tr>
+                </table>
+
+                <div class="seccion-titulo">4. DESCRIPCIÓN DEL PROYECTO</div>
+                <table>
+                    <tr><td style="padding: 10px;">{doc.get('descripcion', 'Sin descripción')}</td></tr>
+                </table>
+
+                <div class="seccion-titulo">5. MATERIAS Y FIRMAS</div>
+                <table>
+                    <tr><th>Materia</th><th>Maestro</th><th>Estado</th></tr>
+                    {filas_asignaciones}
+                </table>
+
+                <div class="firmas">
+                    <div class="firma">
+                        <div class="linea-firma"></div>
+                        <p><strong>{alumno_nombre}</strong></p>
+                        <p>Alumno</p>
+                    </div>
+                    <div class="firma">
+                        <div class="linea-firma"></div>
+                        <p><strong>{doc.get('tutor', '___________________')}</strong></p>
+                        <p>Tutor Empresarial</p>
+                    </div>
+                    <div class="firma">
+                        <div class="linea-firma"></div>
+                        <p><strong>___________________</strong></p>
+                        <p>Coordinador Dual</p>
+                    </div>
+                </div>
+            </body></html>
+            """
+        else:
+            return "<h1>Documento listo para compartir</h1>"
+    except Exception as e:
+        return f"<h1>Error: {e}</h1>", 500
+        
 # ============================================
 # INICIAR SERVIDOR
 # ============================================
@@ -3401,5 +3764,7 @@ if __name__ == '__main__':
     print("   • http://localhost:5000/api/estado-intentos (Estado de bloqueo)")
     print("\n🔧 Presiona CTRL+C para detener el servidor")
     print("="*50 + "\n")
+
+
     
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
