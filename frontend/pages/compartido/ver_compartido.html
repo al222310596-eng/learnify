@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnify | Documento Compartido</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+
+        .header h1 {
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .header p {
+            color: #64748b;
+            margin: 0.5rem 0 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #dc2626;
+        }
+
+        .btn-descargar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #06b6d4;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .btn-descargar:hover {
+            background: #0891b2;
+        }
+
+        .documento-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap" style="color:#667eea;"></i> Learnify</h1>
+            <p>Documento Compartido</p>
+        </div>
+        <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Validando enlace...</div>
+        <div id="error" class="error" style="display:none;"></div>
+        <div id="documentoContent" class="documento-content">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <a id="btnDescargar" class="btn-descargar" href="#" target="_blank" style="display:none;">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </a>
+            </div>
+            <div id="formatoImprimible" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Enlace no válido.';
+    } else {
+        validarToken(token);
+    }
+
+    async function validarToken(token) {
+        try {
+            const res = await fetch(`/api/compartir/validar/${token}`);
+            const data = await res.json();
+
+            if (data.exito) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('documentoContent').style.display = 'block';
+                
+                // Generamos el HTML del documento en la página pública
+                const iframe = document.createElement('iframe');
+                iframe.src = `/api/compartir/generar-html/${token}`; 
+                iframe.style.width = '100%';
+                iframe.style.height = '900px';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '12px';
+                iframe.style.marginTop = '1rem';
+                document.getElementById('formatoImprimible').appendChild(iframe);
+
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.mensaje}`;
+            }
+        } catch (e) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión.';
+        }
+    }
+</script>
+</body>
+
+</html>

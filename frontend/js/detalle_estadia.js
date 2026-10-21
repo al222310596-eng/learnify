@@ -52,10 +52,10 @@ function formatearFechaLarga(fecha) {
 
 function etiquetaEstado(estado) {
     const mapa = {
-        'pendiente':  { texto: 'Pendiente',  icono: 'fa-clock',         clase: 'estado-pendiente' },
-        'en-curso':   { texto: 'En curso',   icono: 'fa-play-circle',   clase: 'estado-en-curso' },
-        'completada': { texto: 'Completada', icono: 'fa-check-circle',  clase: 'estado-completada' },
-        'cancelada':  { texto: 'Cancelada',  icono: 'fa-times-circle',  clase: 'estado-cancelada' }
+        'pendiente': { texto: 'Pendiente', icono: 'fa-clock', clase: 'estado-pendiente' },
+        'en-curso': { texto: 'En curso', icono: 'fa-play-circle', clase: 'estado-en-curso' },
+        'completada': { texto: 'Completada', icono: 'fa-check-circle', clase: 'estado-completada' },
+        'cancelada': { texto: 'Cancelada', icono: 'fa-times-circle', clase: 'estado-cancelada' }
     };
     return mapa[estado] || { texto: estado || 'Sin estado', icono: 'fa-clock', clase: 'estado-pendiente' };
 }
@@ -144,6 +144,10 @@ function renderizarDetalle(e) {
                 </a>
                 <button class="btn imprimir" onclick="imprimirFormato()">
                     <i class="fas fa-print"></i> Imprimir Formato
+                </button>
+                <!-- NUEVO BOTÓN COMPARTIR -->
+                <button class="btn-compartir" onclick="abrirModalCompartir('${e._id}', 'estadia')">
+                    <i class="fas fa-share-alt"></i> Compartir
                 </button>
                 ${esPropietario ? `
                     <a href="crear_estadia.html?id=${e._id}" class="btn primario">
@@ -259,8 +263,8 @@ function renderizarDetalle(e) {
                 <div class="detalle-item">
                     <span class="detalle-item-label">Descripción</span>
                     ${e.descripcion && e.descripcion.trim()
-                        ? `<div class="detalle-texto">${escapeHtml(e.descripcion)}</div>`
-                        : '<span class="detalle-item-valor vacio">Sin descripción</span>'}
+            ? `<div class="detalle-texto">${escapeHtml(e.descripcion)}</div>`
+            : '<span class="detalle-item-valor vacio">Sin descripción</span>'}
                 </div>
             </div>
 
@@ -497,6 +501,266 @@ function imprimirFormato() {
     setTimeout(() => {
         window.print();
     }, 300);
+}
+// ============================================
+// COMPARTIR ESTADÍAS
+// ============================================
+function abrirModalCompartir(estadiaId, tipo = 'estadia') {
+    let modal = document.getElementById('modalCompartirGlobal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalCompartirGlobal';
+        modal.className = 'modal-compartir';
+        modal.innerHTML = `
+            <div class="modal-compartir-contenido">
+                <div class="modal-compartir-header">
+                    <h3><i class="fas fa-share-alt"></i> Compartir Documento</h3>
+                    <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;">&times;</button>
+                </div>
+                <div class="tabs-compartir">
+                    <button class="tab-btn active" onclick="cambiarTabCompartir('correo', this)">Por Correo</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('enlace', this)">Por Enlace</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('historial', this)">Historial</button>
+                </div>
+                
+                <!-- PESTAÑA CORREO -->
+                <div id="tab-correo" class="tab-content active">
+                    <div class="form-grupo-compartir">
+                        <label>Correos destinatarios (separados por coma)</label>
+                        <input type="text" id="compartirCorreos" placeholder="ejemplo1@correo.com, ejemplo2@correo.com">
+                    </div>
+                    <button class="btn-compartir-accion" onclick="ejecutarCompartir('${estadiaId}', '${tipo}')">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                </div>
+
+                <!-- PESTAÑA ENLACE CON VIGENCIA Y PERMISOS -->
+                <div id="tab-enlace" class="tab-content">
+                    <div class="form-grupo-compartir">
+                        <label>Permisos</label>
+                        <select id="compartirPermisosEnlace">
+                            <option value="ver">Solo Ver</option>
+                        </select>
+                    </div>
+                    <div class="form-grupo-compartir">
+                        <label>Vigencia (Expiración)</label>
+                        <select id="compartirExpiracionEnlace">
+                            <option value="1">1 Día</option>
+                            <option value="7" selected>7 Días</option>
+                            <option value="30">30 Días</option>
+                            <option value="0">Nunca</option>
+                        </select>
+                    </div>
+                    <button class="btn-compartir-accion" onclick="generarSoloEnlace('${estadiaId}', '${tipo}')" style="margin-bottom: 10px;">
+                        <i class="fas fa-link"></i> Generar Enlace
+                    </button>
+                    <div class="enlace-container">
+                        <input type="text" id="inputEnlaceCompartir" readonly placeholder="El enlace aparecerá aquí...">
+                        <button class="btn-copiar" onclick="copiarEnlace()"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA HISTORIAL -->
+                <div id="tab-historial" class="tab-content">
+                    <div id="historialContenido" class="historial-lista">
+                        <p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) cerrarModalCompartir(); };
+    }
+
+    // Resetear pestañas
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('.tab-btn').classList.add('active');
+    document.getElementById('tab-correo').classList.add('active');
+
+    // Limpiar campos
+    document.getElementById('compartirCorreos').value = '';
+    document.getElementById('compartirPermisosEnlace').value = 'descargar';
+    document.getElementById('compartirExpiracionEnlace').value = '7';
+    document.getElementById('inputEnlaceCompartir').value = '';
+    document.getElementById('historialContenido').innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>';
+
+    modal.classList.add('active');
+    window.currentDocIdCompartir = estadiaId;
+}
+
+function cerrarModalCompartir() {
+    document.getElementById('modalCompartirGlobal').classList.remove('active');
+}
+
+function cambiarTabCompartir(tab, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+
+    if (tab === 'historial') {
+        cargarHistorialCompartir(window.currentDocIdCompartir);
+    }
+}
+
+async function ejecutarCompartir(docId, tipo) {
+    const correosStr = document.getElementById('compartirCorreos').value;
+    const correos = correosStr.split(',').map(c => c.trim()).filter(c => c);
+
+    if (correos.length === 0) {
+        mostrarMensaje('error', 'Ingresa al menos un correo');
+        return;
+    }
+
+    const btn = document.querySelector('#tab-correo .btn-compartir-accion');
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
+    btn.disabled = true;
+
+    try {
+        // 1. Obtenemos los datos de la estadía
+        const resDetalle = await fetch(`/api/estadias/detalle/${docId}`);
+        const dataDetalle = await resDetalle.json();
+
+        if (!dataDetalle.exito) throw new Error('No se pudo cargar la estadía');
+
+        // 2. Generamos el HTML en el contenedor oculto
+        const contenedor = document.getElementById('formatoImprimible');
+        contenedor.innerHTML = generarFormatoImprimible(dataDetalle.estadia);
+
+        // Esperamos un momento a que el DOM se actualice
+        await new Promise(r => setTimeout(r, 500));
+
+        // 3. Convertimos el HTML a PDF
+        const elemento = document.getElementById('formatoImprimible');
+
+        // Lo hacemos visible temporalmente para html2canvas
+        elemento.style.display = 'block';
+        elemento.style.position = 'absolute';
+        elemento.style.left = '-9999px';
+        elemento.style.top = '0';
+        elemento.style.width = '21cm'; // Tamaño carta
+
+        const canvas = await html2canvas(elemento, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+
+        // 4. Creamos el PDF (Letter)
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'letter');
+
+        // En lugar de estirar la imagen al 100% de la hoja, 
+        // le damos un margen de 15mm a los lados y arriba/abajo:
+        const margen = 15;
+        const pdfWidth = pdf.internal.pageSize.getWidth() - (margen * 2);
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        // Agregamos la imagen centrada con el margen
+        pdf.addImage(imgData, 'PNG', margen, margen, pdfWidth, pdfHeight);
+
+        // 5. Convertimos a Blob
+        const pdfBlob = pdf.output('blob');
+
+        // Restauramos el contenedor
+        elemento.style.display = 'none';
+
+        // 6. Enviamos al servidor
+        const formData = new FormData();
+        formData.append('pdf_file', pdfBlob, 'documento.pdf');
+        formData.append('correos', correos.join(','));
+        formData.append('tipo_documento', tipo);
+        formData.append('documento_id', docId);
+        formData.append('creador_id', usuario._id);
+
+        const res = await fetch('/api/compartir/crear', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.exito) {
+            mostrarMensaje('exito', '✅ Correo enviado con el PDF adjunto');
+            cerrarModalCompartir();
+        } else {
+            mostrarMensaje('error', data.mensaje);
+        }
+
+    } catch (error) {
+        console.error(error);
+        mostrarMensaje('error', 'Error al generar o enviar el PDF');
+    } finally {
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+async function generarSoloEnlace(docId, tipo) {
+    const btn = document.querySelector('#tab-enlace .btn-compartir-accion');
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+    btn.disabled = true;
+
+    // Leer las opciones de los selectores
+    const permisos = document.getElementById('compartirPermisosEnlace').value;
+    const dias_expiracion = parseInt(document.getElementById('compartirExpiracionEnlace').value, 10);
+
+    try {
+        const res = await fetch('/api/compartir/generar-enlace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                documento_id: docId,
+                tipo_documento: tipo,
+                creador_id: usuario._id,
+                dias_expiracion: dias_expiracion,
+                permisos: permisos,
+                correos: []
+            })
+        });
+        const data = await res.json();
+
+        if (data.exito) {
+            document.getElementById('inputEnlaceCompartir').value = data.enlace;
+            mostrarMensaje('exito', '✅ Enlace generado correctamente');
+        } else {
+            mostrarMensaje('error', data.mensaje);
+        }
+    } catch (e) {
+        mostrarMensaje('error', 'Error de conexión');
+    } finally {
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
+function copiarEnlace() {
+    const input = document.getElementById('inputEnlaceCompartir');
+    if (!input.value) return mostrarMensaje('error', 'Genera un enlace primero');
+    input.select();
+    document.execCommand('copy');
+    mostrarMensaje('exito', 'Enlace copiado al portapapeles');
+}
+
+async function cargarHistorialCompartir(docId) {
+    const cont = document.getElementById('historialContenido');
+    try {
+        const res = await fetch(`/api/compartir/historial/${docId}`);
+        const data = await res.json();
+        if (data.exito && data.historial.length > 0) {
+            cont.innerHTML = data.historial.map(h => `
+                <div class="historial-item">
+                    <span class="accion"><i class="fas fa-${h.accion === 'creado' ? 'plus-circle' : 'eye'}"></i> ${h.accion.toUpperCase()}</span>
+                    <span class="fecha">${h.fecha}</span>
+                    <span style="font-size:0.7rem;color:#94a3b8;">IP: ${h.ip}</span>
+                </div>
+            `).join('');
+        } else {
+            cont.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">No hay historial aún.</p>';
+        }
+    } catch (e) {
+        cont.innerHTML = '<p style="text-align:center;color:#dc2626;font-size:0.85rem;">Error al cargar historial.</p>';
+    }
 }
 
 // ============================================

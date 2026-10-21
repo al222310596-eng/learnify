@@ -78,7 +78,6 @@ async function cargarDuales() {
         `;
     }
 }
-
 // ============================================
 // MOSTRAR DUALES
 // ============================================
@@ -160,10 +159,18 @@ function mostrarDuales(duales) {
                     </div>
                 ` : ''}
                 <span class="dual-estado ${estadoClass}">${estadoIcono} ${estadoText}</span>
+                
                 <div class="dual-acciones">
                     <button onclick="verDetalleDual('${dual._id}')" class="btn-detalle-dual">
                         <i class="fas fa-eye"></i> Ver detalles
                     </button>
+                    
+                    ${!esMaestro ? `
+                        <button data-iddual="${dual._id}" class="btn-compartir-dual" style="background: #06b6d4; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-share-alt"></i> Compartir
+                        </button>
+                    ` : ''}
+
                     ${esMaestro ? `
                         ${dual.estado !== 'inactivo' ? `
                             <button onclick="editarDual('${dual._id}')" class="btn-editar-dual">
@@ -178,6 +185,296 @@ function mostrarDuales(duales) {
             </div>
         `;
     }).join('');
+
+    // ✅ Asignar el evento de clic a los botones de compartir (sin setTimeout)
+    container.querySelectorAll('.btn-compartir-dual').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const dualId = this.getAttribute('data-iddual');
+            abrirModalCompartir(dualId, 'dual');
+        });
+    });
+}
+
+// ============================================
+// CERRAR MODAL COMPARTIR
+// ============================================
+function cerrarModalCompartir() {
+    const modal = document.getElementById('modalCompartirGlobal');
+    if (modal) modal.classList.remove('active');
+}
+
+// ============================================
+// CAMBIAR DE TAB (Correo / Enlace / Historial)
+// ============================================
+function cambiarTabCompartir(tab, btn) {
+    const modal = document.getElementById('modalCompartirGlobal');
+    if (!modal) return;
+
+    // Quitar active de todos los tabs y contenidos
+    modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    modal.querySelectorAll('.tab-content').forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
+    });
+
+    // Activar el tab seleccionado
+    if (btn) btn.classList.add('active');
+    const contenido = document.getElementById(`tab-${tab}`);
+    if (contenido) {
+        contenido.classList.add('active');
+        contenido.style.display = 'block';
+    }
+
+    // Si es historial, cargarlo
+    if (tab === 'historial') {
+        cargarHistorialCompartir();
+    }
+}
+
+// ============================================
+// COPIAR ENLACE AL PORTAPAPELES
+// ============================================
+function copiarEnlace() {
+    const input = document.getElementById('inputEnlaceCompartir');
+    if (!input || !input.value) {
+        alert('Primero genera un enlace');
+        return;
+    }
+
+    // Método moderno
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value)
+            .then(() => {
+                const btn = document.querySelector('.btn-copiar');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.background = '';
+                }, 1500);
+            })
+            .catch(() => {
+                // Fallback
+                input.select();
+                document.execCommand('copy');
+                alert('Enlace copiado');
+            });
+    } else {
+        input.select();
+        document.execCommand('copy');
+        alert('Enlace copiado');
+    }
+}
+
+// ============================================
+// ENVIAR POR CORREO (Compartir)
+// ============================================
+async function ejecutarCompartir(docId, tipo) {
+    const correosInput = document.getElementById('compartirCorreos');
+    const btn = document.getElementById('btnEnviarCorreoDual');
+
+    if (!docId) {
+        alert('No se identificó el documento');
+        return;
+    }
+
+    const correos = correosInput.value.trim();
+    if (!correos) {
+        alert('Ingresa al menos un correo destinatario');
+        correosInput.focus();
+        return;
+    }
+
+    const listaCorreos = correos.split(',').map(c => c.trim()).filter(Boolean);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidos = listaCorreos.filter(c => !emailRegex.test(c));
+    if (invalidos.length > 0) {
+        alert(`Correos inválidos:\n${invalidos.join('\n')}`);
+        return;
+    }
+
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF y enviando...';
+    btn.disabled = true;
+
+    try {
+        // 1. Cargar los datos del dual
+        const resDual = await fetch(`/api/duales/detalle/${docId}`);
+        const dataDual = await resDual.json();
+        if (!dataDual.exito) throw new Error('No se pudo cargar el dual');
+
+        // 2. Generar el PDF en memoria usando jsPDF + html2canvas
+        //    (reutilizamos generarFormatoImprimibleDual que ya tienes)
+        const htmlFormato = generarFormatoImprimibleDual(dataDual.dual);
+        const contenedor = document.createElement('div');
+        contenedor.innerHTML = htmlFormato;
+        contenedor.style.position = 'fixed';
+        contenedor.style.left = '-9999px';
+        contenedor.style.top = '0';
+        contenedor.style.width = '800px';
+        contenedor.style.background = 'white';
+        document.body.appendChild(contenedor);
+
+        const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        const pdfBlob = pdf.output('blob');
+        document.body.removeChild(contenedor);
+
+        // 3. Enviar el PDF al endpoint correcto
+        const formData = new FormData();
+        formData.append('pdf_file', pdfBlob, `dual_${docId}.pdf`);
+        formData.append('correos', listaCorreos.join(','));
+        formData.append('tipo_documento', 'dual');
+        formData.append('documento_id', docId);
+        formData.append('creador_id', usuario._id);
+
+        const res = await fetch('/api/compartir/crear', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.exito) {
+            alert(`✅ Enviado correctamente a ${listaCorreos.length} destinatario(s)`);
+            correosInput.value = '';
+        } else {
+            alert('❌ ' + (data.mensaje || 'Error al enviar'));
+        }
+    } catch (error) {
+        console.error('Error al compartir:', error);
+        alert('❌ ' + (error.message || 'Error de conexión'));
+    } finally {
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+// ============================================
+// GENERAR ENLACE PÚBLICO
+// ============================================
+async function generarSoloEnlace(docId, tipo) {
+    const btn = document.getElementById('btnGenerarEnlaceDual');
+    const inputEnlace = document.getElementById('inputEnlaceCompartir');
+
+    if (!docId) {
+        alert('No se identificó el documento');
+        return;
+    }
+
+    const permisos = document.getElementById('compartirPermisosEnlace').value;
+    const dias = document.getElementById('compartirExpiracionEnlace').value;
+
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/compartir/generar-enlace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                documento_id: docId,
+                tipo_documento: tipo || 'dual',
+                creador_id: usuario._id,
+                dias_expiracion: parseInt(dias),
+                permisos: permisos
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.exito && data.enlace) {
+            inputEnlace.value = data.enlace;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(data.enlace).catch(() => { });
+            }
+        } else {
+            alert('❌ ' + (data.mensaje || 'Error al generar enlace'));
+        }
+    } catch (error) {
+        console.error('Error al generar enlace:', error);
+        alert('❌ Error de conexión');
+    } finally {
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+    }
+}
+// ============================================
+// CARGAR HISTORIAL DE COMPARTIDOS
+// ============================================
+async function cargarHistorialCompartir() {
+    const contenedor = document.getElementById('historialContenido');
+    if (!contenedor) return;
+
+    const docId = window.currentDocIdCompartir;
+    if (!docId) {
+        contenedor.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Sin documento seleccionado</p>';
+        return;
+    }
+
+    contenedor.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;"><i class="fas fa-spinner fa-spin"></i> Cargando historial...</p>';
+
+    try {
+        const res = await fetch(`/api/compartir/historial/${docId}`);
+        const data = await res.json();
+
+        if (!data.exito || !data.historial || data.historial.length === 0) {
+            contenedor.innerHTML = `
+                <p style="text-align:center;color:#94a3b8;font-size:0.85rem;">
+                    <i class="fas fa-info-circle"></i> Aún no has compartido este documento.
+                </p>
+            `;
+            return;
+        }
+
+        contenedor.innerHTML = data.historial.map(item => {
+            const icono = item.accion === 'visto'
+                ? '<i class="fas fa-eye"></i>'
+                : '<i class="fas fa-paper-plane"></i>';
+            const clase = item.accion === 'visto' ? 'enlace' : 'correo';
+            const texto = item.accion === 'visto' ? 'Visto' : 'Compartido';
+
+            return `
+                <div class="historial-item">
+                    <div class="historial-icono ${clase}">${icono}</div>
+                    <div class="historial-detalle">
+                        <p><strong>${texto}</strong> ${item.ip ? '· IP: ' + item.ip : ''}</p>
+                        <span>${item.fecha || ''}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error al cargar historial:', error);
+        contenedor.innerHTML = `
+            <p style="text-align:center;color:#dc2626;font-size:0.85rem;">
+                <i class="fas fa-exclamation-triangle"></i> Error al cargar el historial
+            </p>
+        `;
+    }
 }
 
 // ============================================
@@ -803,4 +1100,98 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
     }
+
 });
+// ============================================
+// COMPARTIR DUALES (VERSIÓN ÚNICA Y DEFINITIVA)
+// ============================================
+function abrirModalCompartir(dualId, tipo = 'dual') {
+    let modal = document.getElementById('modalCompartirGlobal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalCompartirGlobal';
+        modal.className = 'modal-compartir';
+        modal.innerHTML = `
+            <div class="modal-compartir-contenido">
+                <div class="modal-compartir-header">
+                    <h3><i class="fas fa-share-alt"></i> Compartir Documento</h3>
+                    <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;">&times;</button>
+                </div>
+                
+                <div class="tabs-compartir">
+                    <button class="tab-btn active" onclick="cambiarTabCompartir('correo', this)">Por Correo</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('enlace', this)">Por Enlace</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('historial', this)">Historial</button>
+                </div>
+                
+                <div id="tab-correo" class="tab-content active">
+                    <div class="form-grupo-compartir">
+                        <label>Correos destinatarios (separados por coma)</label>
+                        <input type="text" id="compartirCorreos" placeholder="ejemplo1@correo.com, ejemplo2@correo.com">
+                    </div>
+                    <button id="btnEnviarCorreoDual" class="btn-compartir-accion">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                </div>
+
+                <div id="tab-enlace" class="tab-content" style="display: none;">
+                    <div class="form-grupo-compartir">
+                        <label>Permisos</label>
+                        <select id="compartirPermisosEnlace">
+                            <option value="ver">Solo Ver</option>
+                        </select>
+                    </div>
+                    <div class="form-grupo-compartir">
+                        <label>Vigencia (Expiración)</label>
+                        <select id="compartirExpiracionEnlace">
+                            <option value="1">1 Día</option>
+                            <option value="7" selected>7 Días</option>
+                            <option value="30">30 Días</option>
+                            <option value="0">Nunca</option>
+                        </select>
+                    </div>
+                    <button id="btnGenerarEnlaceDual" class="btn-compartir-accion" style="margin-bottom: 10px;">
+                        <i class="fas fa-link"></i> Generar Enlace
+                    </button>
+                    <div class="enlace-container">
+                        <input type="text" id="inputEnlaceCompartir" readonly placeholder="El enlace aparecerá aquí...">
+                        <button class="btn-copiar" onclick="copiarEnlace()"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <div id="tab-historial" class="tab-content" style="display: none;">
+                    <div id="historialContenido" class="historial-lista">
+                        <p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) cerrarModalCompartir(); };
+
+        document.getElementById('btnEnviarCorreoDual').onclick = function() {
+            ejecutarCompartir(window.currentDocIdCompartir, window.currentDocTipoCompartir);
+        };
+        document.getElementById('btnGenerarEnlaceDual').onclick = function() {
+            generarSoloEnlace(window.currentDocIdCompartir, window.currentDocTipoCompartir);
+        };
+    }
+
+    window.currentDocIdCompartir = dualId;
+    window.currentDocTipoCompartir = tipo;
+
+    document.querySelectorAll('.tab-btn').forEach((b, index) => {
+        if (index === 0) b.classList.add('active'); else b.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-content').forEach((c, index) => {
+        if (index === 0) c.style.display = 'block'; else c.style.display = 'none';
+    });
+
+    document.getElementById('compartirCorreos').value = '';
+    document.getElementById('compartirPermisosEnlace').value = 'descargar';
+    document.getElementById('compartirExpiracionEnlace').value = '7';
+    document.getElementById('inputEnlaceCompartir').value = '';
+    document.getElementById('historialContenido').innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>';
+
+    modal.classList.add('active');
+}

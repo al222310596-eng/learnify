@@ -25,9 +25,21 @@
     gap: 0.5rem;
 }
 
-.header-minutas h2 i { color: #667eea; }
-.subtitulo { color: #64748b; font-size: 0.9rem; margin: 0.2rem 0 0; }
-.acciones-header { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.header-minutas h2 i {
+    color: #667eea;
+}
+
+.subtitulo {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0.2rem 0 0;
+}
+
+.acciones-header {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
 
 /* Buscador */
 .buscador-container {
@@ -41,7 +53,10 @@
     border: 1px solid #e2e8f0;
 }
 
-.buscador-container i { color: #94a3b8; }
+.buscador-container i {
+    color: #94a3b8;
+}
+
 .buscador-container input {
     flex: 1;
     border: none;
@@ -130,7 +145,9 @@
     border-radius: 8px;
 }
 
-.minuta-info-item i { color: #667eea; }
+.minuta-info-item i {
+    color: #667eea;
+}
 
 .minuta-acciones {
     display: flex;
@@ -153,10 +170,37 @@
     transition: all 0.2s;
 }
 
-.btn-ver     { background: #dbeafe; color: #1d4ed8; }
-.btn-imprimir{ background: #e0e7ff; color: #4338ca; }
-.btn-eliminar{ background: #fee2e2; color: #dc2626; }
-.btn-minuta:hover { transform: scale(1.05); }
+.btn-ver {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.btn-imprimir {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.btn-eliminar {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-minuta:hover {
+    transform: scale(1.05);
+}
+
+/* ============================================
+   BOTÓN COMPARTIR (NUEVO)
+   ============================================ */
+.btn-compartir {
+    background: #06b6d4;
+    color: #fff;
+}
+
+.btn-compartir:hover {
+    background: #0891b2;
+    transform: scale(1.05);
+}
 
 /* Sin minutas */
 .sin-minutas {
@@ -192,7 +236,9 @@
     border-bottom: 2px solid #f1f5f9;
 }
 
-.seccion-form:last-of-type { border-bottom: none; }
+.seccion-form:last-of-type {
+    border-bottom: none;
+}
 
 .seccion-form-header {
     display: flex;
@@ -212,7 +258,9 @@
     gap: 0.5rem;
 }
 
-.seccion-form-header .seccion-form-titulo { margin: 0; }
+.seccion-form-header .seccion-form-titulo {
+    margin: 0;
+}
 
 .form-row {
     display: grid;
@@ -236,8 +284,13 @@
     gap: 0.4rem;
 }
 
-.form-grupo label i { color: #667eea; }
-.form-grupo label .required { color: #ef4444; }
+.form-grupo label i {
+    color: #667eea;
+}
+
+.form-grupo label .required {
+    color: #ef4444;
+}
 
 .form-grupo input,
 .form-grupo textarea {
@@ -355,18 +408,26 @@
     transition: background 0.2s;
 }
 
-.btn.imprimir:hover { background: #0284c7; }
+.btn.imprimir:hover {
+    background: #0284c7;
+}
 
 /* ============================================
    FORMATO IMPRIMIBLE (oculto en pantalla)
    ============================================ */
-.formato-imprimible { display: none; }
+.formato-imprimible {
+    display: none;
+}
 
 @media print {
-    body * { visibility: hidden !important; }
+    body * {
+        visibility: hidden !important;
+    }
 
     .formato-imprimible,
-    .formato-imprimible * { visibility: visible !important; }
+    .formato-imprimible * {
+        visibility: visible !important;
+    }
 
     .formato-imprimible {
         display: block !important;
@@ -383,7 +444,8 @@
         z-index: 99999 !important;
     }
 
-    html, body {
+    html,
+    body {
         margin: 0 !important;
         padding: 0 !important;
         background: #fff !important;
@@ -551,11 +613,234 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .minutas-grid { grid-template-columns: 1fr; }
-    .form-minuta { padding: 1.2rem; }
-    .form-row { grid-template-columns: 1fr; }
-    .header-minutas { flex-direction: column; align-items: stretch; }
-    .header-minutas .btn { justify-content: center; }
-    .botones-form { flex-direction: column; }
-    .botones-form .btn { width: 100%; justify-content: center; }
+    .minutas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-minuta {
+        padding: 1.2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-minutas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-minutas .btn {
+        justify-content: center;
+    }
+
+    .botones-form {
+        flex-direction: column;
+    }
+
+    .botones-form .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================
+   MODAL COMPARTIR (NUEVO)
+   ============================================ */
+.modal-compartir {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-compartir.active {
+    display: flex;
+}
+
+.modal-compartir-contenido {
+    background: #fff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    padding: 1.5rem;
+    animation: modalFadeIn 0.3s;
+}
+
+.modal-compartir-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.75rem;
+}
+
+.modal-compartir-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.2rem;
+}
+
+.modal-compartir-header h3 i {
+    color: #06b6d4;
+    margin-right: 0.5rem;
+}
+
+.form-grupo-compartir {
+    margin-bottom: 1rem;
+}
+
+.form-grupo-compartir label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.4rem;
+}
+
+.form-grupo-compartir input,
+.form-grupo-compartir select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.form-grupo-compartir input:focus,
+.form-grupo-compartir select:focus {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+}
+
+.enlace-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.enlace-container input {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.btn-copiar {
+    background: #06b6d4;
+    color: #fff;
+    border: none;
+    padding: 0 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-copiar:hover {
+    background: #0891b2;
+}
+
+.btn-compartir-accion {
+    width: 100%;
+    padding: 12px;
+    background: #06b6d4;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.btn-compartir-accion:hover {
+    background: #0891b2;
+}
+
+.tabs-compartir {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #94a3b8;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: #06b6d4;
+    border-bottom-color: #06b6d4;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.historial-lista {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.historial-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.historial-item:last-child {
+    border-bottom: none;
+}
+
+.historial-item .accion {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.historial-item .fecha {
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
