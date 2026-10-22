@@ -3570,18 +3570,27 @@ def historial_compartido(documento_id):
     except Exception as error:
         return jsonify({"exito": False, "mensaje": str(error)}), 400
     
+    #cambios para el compartido
 @app.route('/api/compartir/generar-html/<string:token>', methods=['GET'])
 def generar_html_compartido(token):
+    compartido = db.compartidos.find_one({"token": token})
+    if not compartido:
+        return "<h1>Enlace no válido</h1>", 404
+    return html_documento(compartido['tipo_documento'], compartido['documento_id'])
+
+# NUEVO: HTML del dual para que el móvil genere su PDF
+@app.route('/api/duales/formato/<string:dual_id>', methods=['GET'])
+def formato_dual(dual_id):
+    return html_documento('dual', dual_id)
+
+# Función que arma el HTML según el tipo (antes estaba dentro de generar_html_compartido)
+def html_documento(tipo, documento_id):
     try:
-        compartido = db.compartidos.find_one({"token": token})
-        if not compartido: return "<h1>Enlace no válido</h1>", 404
-        
-        tipo = compartido['tipo_documento']
         doc = None
-        if tipo == 'minuta': doc = db.minutas.find_one({"_id": ObjectId(compartido['documento_id'])})
-        elif tipo == 'estadia': doc = db.estadias.find_one({"_id": ObjectId(compartido['documento_id'])})
-        elif tipo == 'dual': doc = db.duales.find_one({"_id": ObjectId(compartido['documento_id'])})
-        
+        if tipo == 'minuta': doc = db.minutas.find_one({"_id": ObjectId(documento_id)})
+        elif tipo == 'estadia': doc = db.estadias.find_one({"_id": ObjectId(documento_id)})
+        elif tipo == 'dual': doc = db.duales.find_one({"_id": ObjectId(documento_id)})
+
         if not doc: return "<h1>No encontrado</h1>", 404
 
         base_url = request.host_url.rstrip('/')
