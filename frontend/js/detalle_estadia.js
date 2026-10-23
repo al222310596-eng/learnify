@@ -498,6 +498,16 @@ function imprimirFormato() {
     const contenedor = document.getElementById('formatoImprimible');
     contenedor.innerHTML = generarFormatoImprimible(estadiaActual);
 
+ fetch('/api/historial/registrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            usuario_id: usuario._id,
+            tipo: 'Estadía',
+            referencia: estadiaActual.proyecto || 'Formato de Estadía'
+        })
+    });
+
     setTimeout(() => {
         window.print();
     }, 300);

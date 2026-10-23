@@ -427,6 +427,9 @@ function cargarActividadReciente() {
 let graficaTareas = null;
 
 function inicializarGrafica() {
+
+    const canvas = document.getElementById('graficaTareas');
+    if (!canvas) return;
     const ctx = document.getElementById('graficaTareas').getContext('2d');
     
     graficaTareas = new Chart(ctx, {
@@ -806,6 +809,55 @@ function cargarSalaActivaJitsi() {
 }
 
 // ============================================
+// CARGAR HISTORIAL DE DESCARGAS
+// ============================================
+async function cargarHistorialDescargas() {
+    const contenedor = document.getElementById('historialDescargasLista');
+    if (!contenedor) return;
+
+    // Obtener usuario directo para evitar errores
+    const localUser = JSON.parse(localStorage.getItem('usuario'));
+    if (!localUser) return;
+
+    try {
+        const res = await fetch(`/api/historial/${localUser._id}`);
+        const data = await res.json();
+
+        if (data.exito && data.historial.length > 0) {
+            contenedor.innerHTML = data.historial.map(item => {
+                let icono = 'fa-file-alt';
+                let colorIcono = '#4338ca';
+                let bgIcono = '#e0e7ff';
+
+                if (item.tipo === 'Estadía') { icono = 'fa-building'; colorIcono = '#059669'; bgIcono = '#d1fae5'; }
+                if (item.tipo === 'Minuta') { icono = 'fa-file-signature'; colorIcono = '#d97706'; bgIcono = '#fef3c7'; }
+                if (item.tipo === 'Dual') { icono = 'fa-briefcase'; colorIcono = '#2563eb'; bgIcono = '#dbeafe'; }
+
+                return `
+                    <div class="actividad-item" style="display:flex; align-items:center; gap:12px; padding:12px; border-bottom:1px solid #f1f5f9;">
+                        <div style="background:${bgIcono}; color:${colorIcono}; width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fas ${icono}"></i>
+                        </div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-weight:600; font-size:0.85rem; color:#1e293b;">${item.tipo} descargada</div>
+                            <div style="font-size:0.75rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.referencia || 'Sin título'}</div>
+                        </div>
+                        <div style="font-size:0.7rem; color:#94a3b8; white-space:nowrap;">
+                            ${item.fecha}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            contenedor.innerHTML = `<div class="actividad-vacia"><i class="fas fa-info-circle"></i> Aún no has descargado documentos</div>`;
+        }
+    } catch (error) {
+        console.error(error);
+        contenedor.innerHTML = `<div class="actividad-vacia">Error al cargar</div>`;
+    }
+}
+
+// ============================================
 // INICIALIZAR DASHBOARD
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -816,6 +868,8 @@ document.addEventListener('DOMContentLoaded', function() {
     mostrarInfoUsuario();
     cargarEquipos();
     cargarTareasPendientes();
+    cargarHistorialDescargas();
+
     
     cargarEstadisticasReales().then(() => {
         inicializarGrafica();
