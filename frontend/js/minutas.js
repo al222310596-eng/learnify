@@ -381,6 +381,16 @@ function imprimirMinuta() {
         usuario_nombre: usuario.nombre
     });
 
+     fetch('/api/historial/registrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            usuario_id: usuario._id,
+            tipo: 'Minuta',
+            referencia: asunto
+        })
+    });
+
     setTimeout(() => window.print(), 300);
 }
 

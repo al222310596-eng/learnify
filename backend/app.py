@@ -3754,7 +3754,54 @@ def html_documento(tipo, documento_id):
             return "<h1>Documento listo para compartir</h1>"
     except Exception as e:
         return f"<h1>Error: {e}</h1>", 500
-        
+
+
+# ============================================
+# 18. HISTORIAL DE DESCARGAS
+# ============================================
+
+@app.route('/api/historial/registrar', methods=['POST'])
+def registrar_descarga():
+    try:
+        datos = request.json
+        usuario_id = datos.get('usuario_id')
+        tipo = datos.get('tipo')  # 'Minuta', 'Estadía', 'Dual', etc.
+        referencia = datos.get('referencia', '') # Asunto o nombre del proyecto
+
+        if not usuario_id or not tipo:
+            return jsonify({"exito": False, "mensaje": "Faltan datos"}), 400
+
+        db.historial_descargas.insert_one({
+            "usuario_id": ObjectId(usuario_id),
+            "tipo": tipo,
+            "referencia": referencia,
+            "fecha": datetime.now()
+        })
+        return jsonify({"exito": True})
+    except Exception as e:
+        return jsonify({"exito": False, "mensaje": str(e)}), 400
+
+@app.route('/api/historial/<string:usuario_id>', methods=['GET'])
+def obtener_historial(usuario_id):
+    try:
+        # Traer solo los últimos 10 registros para no saturar el Dashboard
+        cursor = db.historial_descargas.find({
+            "usuario_id": ObjectId(usuario_id)
+        }).sort("fecha", -1).limit(10)
+
+        historial = []
+        for h in cursor:
+            historial.append({
+                "_id": str(h["_id"]),
+                "tipo": h.get("tipo"),
+                "referencia": h.get("referencia"),
+                "fecha": h["fecha"].strftime('%Y-%m-%d %H:%M') if h.get("fecha") else None
+            })
+        return jsonify({"exito": True, "historial": historial})
+    except Exception as e:
+        return jsonify({"exito": False, "mensaje": str(e)}), 400
+    
+
 # ============================================
 # INICIAR SERVIDOR
 # ============================================
