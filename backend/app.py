@@ -2438,6 +2438,246 @@ def eliminar_estadia(estadia_id):
     except Exception as error:
         print(f"Error en eliminar_estadia: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+
+# ============================================
+# 9.1 IMPORTAR ESTADÍAS DESDE EXCEL (HU31)
+# ============================================
+
+# Columnas de la plantilla: (nombre_columna, obligatoria, ejemplo)
+COLUMNAS_ESTADIAS_EXCEL = [
+    ("email_alumno",     True,  "alumno@correo.com"),
+    ("nombre",           True,  "Juan"),
+    ("apellidos",        False, "Pérez López"),
+    ("carrera",          False, "Ing. en Software"),
+    ("grupo",            False, "ISW-101"),
+    ("empresa",          True,  "Empresa Ejemplo S.A."),
+    ("lugar_estadia",    False, "Toluca, Estado de México"),
+    ("asesor_externo",   False, "Ing. María Gómez"),
+    ("proyecto",         False, "Sistema de inventarios"),
+    ("equipo",           False, "Equipo 1"),
+    ("descripcion",      False, "Desarrollo de módulo web"),
+    ("periodo",          False, "Sep-Dic 2026"),
+    ("fecha_inicio",     False, "2026-09-01"),
+    ("fecha_fin",        False, "2026-12-15"),
+    ("horas",            False, 600),
+]
+MAX_FILAS_IMPORTAR = 500
+MAX_TAMANO_EXCEL = 5 * 1024 * 1024  # 5 MB
+
+
+def _texto_celda(valor):
+    """Convierte cualquier valor de una celda a texto limpio."""
+    if valor is None:
+        return ""
+    if isinstance(valor, float) and valor.is_integer():
+        valor = int(valor)
+    return str(valor).strip()
+
+
+def _fecha_celda(valor):
+    """Acepta fechas reales de Excel o texto AAAA-MM-DD / DD/MM/AAAA."""
+    if valor is None or _texto_celda(valor) == "":
+        return None
+    if isinstance(valor, datetime):
+        return valor
+    texto = _texto_celda(valor)
+    for formato in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(texto, formato)
+        except ValueError:
+            continue
+    raise ValueError(f"fecha no válida '{texto}' (usa AAAA-MM-DD)")
+
+
+@app.route('/api/estadias/importar/plantilla', methods=['GET'])
+def descargar_plantilla_estadias():
+    """Descarga el formato Excel que el maestro debe llenar."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        libro = Workbook()
+        hoja = libro.active
+        hoja.title = "Estadias"
+
+        relleno_obligatorio = PatternFill("solid", fgColor="1F4E78")
+        relleno_opcional = PatternFill("solid", fgColor="7F7F7F")
+
+        for col, (nombre, obligatoria, ejemplo) in enumerate(COLUMNAS_ESTADIAS_EXCEL, start=1):
+            celda = hoja.cell(row=1, column=col, value=nombre)
+            celda.font = Font(bold=True, color="FFFFFF")
+            celda.fill = relleno_obligatorio if obligatoria else relleno_opcional
+            celda.alignment = Alignment(horizontal="center")
+            hoja.cell(row=2, column=col, value=ejemplo)
+            hoja.column_dimensions[celda.column_letter].width = max(len(nombre), len(str(ejemplo))) + 4
+
+        ayuda = libro.create_sheet("Instrucciones")
+        instrucciones = [
+            "INSTRUCCIONES PARA IMPORTAR ESTADÍAS",
+            "1. Llena la hoja 'Estadias' a partir de la fila 2 (la fila 2 es un ejemplo, bórrala o reemplázala).",
+            "2. No cambies los nombres de las columnas de la fila 1.",
+            "3. Las columnas en azul son OBLIGATORIAS: email_alumno, nombre y empresa.",
+            "4. email_alumno debe ser el correo con el que el alumno ya está registrado en Learnify.",
+            "5. Las fechas van como AAAA-MM-DD (ejemplo: 2026-09-01) o como fecha de Excel.",
+            "6. horas debe ser un número entero.",
+            f"7. Máximo {MAX_FILAS_IMPORTAR} filas por archivo.",
+        ]
+        for i, linea in enumerate(instrucciones, start=1):
+            ayuda.cell(row=i, column=1, value=linea)
+        ayuda["A1"].font = Font(bold=True, size=13)
+        ayuda.column_dimensions["A"].width = 100
+
+        salida = BytesIO()
+        libro.save(salida)
+        salida.seek(0)
+
+        return Response(
+            salida.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=plantilla_estadias.xlsx"}
+        )
+    except Exception as error:
+        print(f"Error en descargar_plantilla_estadias: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 500
+
+
+@app.route('/api/estadias/importar', methods=['POST'])
+def importar_estadias_excel():
+    """Importa estadías en masa desde un Excel (.xlsx). Solo maestros."""
+    try:
+        from openpyxl import load_workbook
+
+        usuario_id = request.form.get('usuario_id')
+        archivo = request.files.get('archivo')
+
+        # --- 1. Validar quién sube el archivo ---
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+        maestro = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not maestro or maestro.get("rol") != "maestro":
+            return jsonify({"exito": False, "mensaje": "Solo los maestros pueden importar estadías"}), 403
+
+        # --- 2. Validar el archivo ---
+        if not archivo or not archivo.filename:
+            return jsonify({"exito": False, "mensaje": "Selecciona un archivo Excel"}), 400
+        if not archivo.filename.lower().endswith('.xlsx'):
+            return jsonify({"exito": False, "mensaje": "El archivo debe ser .xlsx (usa la plantilla)"}), 400
+        contenido = archivo.read()
+        if len(contenido) > MAX_TAMANO_EXCEL:
+            return jsonify({"exito": False, "mensaje": "El archivo supera 5 MB"}), 400
+
+        try:
+            libro = load_workbook(BytesIO(contenido), read_only=True, data_only=True)
+        except Exception:
+            return jsonify({"exito": False, "mensaje": "No se pudo leer el Excel; verifica que no esté dañado"}), 400
+        hoja = libro["Estadias"] if "Estadias" in libro.sheetnames else libro.worksheets[0]
+        filas = list(hoja.iter_rows(values_only=True))
+        libro.close()
+
+        # --- 3. Validar columnas ---
+        if not filas:
+            return jsonify({"exito": False, "mensaje": "El archivo está vacío"}), 400
+        encabezados = [_texto_celda(c).lower() for c in filas[0]]
+        obligatorias = [n for n, obl, _ in COLUMNAS_ESTADIAS_EXCEL if obl]
+        faltantes = [n for n in obligatorias if n not in encabezados]
+        if faltantes:
+            return jsonify({
+                "exito": False,
+                "mensaje": "Faltan columnas obligatorias: " + ", ".join(faltantes) + ". Descarga la plantilla."
+            }), 400
+        indice = {nombre: pos for pos, nombre in enumerate(encabezados) if nombre}
+
+        def valor(fila, columna):
+            pos = indice.get(columna)
+            return fila[pos] if pos is not None and pos < len(fila) else None
+
+        datos_filas = [(n, f) for n, f in enumerate(filas[1:], start=2)
+                       if any(_texto_celda(c) for c in f)]
+        if not datos_filas:
+            return jsonify({"exito": False, "mensaje": "No hay filas con datos para importar"}), 400
+        if len(datos_filas) > MAX_FILAS_IMPORTAR:
+            return jsonify({"exito": False,
+                            "mensaje": f"El archivo tiene {len(datos_filas)} filas; el máximo es {MAX_FILAS_IMPORTAR}"}), 400
+
+        # --- 4. Validar y registrar fila por fila ---
+        exitosos = 0
+        errores = []
+        for num_fila, fila in datos_filas:
+            try:
+                email = _texto_celda(valor(fila, "email_alumno")).lower()
+                nombre = _texto_celda(valor(fila, "nombre"))
+                empresa = _texto_celda(valor(fila, "empresa"))
+
+                if not email or not nombre or not empresa:
+                    raise ValueError("email_alumno, nombre y empresa son obligatorios")
+
+                alumno = db.usuarios.find_one({"email": email, "rol": "alumno"})
+                if not alumno:
+                    raise ValueError(f"no existe un alumno registrado con el correo {email}")
+
+                fecha_inicio = _fecha_celda(valor(fila, "fecha_inicio"))
+                fecha_fin = _fecha_celda(valor(fila, "fecha_fin"))
+                if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+                    raise ValueError("fecha_fin es anterior a fecha_inicio")
+
+                texto_horas = _texto_celda(valor(fila, "horas"))
+                if texto_horas:
+                    if not texto_horas.isdigit():
+                        raise ValueError(f"horas debe ser un número entero (llegó '{texto_horas}')")
+                    horas = int(texto_horas)
+                else:
+                    horas = 0
+
+                # Evitar duplicados: mismo alumno + empresa + fecha de inicio
+                if db.estadias.find_one({"usuario_id": alumno["_id"], "empresa": empresa,
+                                         "fecha_inicio": fecha_inicio}):
+                    raise ValueError("ya existe una estadía de este alumno en esa empresa y fecha")
+
+                apellidos = _texto_celda(valor(fila, "apellidos"))
+                db.estadias.insert_one({
+                    "usuario_id": alumno["_id"],
+                    "maestro_id": maestro["_id"],
+                    "maestro_nombre": maestro["nombre"],
+                    "maestro_email": maestro["email"],
+                    "nombre": nombre,
+                    "apellidos": apellidos,
+                    "titulo": f"{nombre} {apellidos}".strip(),
+                    "carrera": _texto_celda(valor(fila, "carrera")),
+                    "grupo": _texto_celda(valor(fila, "grupo")),
+                    "empresa": empresa,
+                    "ubicacion": _texto_celda(valor(fila, "lugar_estadia")),
+                    "asesor_academico": maestro["nombre"],
+                    "asesor_externo": _texto_celda(valor(fila, "asesor_externo")),
+                    "proyecto": _texto_celda(valor(fila, "proyecto")),
+                    "equipo": _texto_celda(valor(fila, "equipo")),
+                    "descripcion": _texto_celda(valor(fila, "descripcion")),
+                    "periodo": _texto_celda(valor(fila, "periodo")),
+                    "fecha_inicio": fecha_inicio,
+                    "fecha_fin": fecha_fin,
+                    "horas": horas,
+                    "estado": "pendiente",
+                    "fecha_creacion": datetime.now()
+                })
+                exitosos += 1
+            except Exception as error_fila:
+                errores.append({"fila": num_fila, "motivo": str(error_fila)})
+
+        # --- 5. Resumen ---
+        return jsonify({
+            "exito": True,
+            "mensaje": f"Importación terminada: {exitosos} registradas, {len(errores)} con error",
+            "resumen": {
+                "total": len(datos_filas),
+                "exitosos": exitosos,
+                "con_error": len(errores),
+                "errores": errores
+            }
+        })
+    except Exception as error:
+        print(f"Error en importar_estadias_excel: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+        
 # ============================================
 # 15. MINUTAS
 # ============================================

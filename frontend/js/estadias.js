@@ -30,6 +30,11 @@ function configurarPorRol() {
         btnCrear.style.display = 'none';
         if (titulo) titulo.textContent = 'Solicitudes de Estadía de mis Alumnos';
     }
+        // HU31: importar desde Excel solo para maestros
+    const accionesMaestro = document.getElementById('accionesMaestro');
+    if (accionesMaestro) {
+        accionesMaestro.style.display = usuario.rol === 'maestro' ? 'flex' : 'none';
+    }
 }
 
 // ============================================
@@ -400,6 +405,85 @@ async function eliminarEstadiaConfirmado() {
 }
 
 // ============================================
+// HU31: IMPORTAR ESTADÍAS DESDE EXCEL
+// ============================================
+async function importarEstadiasExcel(archivo) {
+    if (!archivo) return;
+
+    if (!archivo.name.toLowerCase().endsWith('.xlsx')) {
+        mostrarMensaje('error', 'El archivo debe ser .xlsx. Descarga la plantilla y úsala.');
+        return;
+    }
+
+    const btnImportar = document.getElementById('btnImportarExcel');
+    const textoOriginal = btnImportar.innerHTML;
+    btnImportar.disabled = true;
+    btnImportar.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Importando...';
+
+    try {
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+        formData.append('usuario_id', usuario._id);
+
+        const respuesta = await fetch('/api/estadias/importar', {
+            method: 'POST',
+            body: formData
+        });
+        const resultado = await respuesta.json();
+
+        if (resultado.exito) {
+            mostrarResumenImportacion(resultado.resumen);
+            cargarEstadias();
+        } else {
+            mostrarMensaje('error', resultado.mensaje || 'No se pudo importar el archivo');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensaje('error', 'Error de conexión');
+    } finally {
+        btnImportar.disabled = false;
+        btnImportar.innerHTML = textoOriginal;
+        document.getElementById('inputExcelEstadias').value = '';
+    }
+}
+
+function mostrarResumenImportacion(resumen) {
+    const cuerpo = document.getElementById('resumenImportacionCuerpo');
+    const modal = document.getElementById('modalResumenImportacion');
+    if (!cuerpo || !modal) return;
+
+    let html = `
+        <div class="resumen-importacion-cifras">
+            <div class="resumen-cifra"><strong>${resumen.total}</strong><span>Filas leídas</span></div>
+            <div class="resumen-cifra exito"><strong>${resumen.exitosos}</strong><span>Registradas</span></div>
+            <div class="resumen-cifra error"><strong>${resumen.con_error}</strong><span>Con error</span></div>
+        </div>`;
+
+    if (resumen.errores.length > 0) {
+        html += `
+            <p><strong>Filas con error</strong> (corrígelas en tu Excel y vuelve a importar solo esas):</p>
+            <div class="tabla-errores-importacion">
+                <table>
+                    <thead><tr><th>Fila</th><th>Motivo</th></tr></thead>
+                    <tbody>
+                        ${resumen.errores.map(e => `<tr><td>${e.fila}</td><td>${escapeHtml(e.motivo)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += '<p>Todas las estadías se registraron correctamente.</p>';
+    }
+
+    cuerpo.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function cerrarResumenImportacion() {
+    const modal = document.getElementById('modalResumenImportacion');
+    if (modal) modal.style.display = 'none';
+}
+
+// ============================================
 // HELPERS
 // ============================================
 function calcularDiasRestantes(fechaFin) {
@@ -460,4 +544,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
     if (btnLimpiarFiltros) btnLimpiarFiltros.onclick = limpiarFiltros;
+
+        // HU31: importar desde Excel
+    const btnImportarExcel = document.getElementById('btnImportarExcel');
+    const inputExcel = document.getElementById('inputExcelEstadias');
+    if (btnImportarExcel && inputExcel) {
+        btnImportarExcel.onclick = () => inputExcel.click();
+        inputExcel.onchange = () => importarEstadiasExcel(inputExcel.files[0]);
+    }
+
+    const btnCerrarResumen = document.getElementById('btnCerrarResumenImportacion');
+    if (btnCerrarResumen) btnCerrarResumen.onclick = cerrarResumenImportacion;
 });
