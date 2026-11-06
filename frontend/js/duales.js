@@ -27,16 +27,23 @@ const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
 // ============================================
 function configurarBotonesPorRol() {
     const btnCrear = document.getElementById('btnCrearDual');
-    if (!btnCrear) return;
+    const accionesMaestro = document.getElementById('accionesMaestro');
+    const textoBtnCrear = document.getElementById('textoBtnCrearDual');
 
     const esMaestro = usuario.rol === 'maestro';
 
     if (esMaestro) {
-        btnCrear.style.display = 'inline-flex';
-        console.log('👨‍🏫 Usuario es MAESTRO');
+        if (accionesMaestro) accionesMaestro.style.display = 'flex';
+        if (btnCrear) {
+            btnCrear.style.display = 'inline-flex';
+            if (textoBtnCrear) textoBtnCrear.textContent = 'Registrar Dual';
+        }
     } else {
-        btnCrear.style.display = 'none';
-        console.log('🎓 Usuario es ALUMNO');
+        if (accionesMaestro) accionesMaestro.style.display = 'none';
+        if (btnCrear) {
+            btnCrear.style.display = 'inline-flex';
+            if (textoBtnCrear) textoBtnCrear.textContent = 'Solicitar Dual';
+        }
     }
 }
 
@@ -45,6 +52,8 @@ function configurarBotonesPorRol() {
 // ============================================
 async function cargarDuales() {
     const container = document.getElementById('dualesContainer');
+    if (!container) return;
+    
     container.innerHTML = '<div class="sin-duales"><i class="fas fa-spinner fa-pulse"></i> Cargando duales...</div>';
 
     try {
@@ -78,6 +87,7 @@ async function cargarDuales() {
         `;
     }
 }
+
 // ============================================
 // MOSTRAR DUALES
 // ============================================
@@ -186,7 +196,7 @@ function mostrarDuales(duales) {
         `;
     }).join('');
 
-    // ✅ Asignar el evento de clic a los botones de compartir (sin setTimeout)
+    // Evento para botones de compartir
     container.querySelectorAll('.btn-compartir-dual').forEach(btn => {
         btn.addEventListener('click', function () {
             const dualId = this.getAttribute('data-iddual');
@@ -196,28 +206,114 @@ function mostrarDuales(duales) {
 }
 
 // ============================================
-// CERRAR MODAL COMPARTIR
+// COMPARTIR DUALES
 // ============================================
+function abrirModalCompartir(dualId, tipo = 'dual') {
+    let modal = document.getElementById('modalCompartirGlobal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalCompartirGlobal';
+        modal.className = 'modal-compartir';
+        modal.innerHTML = `
+            <div class="modal-compartir-contenido">
+                <div class="modal-compartir-header">
+                    <h3><i class="fas fa-share-alt"></i> Compartir Documento</h3>
+                    <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;">&times;</button>
+                </div>
+                
+                <div class="tabs-compartir">
+                    <button class="tab-btn active" onclick="cambiarTabCompartir('correo', this)">Por Correo</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('enlace', this)">Por Enlace</button>
+                    <button class="tab-btn" onclick="cambiarTabCompartir('historial', this)">Historial</button>
+                </div>
+                
+                <div id="tab-correo" class="tab-content active">
+                    <div class="form-grupo-compartir">
+                        <label>Correos destinatarios (separados por coma)</label>
+                        <input type="text" id="compartirCorreos" placeholder="ejemplo1@correo.com, ejemplo2@correo.com">
+                    </div>
+                    <button id="btnEnviarCorreoDual" class="btn-compartir-accion">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                </div>
+
+                <div id="tab-enlace" class="tab-content" style="display: none;">
+                    <div class="form-grupo-compartir">
+                        <label>Permisos</label>
+                        <select id="compartirPermisosEnlace">
+                            <option value="ver">Solo Ver</option>
+                        </select>
+                    </div>
+                    <div class="form-grupo-compartir">
+                        <label>Vigencia (Expiración)</label>
+                        <select id="compartirExpiracionEnlace">
+                            <option value="1">1 Día</option>
+                            <option value="7" selected>7 Días</option>
+                            <option value="30">30 Días</option>
+                            <option value="0">Nunca</option>
+                        </select>
+                    </div>
+                    <button id="btnGenerarEnlaceDual" class="btn-compartir-accion" style="margin-bottom: 10px;">
+                        <i class="fas fa-link"></i> Generar Enlace
+                    </button>
+                    <div class="enlace-container">
+                        <input type="text" id="inputEnlaceCompartir" readonly placeholder="El enlace aparecerá aquí...">
+                        <button class="btn-copiar" onclick="copiarEnlace()"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <div id="tab-historial" class="tab-content" style="display: none;">
+                    <div id="historialContenido" class="historial-lista">
+                        <p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) cerrarModalCompartir(); };
+
+        document.getElementById('btnEnviarCorreoDual').onclick = function() {
+            ejecutarCompartir(window.currentDocIdCompartir, window.currentDocTipoCompartir);
+        };
+        document.getElementById('btnGenerarEnlaceDual').onclick = function() {
+            generarSoloEnlace(window.currentDocIdCompartir, window.currentDocTipoCompartir);
+        };
+    }
+
+    window.currentDocIdCompartir = dualId;
+    window.currentDocTipoCompartir = tipo;
+
+    document.querySelectorAll('.tab-btn').forEach((b, index) => {
+        if (index === 0) b.classList.add('active'); else b.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-content').forEach((c, index) => {
+        if (index === 0) c.style.display = 'block'; else c.style.display = 'none';
+    });
+
+    document.getElementById('compartirCorreos').value = '';
+    document.getElementById('compartirPermisosEnlace').value = 'ver';
+    document.getElementById('compartirExpiracionEnlace').value = '7';
+    document.getElementById('inputEnlaceCompartir').value = '';
+    document.getElementById('historialContenido').innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>';
+
+    modal.classList.add('active');
+}
+
 function cerrarModalCompartir() {
     const modal = document.getElementById('modalCompartirGlobal');
     if (modal) modal.classList.remove('active');
 }
 
-// ============================================
-// CAMBIAR DE TAB (Correo / Enlace / Historial)
-// ============================================
 function cambiarTabCompartir(tab, btn) {
     const modal = document.getElementById('modalCompartirGlobal');
     if (!modal) return;
 
-    // Quitar active de todos los tabs y contenidos
     modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     modal.querySelectorAll('.tab-content').forEach(c => {
         c.classList.remove('active');
         c.style.display = 'none';
     });
 
-    // Activar el tab seleccionado
     if (btn) btn.classList.add('active');
     const contenido = document.getElementById(`tab-${tab}`);
     if (contenido) {
@@ -225,15 +321,11 @@ function cambiarTabCompartir(tab, btn) {
         contenido.style.display = 'block';
     }
 
-    // Si es historial, cargarlo
     if (tab === 'historial') {
         cargarHistorialCompartir();
     }
 }
 
-// ============================================
-// COPIAR ENLACE AL PORTAPAPELES
-// ============================================
 function copiarEnlace() {
     const input = document.getElementById('inputEnlaceCompartir');
     if (!input || !input.value) {
@@ -241,7 +333,6 @@ function copiarEnlace() {
         return;
     }
 
-    // Método moderno
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(input.value)
             .then(() => {
@@ -255,7 +346,6 @@ function copiarEnlace() {
                 }, 1500);
             })
             .catch(() => {
-                // Fallback
                 input.select();
                 document.execCommand('copy');
                 alert('Enlace copiado');
@@ -267,9 +357,6 @@ function copiarEnlace() {
     }
 }
 
-// ============================================
-// ENVIAR POR CORREO (Compartir)
-// ============================================
 async function ejecutarCompartir(docId, tipo) {
     const correosInput = document.getElementById('compartirCorreos');
     const btn = document.getElementById('btnEnviarCorreoDual');
@@ -299,13 +386,10 @@ async function ejecutarCompartir(docId, tipo) {
     btn.disabled = true;
 
     try {
-        // 1. Cargar los datos del dual
         const resDual = await fetch(`/api/duales/detalle/${docId}`);
         const dataDual = await resDual.json();
         if (!dataDual.exito) throw new Error('No se pudo cargar el dual');
 
-        // 2. Generar el PDF en memoria usando jsPDF + html2canvas
-        //    (reutilizamos generarFormatoImprimibleDual que ya tienes)
         const htmlFormato = generarFormatoImprimibleDual(dataDual.dual);
         const contenedor = document.createElement('div');
         contenedor.innerHTML = htmlFormato;
@@ -342,7 +426,6 @@ async function ejecutarCompartir(docId, tipo) {
         const pdfBlob = pdf.output('blob');
         document.body.removeChild(contenedor);
 
-        // 3. Enviar el PDF al endpoint correcto
         const formData = new FormData();
         formData.append('pdf_file', pdfBlob, `dual_${docId}.pdf`);
         formData.append('correos', listaCorreos.join(','));
@@ -371,9 +454,7 @@ async function ejecutarCompartir(docId, tipo) {
         btn.disabled = false;
     }
 }
-// ============================================
-// GENERAR ENLACE PÚBLICO
-// ============================================
+
 async function generarSoloEnlace(docId, tipo) {
     const btn = document.getElementById('btnGenerarEnlaceDual');
     const inputEnlace = document.getElementById('inputEnlaceCompartir');
@@ -421,9 +502,7 @@ async function generarSoloEnlace(docId, tipo) {
         btn.disabled = false;
     }
 }
-// ============================================
-// CARGAR HISTORIAL DE COMPARTIDOS
-// ============================================
+
 async function cargarHistorialCompartir() {
     const contenedor = document.getElementById('historialContenido');
     if (!contenedor) return;
@@ -613,7 +692,6 @@ function abrirModalFirma(dualId, asignacionIndex) {
     dualIdParaFirma = dualId;
     asignacionIndexParaFirma = asignacionIndex;
 
-    // Resetear el modal
     document.getElementById('paso1Codigo').style.display = 'block';
     document.getElementById('paso2Codigo').style.display = 'none';
     document.getElementById('inputCodigoFirma').value = '';
@@ -656,7 +734,6 @@ async function solicitarCodigoFirma() {
         const resultado = await respuesta.json();
 
         if (resultado.exito) {
-            // Cambiar al paso 2
             document.getElementById('paso1Codigo').style.display = 'none';
             document.getElementById('paso2Codigo').style.display = 'block';
             document.getElementById('mensajeCodigoEnviado').textContent = resultado.mensaje;
@@ -681,7 +758,6 @@ async function verificarCodigoFirma() {
     const password = document.getElementById('inputPasswordFirma').value;
     const btn = document.getElementById('btnFirmar');
 
-    // Validaciones
     if (!codigo || codigo.length !== 6) {
         mostrarMensajeCodigo('error', 'El código debe tener 6 dígitos');
         return;
@@ -762,7 +838,7 @@ function volverPaso1Codigo() {
 }
 
 // ============================================
-// GENERAR PDF CON FORMATO OFICIAL
+// GENERAR PDF Y FORMATO
 // ============================================
 async function generarPDF(dualId) {
     try {
@@ -778,7 +854,6 @@ async function generarPDF(dualId) {
 
         let contenedor = document.getElementById('formatoImprimible');
         if (!contenedor) {
-            console.warn('⚠️ Contenedor no encontrado. Creándolo dinámicamente...');
             contenedor = document.createElement('div');
             contenedor.id = 'formatoImprimible';
             contenedor.className = 'formato-imprimible';
@@ -797,9 +872,6 @@ async function generarPDF(dualId) {
     }
 }
 
-// ============================================
-// GENERAR EL HTML DEL FORMATO OFICIAL
-// ============================================
 function generarFormatoImprimibleDual(d) {
     const fechaInicio = formatearFechaLarga(d.fecha_inicio);
     const fechaFin = formatearFechaLarga(d.fecha_fin);
@@ -960,7 +1032,7 @@ function generarFormatoImprimibleDual(d) {
 }
 
 // ============================================
-// MOSTRAR MENSAJE
+// MOSTRAR MENSAJE GENERAL
 // ============================================
 function mostrarMensaje(tipo, texto) {
     const mensajeDiv = document.getElementById('mensaje');
@@ -1051,26 +1123,106 @@ function crearDual() {
     window.location.href = 'crear_dual.html';
 }
 
-// ============================================
-// CERRAR SESIÓN
-// ============================================
 function cerrarSesion() {
     localStorage.removeItem('usuario');
     window.location.href = '../../iniciar_sesion.html';
 }
 
 // ============================================
-// INICIALIZAR
+// HU32: IMPORTAR DUALES DESDE EXCEL
+// ============================================
+
+async function importarDualesExcel(archivo) {
+    if (!archivo) return;
+
+    if (!archivo.name.toLowerCase().endsWith('.xlsx')) {
+        mostrarMensaje('error', 'El archivo debe ser .xlsx. Descarga la plantilla y úsala.');
+        return;
+    }
+
+    const btnImportar = document.getElementById('btnImportarExcel');
+    const textoOriginal = btnImportar.innerHTML;
+    btnImportar.disabled = true;
+    btnImportar.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Importando...';
+
+    try {
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+        formData.append('usuario_id', usuario._id);
+
+        const respuesta = await fetch('/api/duales/importar', {
+            method: 'POST',
+            body: formData
+        });
+
+        const resultado = await respuesta.json();
+
+        if (resultado.exito) {
+            mostrarResumenImportacion(resultado.resumen);
+            cargarDuales();
+        } else {
+            mostrarMensaje('error', resultado.mensaje || 'No se pudo importar el archivo');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensaje('error', 'Error de conexión');
+    } finally {
+        btnImportar.disabled = false;
+        btnImportar.innerHTML = textoOriginal;
+        document.getElementById('inputExcelDuales').value = '';
+    }
+}
+
+function mostrarResumenImportacion(resumen) {
+    const cuerpo = document.getElementById('resumenImportacionCuerpo');
+    const modal = document.getElementById('modalResumenImportacion');
+    if (!cuerpo || !modal) return;
+
+    let html = `
+        <div class="resumen-importacion-cifras">
+            <div class="resumen-cifra"><strong>${resumen.total}</strong><span>Filas leídas</span></div>
+            <div class="resumen-cifra exito"><strong>${resumen.exitosos}</strong><span>Registrados</span></div>
+            <div class="resumen-cifra error"><strong>${resumen.con_error}</strong><span>Con error</span></div>
+        </div>`;
+
+    if (resumen.errores.length > 0) {
+        html += `
+            <p><strong>Filas con error</strong> (corrígelas en tu Excel y vuelve a importar solo esas):</p>
+            <div class="tabla-errores-importacion">
+                <table>
+                    <thead><tr><th>Fila</th><th>Motivo</th></tr></thead>
+                    <tbody>
+                        ${resumen.errores.map(e => `<tr><td>${e.fila}</td><td>${escapeHtml(e.motivo)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += '<p>Todos los duales se registraron correctamente.</p>';
+    }
+
+    cuerpo.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function cerrarResumenImportacion() {
+    const modal = document.getElementById('modalResumenImportacion');
+    if (modal) modal.style.display = 'none';
+}
+
+// ============================================
+// INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', function () {
     configurarBotonesPorRol();
     cargarDuales();
 
+    // Botones de crear/editar
     const btnCrear = document.getElementById('btnCrearDual');
     if (btnCrear) {
         btnCrear.onclick = crearDual;
     }
 
+    // Botones del modal de eliminación
     if (btnCancelarEliminar) {
         btnCancelarEliminar.onclick = cerrarModalEliminar;
     }
@@ -1101,97 +1253,14 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-});
-// ============================================
-// COMPARTIR DUALES (VERSIÓN ÚNICA Y DEFINITIVA)
-// ============================================
-function abrirModalCompartir(dualId, tipo = 'dual') {
-    let modal = document.getElementById('modalCompartirGlobal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'modalCompartirGlobal';
-        modal.className = 'modal-compartir';
-        modal.innerHTML = `
-            <div class="modal-compartir-contenido">
-                <div class="modal-compartir-header">
-                    <h3><i class="fas fa-share-alt"></i> Compartir Documento</h3>
-                    <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;">&times;</button>
-                </div>
-                
-                <div class="tabs-compartir">
-                    <button class="tab-btn active" onclick="cambiarTabCompartir('correo', this)">Por Correo</button>
-                    <button class="tab-btn" onclick="cambiarTabCompartir('enlace', this)">Por Enlace</button>
-                    <button class="tab-btn" onclick="cambiarTabCompartir('historial', this)">Historial</button>
-                </div>
-                
-                <div id="tab-correo" class="tab-content active">
-                    <div class="form-grupo-compartir">
-                        <label>Correos destinatarios (separados por coma)</label>
-                        <input type="text" id="compartirCorreos" placeholder="ejemplo1@correo.com, ejemplo2@correo.com">
-                    </div>
-                    <button id="btnEnviarCorreoDual" class="btn-compartir-accion">
-                        <i class="fas fa-paper-plane"></i> Enviar
-                    </button>
-                </div>
-
-                <div id="tab-enlace" class="tab-content" style="display: none;">
-                    <div class="form-grupo-compartir">
-                        <label>Permisos</label>
-                        <select id="compartirPermisosEnlace">
-                            <option value="ver">Solo Ver</option>
-                        </select>
-                    </div>
-                    <div class="form-grupo-compartir">
-                        <label>Vigencia (Expiración)</label>
-                        <select id="compartirExpiracionEnlace">
-                            <option value="1">1 Día</option>
-                            <option value="7" selected>7 Días</option>
-                            <option value="30">30 Días</option>
-                            <option value="0">Nunca</option>
-                        </select>
-                    </div>
-                    <button id="btnGenerarEnlaceDual" class="btn-compartir-accion" style="margin-bottom: 10px;">
-                        <i class="fas fa-link"></i> Generar Enlace
-                    </button>
-                    <div class="enlace-container">
-                        <input type="text" id="inputEnlaceCompartir" readonly placeholder="El enlace aparecerá aquí...">
-                        <button class="btn-copiar" onclick="copiarEnlace()"><i class="fas fa-copy"></i></button>
-                    </div>
-                </div>
-
-                <div id="tab-historial" class="tab-content" style="display: none;">
-                    <div id="historialContenido" class="historial-lista">
-                        <p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        modal.onclick = (e) => { if (e.target === modal) cerrarModalCompartir(); };
-
-        document.getElementById('btnEnviarCorreoDual').onclick = function() {
-            ejecutarCompartir(window.currentDocIdCompartir, window.currentDocTipoCompartir);
-        };
-        document.getElementById('btnGenerarEnlaceDual').onclick = function() {
-            generarSoloEnlace(window.currentDocIdCompartir, window.currentDocTipoCompartir);
-        };
+    // Lógica para el Excel (HU32)
+    const btnImportarExcel = document.getElementById('btnImportarExcel');
+    const inputExcel = document.getElementById('inputExcelDuales');
+    if (btnImportarExcel && inputExcel) {
+        btnImportarExcel.onclick = () => inputExcel.click();
+        inputExcel.onchange = () => importarDualesExcel(inputExcel.files[0]);
     }
 
-    window.currentDocIdCompartir = dualId;
-    window.currentDocTipoCompartir = tipo;
-
-    document.querySelectorAll('.tab-btn').forEach((b, index) => {
-        if (index === 0) b.classList.add('active'); else b.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-content').forEach((c, index) => {
-        if (index === 0) c.style.display = 'block'; else c.style.display = 'none';
-    });
-
-    document.getElementById('compartirCorreos').value = '';
-    document.getElementById('compartirPermisosEnlace').value = 'descargar';
-    document.getElementById('compartirExpiracionEnlace').value = '7';
-    document.getElementById('inputEnlaceCompartir').value = '';
-    document.getElementById('historialContenido').innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>';
-
-    modal.classList.add('active');
-}
+    const btnCerrarResumen = document.getElementById('btnCerrarResumenImportacion');
+    if (btnCerrarResumen) btnCerrarResumen.onclick = cerrarResumenImportacion;
+});
