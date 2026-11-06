@@ -5,6 +5,7 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +16,10 @@
     <link rel="stylesheet" href="../../css/modal_editar_perfil.css">
     <link rel="stylesheet" href="../../css/temas_oscuro.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    
+
+
 </head>
+
 <body class="menu-lateral">
     <div class="app-container">
         <!-- Menú lateral -->
@@ -41,7 +43,7 @@
                 <a href="../../pages/estadias/mis_estadias.html" class="menu-item">
                     <i class="fas fa-building"></i><span> Estadías</span>
                 </a>
-                
+
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info-sidebar" id="userInfoSidebar"></div>
@@ -55,26 +57,57 @@
         <main class="main-content">
             <div class="duales-container">
                 <!-- ========================================== -->
-                <!-- HEADER DE DUALES                          -->
+                <!-- HEADER DE DUALES                           -->
                 <!-- ========================================== -->
                 <div class="header-duales">
                     <h2><i class="fas fa-briefcase"></i> Mis Duales</h2>
+        
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <!-- Botón solo visible para MAESTROS -->
+        
+                        <!-- Acciones solo visibles para MAESTROS (HU32) -->
+                        <div id="accionesMaestro" class="acciones-importar" style="display: none;">
+                            <a href="/api/duales/importar/plantilla" class="btn secundario" download>
+                                <i class="fas fa-file-download"></i> Descargar plantilla
+                            </a>
+                            <button type="button" id="btnImportarExcel" class="btn primario">
+                                <i class="fas fa-file-excel"></i> Importar desde Excel
+                            </button>
+                            <input type="file" id="inputExcelDuales" accept=".xlsx" style="display: none;">
+                        </div>
+        
+                        <!-- Botón para crear un dual (Visible para alumnos, y para maestros si registran manualmente) -->
                         <button id="btnCrearDual" class="btn primario" style="display: none;">
-                            <i class="fas fa-plus-circle"></i> Registrar Dual
+                            <i class="fas fa-plus-circle"></i> <span id="textoBtnCrearDual">Solicitar Dual</span>
                         </button>
                     </div>
                 </div>
-
+        
+                <!-- MENSAJES Y TARJETAS -->
                 <div id="mensaje" class="mensaje"></div>
-
+        
                 <div id="dualesContainer" class="duales-grid">
                     <div class="sin-duales">
                         <i class="fas fa-spinner fa-pulse"></i> Cargando duales...
                     </div>
                 </div>
-            </div>
+        
+                <!-- Modal con el resumen de la importación (HU32) -->
+                <div id="modalResumenImportacion" class="modal-confirmar" style="display: none;">
+                    <div class="modal-confirmar-contenido">
+                        <div class="modal-confirmar-header">
+                            <i class="fas fa-file-excel"></i>
+                            <h3>Resultado de la importación</h3>
+                        </div>
+                        <div class="modal-confirmar-body" id="resumenImportacionCuerpo"></div>
+                        <div class="modal-confirmar-footer">
+                            <button type="button" id="btnCerrarResumenImportacion" class="btn primario">
+                                <i class="fas fa-check"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        
+            </div> <!-- Cierre correcto de duales-container -->
         </main>
     </div>
 
@@ -143,7 +176,8 @@
                     color: #4338ca;
                 ">
                     <i class="fas fa-info-circle"></i>
-                    Por seguridad, enviaremos un <strong>código de 6 dígitos</strong> a tu correo electrónico. Deberás ingresarlo junto con tu contraseña para firmar.
+                    Por seguridad, enviaremos un <strong>código de 6 dígitos</strong> a tu correo electrónico. Deberás
+                    ingresarlo junto con tu contraseña para firmar.
                 </div>
 
                 <!-- PASO 1: SOLICITAR CÓDIGO -->
@@ -197,7 +231,8 @@
                         ">
                             <i class="fas fa-key"></i> Código de 6 dígitos
                         </label>
-                        <input type="text" id="inputCodigoFirma" maxlength="6" placeholder="000000" autocomplete="off" style="
+                        <input type="text" id="inputCodigoFirma" maxlength="6" placeholder="000000" autocomplete="off"
+                            style="
                             width: 100%;
                             padding: 16px;
                             font-size: 1.8rem;
@@ -298,4 +333,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../../js/duales.js?v=99"></script>
 </body>
+
 </html>

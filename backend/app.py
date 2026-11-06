@@ -1971,23 +1971,59 @@ def actualizar_dual(dual_id):
             return jsonify({"exito": False, "mensaje": "Dual no encontrado"}), 404
         
         actualizacion = {}
-        campos_permitidos = ["titulo", "empresa", "descripcion", "cuatrimestre", "curso", "carrera", "horas", "tutor", "asignaciones", "alumno_email"]
+        
+        # 1. Campos normales (excluyendo asignaciones para procesarlas aparte)
+        campos_permitidos = ["titulo", "empresa", "descripcion", "cuatrimestre", "curso", "carrera", "horas", "tutor", "alumno_email"]
         for campo in campos_permitidos:
             if campo in datos:
                 actualizacion[campo] = datos[campo]
         
+        # 2. Fechas
         if "fecha_inicio" in datos and datos["fecha_inicio"]:
             actualizacion["fecha_inicio"] = datetime.strptime(datos["fecha_inicio"], '%Y-%m-%d')
         if "fecha_fin" in datos and datos["fecha_fin"]:
             actualizacion["fecha_fin"] = datetime.strptime(datos["fecha_fin"], '%Y-%m-%d')
         
+        # 3. Alumno
         if "alumno_email" in actualizacion:
             alumno = db.usuarios.find_one({"email": actualizacion["alumno_email"].lower()})
             if alumno:
                 actualizacion["alumno_id"] = alumno["_id"]
             else:
                 return jsonify({"exito": False, "mensaje": "El correo del alumno no está registrado"}), 400
+
+        # 4. Procesar Asignaciones (Materias y Maestros)
+        if "asignaciones" in datos:
+            asignaciones_procesadas = []
+            for asig in datos["asignaciones"]:
+                materia = asig.get("materia", "").strip()
+                maestro_email = asig.get("maestro_email", "").strip().lower()
+                
+                if not materia and not maestro_email:
+                    continue
+
+                maestro_obj = db.usuarios.find_one({"email": maestro_email, "rol": "maestro"})
+                
+                if maestro_obj:
+                    asignaciones_procesadas.append({
+                        "materia": materia,
+                        "maestro_id": str(maestro_obj["_id"]),
+                        "maestro_nombre": maestro_obj["nombre"],
+                        "maestro_email": maestro_obj["email"],
+                        "firmado": asig.get("firmado", False) 
+                    })
+                else:
+                    asignaciones_procesadas.append({
+                        "materia": materia,
+                        "maestro_id": None,
+                        "maestro_nombre": asig.get("maestro_nombre", "Maestro no registrado"),
+                        "maestro_email": maestro_email,
+                        "firmado": asig.get("firmado", False)
+                    })
+            
+            actualizacion["asignaciones"] = asignaciones_procesadas
         
+        # 5. Guardar en la base de datos
         if actualizacion:
             db.duales.update_one({"_id": ObjectId(dual_id)}, {"$set": actualizacion})
         
@@ -2005,6 +2041,271 @@ def eliminar_dual(dual_id):
         return jsonify({"exito": True, "mensaje": "Dual eliminado correctamente"})
     except Exception as error:
         print(f"Error en eliminar_dual: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+
+# ============================================
+# 8.1 IMPORTAR DUALES DESDE EXCEL (HU32)
+# ============================================
+
+# Columnas de la plantilla: (nombre_columna, obligatoria, ejemplo)
+COLUMNAS_DUALES_EXCEL = [
+    ("email_alumno", True, "alumno@correo.com"),
+    ("titulo", True, "Desarrollo de App Móvil"),
+    ("empresa", True, "Tech Solutions S.A."),
+    ("descripcion", False, "Desarrollo de módulo de login"),
+    ("cuatrimestre", False, "5to"),
+    ("curso", False, "Desarrollo Móvil"),
+    ("carrera", False, "Ing. en Software"),
+    ("fecha_inicio", False, "2026-09-01"),
+    ("fecha_fin", False, "2026-12-15"),
+    ("horas", False, 480),
+    ("tutor", False, "Ing. Carlos Ruiz"),
+    ("materia_maestro", False, "Programación Web|maestro@correo.com"), # Formato: Materia|EmailMaestro
+]
+
+MAX_FILAS_IMPORTAR_DUALES = 500
+MAX_TAMANO_EXCEL = 5 * 1024 * 1024  # 5 MB
+
+def _texto_celda(valor):
+    """Convierte cualquier valor de una celda a texto limpio."""
+    if valor is None:
+        return ""
+    if isinstance(valor, float) and valor.is_integer():
+        valor = int(valor)
+    return str(valor).strip()
+
+def _fecha_celda(valor):
+    """Acepta fechas reales de Excel o texto AAAA-MM-DD / DD/MM/AAAA."""
+    if valor is None or _texto_celda(valor) == "":
+        return None
+    if isinstance(valor, datetime):
+        return valor
+    texto = _texto_celda(valor)
+    for formato in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(texto, formato)
+        except ValueError:
+            continue
+    raise ValueError(f"fecha no válida '{texto}' (usa AAAA-MM-DD)")
+
+@app.route('/api/duales/importar/plantilla', methods=['GET'])
+def descargar_plantilla_duales():
+    """Descarga el formato Excel que el maestro debe llenar para Duales."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        libro = Workbook()
+        hoja = libro.active
+        hoja.title = "Duales"
+
+        relleno_obligatorio = PatternFill("solid", fgColor="1F4E78")
+        relleno_opcional = PatternFill("solid", fgColor="7F7F7F")
+
+        for col, (nombre, obligatoria, ejemplo) in enumerate(COLUMNAS_DUALES_EXCEL, start=1):
+            celda = hoja.cell(row=1, column=col, value=nombre)
+            celda.font = Font(bold=True, color="FFFFFF")
+            celda.fill = relleno_obligatorio if obligatoria else relleno_opcional
+            celda.alignment = Alignment(horizontal="center")
+            hoja.cell(row=2, column=col, value=ejemplo)
+            hoja.column_dimensions[celda.column_letter].width = max(len(nombre), len(str(ejemplo))) + 4
+
+        ayuda = libro.create_sheet("Instrucciones")
+        instrucciones = [
+            "INSTRUCCIONES PARA IMPORTAR DUALES",
+            "1. Llena la hoja 'Duales' a partir de la fila 2 (la fila 2 es un ejemplo, bórrala o reemplázala).",
+            "2. No cambies los nombres de las columnas de la fila 1.",
+            "3. Las columnas en azul son OBLIGATORIAS: email_alumno, titulo y empresa.",
+            "4. email_alumno debe ser el correo con el que el alumno ya está registrado en Learnify.",
+            "5. Las fechas van como AAAA-MM-DD (ejemplo: 2026-09-01) o como fecha de Excel.",
+            "6. horas debe ser un número entero.",
+            "7. Para 'materia_maestro', usa el formato: Nombre de la Materia|correo_del_maestro@ejemplo.com",
+            f"8. Máximo {MAX_FILAS_IMPORTAR_DUALES} filas por archivo.",
+        ]
+        for i, linea in enumerate(instrucciones, start=1):
+            ayuda.cell(row=i, column=1, value=linea)
+        ayuda["A1"].font = Font(bold=True, size=13)
+        ayuda.column_dimensions["A"].width = 100
+
+        salida = BytesIO()
+        libro.save(salida)
+        salida.seek(0)
+
+        return Response(
+            salida.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=plantilla_duales.xlsx"}
+        )
+    except Exception as error:
+        print(f"Error en descargar_plantilla_duales: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 500
+
+@app.route('/api/duales/importar', methods=['POST'])
+def importar_duales_excel():
+    """Importa duales en masa desde un Excel (.xlsx). Solo maestros."""
+    try:
+        from openpyxl import load_workbook
+
+        usuario_id = request.form.get('usuario_id')
+        archivo = request.files.get('archivo')
+
+        # --- 1. Validar quién sube el archivo ---
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+
+        maestro = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not maestro or maestro.get("rol") != "maestro":
+            return jsonify({"exito": False, "mensaje": "Solo los maestros pueden importar duales"}), 403
+
+        # --- 2. Validar el archivo ---
+        if not archivo or not archivo.filename:
+            return jsonify({"exito": False, "mensaje": "Selecciona un archivo Excel"}), 400
+
+        if not archivo.filename.lower().endswith('.xlsx'):
+            return jsonify({"exito": False, "mensaje": "El archivo debe ser .xlsx (usa la plantilla)"}), 400
+
+        contenido = archivo.read()
+        if len(contenido) > MAX_TAMANO_EXCEL:
+            return jsonify({"exito": False, "mensaje": "El archivo supera 5 MB"}), 400
+
+        try:
+            libro = load_workbook(BytesIO(contenido), read_only=True, data_only=True)
+        except Exception:
+            return jsonify({"exito": False, "mensaje": "No se pudo leer el Excel; verifica que no esté dañado"}), 400
+
+        hoja = libro["Duales"] if "Duales" in libro.sheetnames else libro.worksheets[0]
+        filas = list(hoja.iter_rows(values_only=True))
+        libro.close()
+
+        # --- 3. Validar columnas ---
+        if not filas:
+            return jsonify({"exito": False, "mensaje": "El archivo está vacío"}), 400
+
+        encabezados = [_texto_celda(c).lower() for c in filas[0]]
+        obligatorias = [n for n, obl, _ in COLUMNAS_DUALES_EXCEL if obl]
+        faltantes = [n for n in obligatorias if n not in encabezados]
+
+        if faltantes:
+            return jsonify({
+                "exito": False,
+                "mensaje": "Faltan columnas obligatorias: " + ", ".join(faltantes) + ". Descarga la plantilla."
+            }), 400
+
+        indice = {nombre: pos for pos, nombre in enumerate(encabezados) if nombre}
+        def valor(fila, columna):
+            pos = indice.get(columna)
+            return fila[pos] if pos is not None and pos < len(fila) else None
+
+        datos_filas = [(n, f) for n, f in enumerate(filas[1:], start=2) if any(_texto_celda(c) for c in f)]
+
+        if not datos_filas:
+            return jsonify({"exito": False, "mensaje": "No hay filas con datos para importar"}), 400
+
+        if len(datos_filas) > MAX_FILAS_IMPORTAR_DUALES:
+            return jsonify({"exito": False, "mensaje": f"El archivo tiene {len(datos_filas)} filas; el máximo es {MAX_FILAS_IMPORTAR_DUALES}"}), 400
+
+        # --- 4. Validar y registrar fila por fila ---
+        exitosos = 0
+        errores = []
+
+        for num_fila, fila in datos_filas:
+            try:
+                email = _texto_celda(valor(fila, "email_alumno")).lower()
+                titulo = _texto_celda(valor(fila, "titulo"))
+                empresa = _texto_celda(valor(fila, "empresa"))
+
+                if not email or not titulo or not empresa:
+                    raise ValueError("email_alumno, titulo y empresa son obligatorios")
+
+                # Buscamos al alumno SOLO por el correo (sin importar si tiene un rol asignado)
+                alumno = db.usuarios.find_one({"email": email})
+                if not alumno:
+                    raise ValueError(f"no existe un alumno registrado con el correo {email}")
+
+                fecha_inicio = _fecha_celda(valor(fila, "fecha_inicio"))
+                fecha_fin = _fecha_celda(valor(fila, "fecha_fin"))
+
+                if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+                    raise ValueError("fecha_fin es anterior a fecha_inicio")
+
+                texto_horas = _texto_celda(valor(fila, "horas"))
+                if texto_horas:
+                    if not texto_horas.isdigit():
+                        raise ValueError(f"horas debe ser un número entero (llegó '{texto_horas}')")
+                    horas = int(texto_horas)
+                else:
+                    horas = 0
+
+                # Evitar duplicados: mismo alumno + titulo + fecha de inicio
+                if db.duales.find_one({"alumno_id": alumno["_id"], "titulo": titulo, "fecha_inicio": fecha_inicio}):
+                    raise ValueError("ya existe un dual con este alumno, título y fecha de inicio")
+
+                # Procesar asignaciones (materias y maestros)
+                asignaciones = []
+                materia_maestro_str = _texto_celda(valor(fila, "materia_maestro"))
+                
+                if materia_maestro_str and "|" in materia_maestro_str:
+                    partes = materia_maestro_str.split("|")
+                    materia = partes[0].strip()
+                    maestro_email = partes[1].strip().lower()
+                    
+                    # Limpiamos el correo por si viene con espacios
+                    maestro_asig = db.usuarios.find_one({"email": maestro_email})
+                    
+                    if maestro_asig:
+                        asignaciones.append({
+                            "materia": materia,
+                            "maestro_id": str(maestro_asig["_id"]), # Guardamos el ID como string
+                            "maestro_nombre": maestro_asig["nombre"],
+                            "maestro_email": maestro_asig["email"],
+                            "firmado": False
+                        })
+                    else:
+                        asignaciones.append({
+                            "materia": materia,
+                            "maestro_id": None,
+                            "maestro_nombre": "Maestro no registrado",
+                            "maestro_email": maestro_email,
+                            "firmado": False
+                        })
+
+                db.duales.insert_one({
+                    "usuario_id": maestro["_id"],
+                    "alumno_id": alumno["_id"],
+                    "alumno_email": email,
+                    "titulo": titulo,
+                    "empresa": empresa,
+                    "descripcion": _texto_celda(valor(fila, "descripcion")),
+                    "cuatrimestre": _texto_celda(valor(fila, "cuatrimestre")),
+                    "curso": _texto_celda(valor(fila, "curso")),
+                    "carrera": _texto_celda(valor(fila, "carrera")),
+                    "fecha_inicio": fecha_inicio,
+                    "fecha_fin": fecha_fin,
+                    "horas": horas,
+                    "tutor": _texto_celda(valor(fila, "tutor")),
+                    "asignaciones": asignaciones,
+                    "fecha_creacion": datetime.now()
+                })
+
+                exitosos += 1
+
+            except Exception as error_fila:
+                errores.append({"fila": num_fila, "motivo": str(error_fila)})
+
+        # --- 5. Resumen ---
+        return jsonify({
+            "exito": True,
+            "mensaje": f"Importación terminada: {exitosos} registrados, {len(errores)} con error",
+            "resumen": {
+                "total": len(datos_filas),
+                "exitosos": exitosos,
+                "con_error": len(errores),
+                "errores": errores
+            }
+        })
+
+    except Exception as error:
+        print(f"Error en importar_duales_excel: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
 # ============================================

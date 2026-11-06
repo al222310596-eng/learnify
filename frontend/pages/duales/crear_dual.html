@@ -435,15 +435,18 @@
                 });
                 maestroEmailInput.addEventListener('input', function() {
                     asignaciones[index].maestro_email = this.value;
+                    // Al cambiar el correo, reseteamos el ID porque el maestro cambió
+                    asignaciones[index].maestro_id = null; 
                 });
             });
         }
 
-        function agregarAsignacion(materia = '', maestro_nombre = '', maestro_email = '') {
+        function agregarAsignacion(materia = '', maestro_nombre = '', maestro_email = '', maestro_id = null) {
             asignaciones.push({
                 materia: materia,
                 maestro_nombre: maestro_nombre,
-                maestro_email: maestro_email
+                maestro_email: maestro_email,
+                maestro_id: maestro_id // <-- Agregamos el ID aquí
             });
             renderizarAsignaciones();
         }
@@ -502,7 +505,8 @@
                         asignaciones = dual.asignaciones.map(a => ({
                             materia: a.materia || '',
                             maestro_nombre: a.maestro_nombre || '',
-                            maestro_email: a.maestro_email || ''
+                            maestro_email: a.maestro_email || '',
+                            maestro_id: a.maestro_id || null // <-- IMPORTANTE: Guardar el ID
                         }));
                         renderizarAsignaciones();
                     }
@@ -601,7 +605,15 @@
                 horas: parseInt(document.getElementById('horas').value) || 0,
                 tutor: document.getElementById('tutor').value,
                 estado: document.getElementById('estado').value,
-                asignaciones: asignaciones.filter(a => a.materia || a.maestro_email)
+                // Limpiamos los correos antes de enviarlos
+                asignaciones: asignaciones
+                    .filter(a => a.materia || a.maestro_email)
+                    .map(a => ({
+                        materia: a.materia.trim(),
+                        maestro_nombre: a.maestro_nombre.trim(),
+                        maestro_email: a.maestro_email.trim().toLowerCase(),
+                        maestro_id: a.maestro_id // Mandamos el ID si existe
+                    }))
             };
 
             const url = modoEdicion ? `/api/duales/actualizar/${dualId}` : '/api/duales/crear';
