@@ -80,7 +80,6 @@ function renderizarMinutas(minutas) {
                     <button class="btn-minuta btn-imprimir" onclick="imprimirDesdeLista('${m._id}')">
                         <i class="fas fa-print"></i> PDF
                     </button>
-                    <!-- NUEVO BOTÓN COMPARTIR -->
                     <button class="btn-minuta btn-compartir" onclick="abrirModalCompartir('${m._id}', 'minuta')">
                         <i class="fas fa-share-alt"></i> Compartir
                     </button>
@@ -108,7 +107,6 @@ async function verMinuta(id) {
 
         const m = result.minuta;
 
-        // Crear modal simple para ver
         const modal = document.createElement('div');
         modal.className = 'modal-minuta';
         modal.style.cssText = `
@@ -296,7 +294,6 @@ async function guardarMinuta(e) {
         return;
     }
 
-    // Recolectar asistentes
     const asistentes = [];
     document.querySelectorAll('.asistente-item').forEach(item => {
         const nombre = item.querySelector('.asistente-nombre').value.trim();
@@ -304,7 +301,6 @@ async function guardarMinuta(e) {
         if (nombre) asistentes.push({ nombre, firma });
     });
 
-    // Recolectar acuerdos
     const acuerdos = [];
     document.querySelectorAll('.acuerdo-item').forEach(item => {
         const agenda = item.querySelector('.acuerdo-agenda').value.trim();
@@ -381,7 +377,7 @@ function imprimirMinuta() {
         usuario_nombre: usuario.nombre
     });
 
-     fetch('/api/historial/registrar', {
+    fetch('/api/historial/registrar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -405,7 +401,6 @@ function generarFormatoImprimible(m) {
     const hoy = new Date().toLocaleDateString('es-MX');
     const fechaFormateada = m.fecha ? formatearFecha(m.fecha) : hoy;
 
-    // Dividir asistentes en 2 columnas
     const mitad = Math.ceil(m.asistentes.length / 2);
     const asistentesIzq = m.asistentes.slice(0, mitad);
     const asistentesDer = m.asistentes.slice(mitad);
@@ -425,7 +420,6 @@ function generarFormatoImprimible(m) {
         `;
     }
 
-    // Filas de acuerdos
     let filasAcuerdos = '';
     const minAcuerdos = Math.max(m.acuerdos.length, 8);
     for (let i = 0; i < minAcuerdos; i++) {
@@ -547,76 +541,109 @@ function mostrarMensaje(tipo, texto) {
 }
 
 // ============================================
-// 9. INICIALIZAR
+// 9. HU34: IMPORTAR MINUTAS DESDE EXCEL
 // ============================================
-document.addEventListener('DOMContentLoaded', function () {
-    // Página de lista
-    if (document.getElementById('minutasContainer')) {
-        cargarMinutas();
+async function importarMinutasExcel(archivo) {
+    if (!archivo) return;
 
-        const buscador = document.getElementById('buscadorMinutas');
-        if (buscador) {
-            buscador.addEventListener('input', function () {
-                const q = this.value.toLowerCase().trim();
-                const filtradas = minutasCache.filter(m =>
-                    (m.asunto || '').toLowerCase().includes(q) ||
-                    (m.area_carrera || '').toLowerCase().includes(q)
-                );
-                renderizarMinutas(filtradas);
-            });
-        }
+    if (!archivo.name.toLowerCase().endsWith('.xlsx')) {
+        mostrarMensaje('error', 'El archivo debe ser .xlsx. Descarga la plantilla y úsala.');
+        return;
     }
 
-    // Página de creación
-    const form = document.getElementById('formMinuta');
-    if (form) {
-        // Fecha por defecto: hoy
-        const inputFecha = document.getElementById('inputFecha');
-        if (inputFecha) {
-            const hoy = new Date().toISOString().split('T')[0];
-            inputFecha.value = hoy;
+    const btnImportar = document.getElementById('btnImportarExcelMinutas');
+    const textoOriginal = btnImportar.innerHTML;
+    btnImportar.disabled = true;
+    btnImportar.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Importando...';
+
+    try {
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+        formData.append('usuario_id', usuario._id);
+
+        const respuesta = await fetch('/api/minutas/importar', {
+            method: 'POST',
+            body: formData
+        });
+
+        const resultado = await respuesta.json();
+
+        if (resultado.exito) {
+            mostrarResumenImportacionMinutas(resultado.resumen);
+            cargarMinutas();
+        } else {
+            mostrarMensaje('error', resultado.mensaje || 'No se pudo importar el archivo');
         }
-
-        // Hora actual por defecto
-        const inputHora = document.getElementById('inputHora');
-        if (inputHora) {
-            const ahora = new Date();
-            const hh = String(ahora.getHours()).padStart(2, '0');
-            const mm = String(ahora.getMinutes()).padStart(2, '0');
-            inputHora.value = `${hh}:${mm}`;
-        }
-
-        // Agregar 4 asistentes y 3 acuerdos por defecto
-        for (let i = 0; i < 4; i++) agregarAsistente();
-        for (let i = 0; i < 3; i++) agregarAcuerdo();
-
-        form.addEventListener('submit', guardarMinuta);
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensaje('error', 'Error de conexión');
+    } finally {
+        btnImportar.disabled = false;
+        btnImportar.innerHTML = textoOriginal;
+        document.getElementById('inputExcelMinutas').value = '';
     }
-});
+}
+
+function mostrarResumenImportacionMinutas(resumen) {
+    const cuerpo = document.getElementById('resumenImportacionCuerpoMinutas');
+    const modal = document.getElementById('modalResumenImportacionMinutas');
+    if (!cuerpo || !modal) return;
+
+    let html = `
+        <div class="resumen-importacion-cifras">
+            <div class="resumen-cifra"><strong>${resumen.total}</strong><span>Filas leídas</span></div>
+            <div class="resumen-cifra exito"><strong>${resumen.exitosos}</strong><span>Registradas</span></div>
+            <div class="resumen-cifra error"><strong>${resumen.con_error}</strong><span>Con error</span></div>
+        </div>`;
+
+    if (resumen.errores.length > 0) {
+        html += `
+            <p><strong>Filas con error</strong> (corrígelas en tu Excel y vuelve a importar solo esas):</p>
+            <div class="tabla-errores-importacion">
+                <table>
+                    <thead><tr><th>Fila</th><th>Motivo</th></tr></thead>
+                    <tbody>
+                        ${resumen.errores.map(e => `<tr><td>${e.fila}</td><td>${escapeHtml(e.motivo)}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        html += '<p>Todas las minutas se registraron correctamente.</p>';
+    }
+
+    cuerpo.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function cerrarResumenImportacionMinutas() {
+    const modal = document.getElementById('modalResumenImportacionMinutas');
+    if (modal) modal.style.display = 'none';
+}
+
 // ============================================
-// COMPARTIR MINUTAS (VERSIÓN FINAL)
+// 10. COMPARTIR MINUTAS (VERSIÓN FINAL)
 // ============================================
 function abrirModalCompartir(minutaId, tipo = 'minuta') {
     let modal = document.getElementById('modalCompartirGlobal');
-    
+
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'modalCompartirGlobal';
         modal.className = 'modal-compartir';
-        
+
         modal.innerHTML = `
             <div class="modal-compartir-contenido">
                 <div class="modal-compartir-header">
                     <h3><i class="fas fa-share-alt"></i> Compartir Documento</h3>
                     <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;">&times;</button>
                 </div>
-                
+
                 <div class="tabs-compartir">
                     <button class="tab-btn active" onclick="cambiarTabCompartir('correo', this)">Por Correo</button>
                     <button class="tab-btn" onclick="cambiarTabCompartir('enlace', this)">Por Enlace</button>
                     <button class="tab-btn" onclick="cambiarTabCompartir('historial', this)">Historial</button>
                 </div>
-                
+
                 <div id="tab-correo" class="tab-content active">
                     <div class="form-grupo-compartir">
                         <label>Correos destinatarios (separados por coma)</label>
@@ -632,7 +659,6 @@ function abrirModalCompartir(minutaId, tipo = 'minuta') {
                         <label>Permisos</label>
                         <select id="compartirPermisosEnlace">
                             <option value="ver">Solo Ver</option>
-                        
                         </select>
                     </div>
                     <div class="form-grupo-compartir">
@@ -660,16 +686,14 @@ function abrirModalCompartir(minutaId, tipo = 'minuta') {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
         modal.onclick = (e) => { if (e.target === modal) cerrarModalCompartir(); };
 
-        // EVENTO DEL BOTÓN ENVIAR
         document.getElementById('btnEnviarCorreo').onclick = function() {
             ejecutarCompartir(window.currentDocIdCompartir, window.currentDocTipoCompartir);
         };
-        
-        // EVENTO DEL BOTÓN GENERAR ENLACE
+
         document.getElementById('btnGenerarEnlace').onclick = function() {
             generarSoloEnlace(window.currentDocIdCompartir, window.currentDocTipoCompartir);
         };
@@ -678,14 +702,13 @@ function abrirModalCompartir(minutaId, tipo = 'minuta') {
     window.currentDocIdCompartir = minutaId;
     window.currentDocTipoCompartir = tipo;
 
-    // Reiniciar pestaña a "Correo"
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     document.querySelector('.tab-btn').classList.add('active');
     document.getElementById('tab-correo').style.display = 'block';
-    
+
     document.getElementById('compartirCorreos').value = '';
-    document.getElementById('compartirPermisosEnlace').value = 'descargar';
+    document.getElementById('compartirPermisosEnlace').value = 'ver';
     document.getElementById('compartirExpiracionEnlace').value = '7';
     document.getElementById('inputEnlaceCompartir').value = '';
     document.getElementById('historialContenido').innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:0.85rem;">Cargando historial...</p>';
@@ -700,9 +723,9 @@ function cerrarModalCompartir() {
 function cambiarTabCompartir(tab, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    
+
     if (btn) btn.classList.add('active');
-    
+
     const tabElement = document.getElementById(`tab-${tab}`);
     if (tabElement) tabElement.style.display = 'block';
 
@@ -721,7 +744,7 @@ function copiarEnlace() {
 
 async function cargarHistorialCompartir(docId) {
     const cont = document.getElementById('historialContenido');
-    if(!cont) return;
+    if (!cont) return;
     try {
         const res = await fetch(`/api/compartir/historial/${docId}`);
         const data = await res.json();
@@ -782,9 +805,6 @@ async function generarSoloEnlace(docId, tipo) {
     }
 }
 
-// ============================================
-// FUNCIÓN QUE FALTABA: EJECUTAR COMPARTIR
-// ============================================
 async function ejecutarCompartir(docId, tipo) {
     const correosStr = document.getElementById('compartirCorreos').value;
     const correos = correosStr.split(',').map(c => c.trim()).filter(c => c);
@@ -800,24 +820,21 @@ async function ejecutarCompartir(docId, tipo) {
     btn.disabled = true;
 
     try {
-        // 1. Obtenemos los datos
         const resDetalle = await fetch(`/api/minutas/detalle/${docId}`);
         const dataDetalle = await resDetalle.json();
 
         if (!dataDetalle.exito) throw new Error('No se pudo cargar la minuta');
 
-        // 2. Generamos el HTML
         generarFormatoImprimible(dataDetalle.minuta);
         await new Promise(r => setTimeout(r, 500));
 
-        // 3. Convertimos a PDF
         const elemento = document.getElementById('formatoImprimible');
         const displayOriginal = elemento.style.display;
         elemento.style.display = 'block';
         elemento.style.position = 'absolute';
         elemento.style.left = '-9999px';
         elemento.style.top = '0';
-        elemento.style.width = '21cm'; 
+        elemento.style.width = '21cm';
 
         const canvas = await html2canvas(elemento, {
             scale: 2,
@@ -834,14 +851,12 @@ async function ejecutarCompartir(docId, tipo) {
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         const pdfBlob = pdf.output('blob');
 
-        // Restaurar estilos
         elemento.style.display = displayOriginal;
         elemento.style.position = '';
         elemento.style.left = '';
         elemento.style.top = '';
         elemento.style.width = '';
 
-        // 4. Enviamos al servidor
         const formData = new FormData();
         formData.append('pdf_file', pdfBlob, 'documento.pdf');
         formData.append('correos', correos.join(','));
@@ -871,3 +886,67 @@ async function ejecutarCompartir(docId, tipo) {
         btn.disabled = false;
     }
 }
+
+// ============================================
+// 11. INICIALIZAR
+// ============================================
+document.addEventListener('DOMContentLoaded', function () {
+    // Página de lista
+    if (document.getElementById('minutasContainer')) {
+        cargarMinutas();
+
+        const buscador = document.getElementById('buscadorMinutas');
+        if (buscador) {
+            buscador.addEventListener('input', function () {
+                const q = this.value.toLowerCase().trim();
+                const filtradas = minutasCache.filter(m =>
+                    (m.asunto || '').toLowerCase().includes(q) ||
+                    (m.area_carrera || '').toLowerCase().includes(q)
+                );
+                renderizarMinutas(filtradas);
+            });
+        }
+
+        // HU34: Mostrar acciones de importación solo para maestros
+        const accionesMaestroMinutas = document.getElementById('accionesMaestroMinutas');
+        if (accionesMaestroMinutas && usuario.rol === 'maestro') {
+            accionesMaestroMinutas.style.display = 'flex';
+        }
+
+        // HU34: Conectar botones de importación
+        const btnImportarExcelMinutas = document.getElementById('btnImportarExcelMinutas');
+        const inputExcelMinutas = document.getElementById('inputExcelMinutas');
+        if (btnImportarExcelMinutas && inputExcelMinutas) {
+            btnImportarExcelMinutas.onclick = () => inputExcelMinutas.click();
+            inputExcelMinutas.onchange = () => importarMinutasExcel(inputExcelMinutas.files[0]);
+        }
+
+        const btnCerrarResumenMinutas = document.getElementById('btnCerrarResumenImportacionMinutas');
+        if (btnCerrarResumenMinutas) {
+            btnCerrarResumenMinutas.onclick = cerrarResumenImportacionMinutas;
+        }
+    }
+
+    // Página de creación
+    const form = document.getElementById('formMinuta');
+    if (form) {
+        const inputFecha = document.getElementById('inputFecha');
+        if (inputFecha) {
+            const hoy = new Date().toISOString().split('T')[0];
+            inputFecha.value = hoy;
+        }
+
+        const inputHora = document.getElementById('inputHora');
+        if (inputHora) {
+            const ahora = new Date();
+            const hh = String(ahora.getHours()).padStart(2, '0');
+            const mm = String(ahora.getMinutes()).padStart(2, '0');
+            inputHora.value = `${hh}:${mm}`;
+        }
+
+        for (let i = 0; i < 4; i++) agregarAsistente();
+        for (let i = 0; i < 3; i++) agregarAcuerdo();
+
+        form.addEventListener('submit', guardarMinuta);
+    }
+});

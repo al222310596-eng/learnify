@@ -21,7 +21,6 @@ from datetime import datetime, timedelta
 from email.mime.base import MIMEBase
 from email import encoders
 from io import BytesIO
-
 from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -3213,6 +3212,260 @@ def eliminar_minuta(minuta_id):
         print(f" Error en eliminar_minuta: {error}")
         return jsonify({"exito": False, "mensaje": str(error)}), 400
 
+# ============================================
+# 8.2 IMPORTAR MINUTAS DESDE EXCEL (HU34)
+# ============================================
+
+# Columnas de la plantilla: (nombre_columna, obligatoria, ejemplo)
+COLUMNAS_MINUTAS_EXCEL = [
+    ("email_creador", True,  "maestro@correo.com"),
+    ("fecha",         True,  "2026-11-06"),
+    ("hora",          False, "10:30"),
+    ("area_carrera",  False, "Ing. en Software"),
+    ("asunto",        True,  "Revisión de avances del proyecto"),
+    ("asistentes",    False, "Juan Pérez|María López|Carlos Ruiz"),
+    ("acuerdos",      False, "Revisar módulo de login|Juan Pérez|2026-11-15;Actualizar BD|María López|2026-11-20"),
+]
+
+MAX_FILAS_IMPORTAR_MINUTAS = 500
+MAX_TAMANO_EXCEL_MINUTAS = 5 * 1024 * 1024  # 5 MB
+
+
+def _texto_celda_min(valor):
+    """Convierte cualquier valor de una celda a texto limpio."""
+    if valor is None:
+        return ""
+    if isinstance(valor, float) and valor.is_integer():
+        valor = int(valor)
+    return str(valor).strip()
+
+
+def _fecha_celda_min(valor):
+    """Acepta fechas reales de Excel o texto AAAA-MM-DD / DD/MM/AAAA."""
+    if valor is None or _texto_celda_min(valor) == "":
+        return None
+    if isinstance(valor, datetime):
+        return valor
+    texto = _texto_celda_min(valor)
+    for formato in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(texto, formato)
+        except ValueError:
+            continue
+    raise ValueError(f"fecha no válida '{texto}' (usa AAAA-MM-DD)")
+
+
+@app.route('/api/minutas/importar/plantilla', methods=['GET'])
+def descargar_plantilla_minutas():
+    """Descarga el formato Excel que el maestro debe llenar para Minutas."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        libro = Workbook()
+        hoja = libro.active
+        hoja.title = "Minutas"
+
+        relleno_obligatorio = PatternFill("solid", fgColor="1F4E78")
+        relleno_opcional = PatternFill("solid", fgColor="7F7F7F")
+
+        for col, (nombre, obligatoria, ejemplo) in enumerate(COLUMNAS_MINUTAS_EXCEL, start=1):
+            celda = hoja.cell(row=1, column=col, value=nombre)
+            celda.font = Font(bold=True, color="FFFFFF")
+            celda.fill = relleno_obligatorio if obligatoria else relleno_opcional
+            celda.alignment = Alignment(horizontal="center")
+            hoja.cell(row=2, column=col, value=ejemplo)
+            hoja.column_dimensions[celda.column_letter].width = max(len(nombre), len(str(ejemplo))) + 4
+
+        ayuda = libro.create_sheet("Instrucciones")
+        instrucciones = [
+            "INSTRUCCIONES PARA IMPORTAR MINUTAS",
+            "1. Llena la hoja 'Minutas' a partir de la fila 2 (la fila 2 es un ejemplo, bórrala o reemplázala).",
+            "2. No cambies los nombres de las columnas de la fila 1.",
+            "3. Las columnas en azul son OBLIGATORIAS: email_creador, fecha y asunto.",
+            "4. email_creador debe ser el correo del usuario que crea la minuta (maestro o alumno).",
+            "5. Las fechas van como AAAA-MM-DD (ejemplo: 2026-11-06) o como fecha de Excel.",
+            "6. hora va en formato HH:MM (ejemplo: 10:30).",
+            "7. Para 'asistentes', separa los nombres con el símbolo | (ejemplo: Juan Pérez|María López).",
+            "8. Para 'acuerdos', usa el formato: Agenda|Responsable|AAAA-MM-DD; separando cada acuerdo con ;",
+            "   Ejemplo: Revisar login|Juan Pérez|2026-11-15;Actualizar BD|María López|2026-11-20",
+            f"9. Máximo {MAX_FILAS_IMPORTAR_MINUTAS} filas por archivo.",
+        ]
+        for i, linea in enumerate(instrucciones, start=1):
+            ayuda.cell(row=i, column=1, value=linea)
+        ayuda["A1"].font = Font(bold=True, size=13)
+        ayuda.column_dimensions["A"].width = 110
+
+        salida = BytesIO()
+        libro.save(salida)
+        salida.seek(0)
+
+        return Response(
+            salida.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=plantilla_minutas.xlsx"}
+        )
+    except Exception as error:
+        print(f"Error en descargar_plantilla_minutas: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 500
+
+
+@app.route('/api/minutas/importar', methods=['POST'])
+def importar_minutas_excel():
+    """Importa minutas en masa desde un Excel (.xlsx). Solo maestros."""
+    try:
+        from openpyxl import load_workbook
+
+        usuario_id = request.form.get('usuario_id')
+        archivo = request.files.get('archivo')
+
+        # --- 1. Validar quién sube el archivo ---
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+
+        maestro = db.usuarios.find_one({"_id": ObjectId(usuario_id)})
+        if not maestro or maestro.get("rol") != "maestro":
+            return jsonify({"exito": False, "mensaje": "Solo los maestros pueden importar minutas"}), 403
+
+        # --- 2. Validar el archivo ---
+        if not archivo or not archivo.filename:
+            return jsonify({"exito": False, "mensaje": "Selecciona un archivo Excel"}), 400
+
+        if not archivo.filename.lower().endswith('.xlsx'):
+            return jsonify({"exito": False, "mensaje": "El archivo debe ser .xlsx (usa la plantilla)"}), 400
+
+        contenido = archivo.read()
+        if len(contenido) > MAX_TAMANO_EXCEL_MINUTAS:
+            return jsonify({"exito": False, "mensaje": "El archivo supera 5 MB"}), 400
+
+        try:
+            libro = load_workbook(BytesIO(contenido), read_only=True, data_only=True)
+        except Exception:
+            return jsonify({"exito": False, "mensaje": "No se pudo leer el Excel; verifica que no esté dañado"}), 400
+
+        hoja = libro["Minutas"] if "Minutas" in libro.sheetnames else libro.worksheets[0]
+        filas = list(hoja.iter_rows(values_only=True))
+        libro.close()
+
+        # --- 3. Validar columnas ---
+        if not filas:
+            return jsonify({"exito": False, "mensaje": "El archivo está vacío"}), 400
+
+        encabezados = [_texto_celda_min(c).lower() for c in filas[0]]
+        obligatorias = [n for n, obl, _ in COLUMNAS_MINUTAS_EXCEL if obl]
+        faltantes = [n for n in obligatorias if n not in encabezados]
+
+        if faltantes:
+            return jsonify({
+                "exito": False,
+                "mensaje": "Faltan columnas obligatorias: " + ", ".join(faltantes) + ". Descarga la plantilla."
+            }), 400
+
+        indice = {nombre: pos for pos, nombre in enumerate(encabezados) if nombre}
+
+        def valor(fila, columna):
+            pos = indice.get(columna)
+            return fila[pos] if pos is not None and pos < len(fila) else None
+
+        datos_filas = [(n, f) for n, f in enumerate(filas[1:], start=2) if any(_texto_celda_min(c) for c in f)]
+
+        if not datos_filas:
+            return jsonify({"exito": False, "mensaje": "No hay filas con datos para importar"}), 400
+
+        if len(datos_filas) > MAX_FILAS_IMPORTAR_MINUTAS:
+            return jsonify({"exito": False, "mensaje": f"El archivo tiene {len(datos_filas)} filas; el máximo es {MAX_FILAS_IMPORTAR_MINUTAS}"}), 400
+
+        # --- 4. Validar y registrar fila por fila ---
+        exitosos = 0
+        errores = []
+
+        for num_fila, fila in datos_filas:
+            try:
+                email = _texto_celda_min(valor(fila, "email_creador")).lower()
+                asunto = _texto_celda_min(valor(fila, "asunto"))
+                fecha = _fecha_celda_min(valor(fila, "fecha"))
+
+                if not email or not asunto or not fecha:
+                    raise ValueError("email_creador, fecha y asunto son obligatorios")
+
+                creador = db.usuarios.find_one({"email": email})
+                if not creador:
+                    raise ValueError(f"no existe un usuario registrado con el correo {email}")
+
+                # Asistentes: "Nombre1|Nombre2|Nombre3"
+                asistentes = []
+                asistentes_str = _texto_celda_min(valor(fila, "asistentes"))
+                if asistentes_str:
+                    for nombre_asistente in asistentes_str.split("|"):
+                        nombre_asistente = nombre_asistente.strip()
+                        if nombre_asistente:
+                            asistentes.append({
+                                "nombre": nombre_asistente,
+                                "firma": None
+                            })
+
+                # Acuerdos: "Agenda|Responsable|AAAA-MM-DD;Agenda2|Resp2|AAAA-MM-DD"
+                acuerdos = []
+                acuerdos_str = _texto_celda_min(valor(fila, "acuerdos"))
+                if acuerdos_str:
+                    for bloque in acuerdos_str.split(";"):
+                        bloque = bloque.strip()
+                        if not bloque:
+                            continue
+                        partes = [p.strip() for p in bloque.split("|")]
+                        agenda = partes[0] if len(partes) > 0 else ""
+                        responsable = partes[1] if len(partes) > 1 else ""
+                        fecha_comp = None
+                        if len(partes) > 2 and partes[2]:
+                            try:
+                                fecha_comp = datetime.strptime(partes[2], "%Y-%m-%d")
+                            except ValueError:
+                                fecha_comp = None
+                        acuerdos.append({
+                            "agenda": agenda,
+                            "acuerdo": agenda,  # usamos la misma agenda como acuerdo si no viene aparte
+                            "responsable": responsable,
+                            "fecha_compromiso": fecha_comp
+                        })
+
+                # Evitar duplicados: mismo creador + asunto + fecha
+                if db.minutas.find_one({"usuario_id": creador["_id"], "asunto": asunto, "fecha": fecha}):
+                    raise ValueError("ya existe una minuta con este creador, asunto y fecha")
+
+                db.minutas.insert_one({
+                    "usuario_id": creador["_id"],
+                    "usuario_nombre": creador["nombre"],
+                    "usuario_email": creador["email"],
+                    "usuario_rol": creador["rol"],
+                    "fecha": fecha,
+                    "hora": _texto_celda_min(valor(fila, "hora")),
+                    "area_carrera": _texto_celda_min(valor(fila, "area_carrera")),
+                    "asunto": asunto,
+                    "asistentes": asistentes,
+                    "acuerdos": acuerdos,
+                    "fecha_creacion": datetime.now()
+                })
+
+                exitosos += 1
+
+            except Exception as error_fila:
+                errores.append({"fila": num_fila, "motivo": str(error_fila)})
+
+        # --- 5. Resumen ---
+        return jsonify({
+            "exito": True,
+            "mensaje": f"Importación terminada: {exitosos} registradas, {len(errores)} con error",
+            "resumen": {
+                "total": len(datos_filas),
+                "exitosos": exitosos,
+                "con_error": len(errores),
+                "errores": errores
+            }
+        })
+
+    except Exception as error:
+        print(f"Error en importar_minutas_excel: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
 # ============================================
 # NOTIFICACIONES: ESTADÍAS NUEVAS PARA EL MAESTRO
 # ============================================

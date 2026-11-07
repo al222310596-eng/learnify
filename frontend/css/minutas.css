@@ -189,9 +189,7 @@
     transform: scale(1.05);
 }
 
-/* ============================================
-   BOTÓN COMPARTIR (NUEVO)
-   ============================================ */
+/* Botón compartir */
 .btn-compartir {
     background: #06b6d4;
     color: #fff;
@@ -315,7 +313,7 @@
     resize: vertical;
 }
 
-/* Lista dinámica (asistentes / acuerdos) */
+/* Lista dinámica */
 .lista-dinamica {
     display: flex;
     flex-direction: column;
@@ -645,7 +643,7 @@
 }
 
 /* ============================================
-   MODAL COMPARTIR (NUEVO)
+   MODAL COMPARTIR
    ============================================ */
 .modal-compartir {
     position: fixed;
@@ -843,4 +841,154 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* ============================================
+   MODAL DE CONFIRMACIÓN / RESUMEN (IMPORTACIÓN)
+   ============================================ */
+.modal-confirmar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-confirmar-contenido {
+    background: white;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 450px;
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-confirmar-header {
+    background: #fef3c7;
+    padding: 1.25rem;
+    text-align: center;
+    border-bottom: 1px solid #fde68a;
+}
+
+.modal-confirmar-header i {
+    font-size: 2.5rem;
+    color: #d97706;
+    margin-bottom: 0.5rem;
+}
+
+.modal-confirmar-header h3 {
+    margin: 0;
+    color: #92400e;
+    font-size: 1.2rem;
+}
+
+.modal-confirmar-body {
+    padding: 1.5rem;
+    text-align: center;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-confirmar-body p {
+    margin: 0 0 0.5rem;
+    color: #1e293b;
+}
+
+.modal-confirmar-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.5rem 1.5rem;
+    background: #f8fafc;
+}
+
+.modal-confirmar-footer button {
+    flex: 1;
+    margin: 0;
+}
+
+/* Modo oscuro del modal */
+body.dark-mode .modal-confirmar-contenido {
+    background: #1e293b;
+}
+body.dark-mode .modal-confirmar-body p,
+body.dark-mode .modal-confirmar-body strong,
+body.dark-mode .modal-confirmar-body td,
+body.dark-mode .modal-confirmar-body th {
+    color: #e2e8f0;
+}
+body.dark-mode .modal-confirmar-footer {
+    background: #0f172a;
+}
+
+/* ============================================
+   HU34: IMPORTAR MINUTAS DESDE EXCEL
+   ============================================ */
+.acciones-importar {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.resumen-importacion-cifras {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.resumen-cifra {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 10px;
+    background: rgba(100, 116, 139, 0.12);
+}
+
+.resumen-cifra strong {
+    font-size: 1.6rem;
+}
+
+.resumen-cifra span {
+    font-size: 0.8rem;
+}
+
+.resumen-cifra.exito {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.resumen-cifra.error {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.tabla-errores-importacion {
+    max-height: 220px;
+    overflow-y: auto;
+    text-align: left;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 8px;
+}
+
+.tabla-errores-importacion table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.tabla-errores-importacion th,
+.tabla-errores-importacion td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.tabla-errores-importacion td:first-child,
+.tabla-errores-importacion th:first-child {
+    width: 60px;
+    text-align: center;
 }
