@@ -73,14 +73,22 @@
                         <h1><i class="fas fa-users"></i> Mis Equipos</h1>
                         <p class="page-subtitle">Gestiona tus equipos, miembros y actividades</p>
                     </div>
-                    <div class="page-header-actions">
-                        <button id="btnMostrarUnirse" class="btn btn-outline">
-                            <i class="fas fa-user-plus"></i> Unirse a equipo
-                        </button>
-                        <button id="btnCrearEquipo" class="btn btn-primary">
-                            <i class="fas fa-plus-circle"></i> Crear equipo
-                        </button>
-                    </div>
+                 <div class="page-header-actions">
+    <button id="btnMostrarUnirse" class="btn btn-outline">
+        <i class="fas fa-user-plus"></i> Unirse a equipo
+    </button>
+   <button id="btnDescargarPlantillaEquipos" class="btn btn-outline" style="display: none;">
+        <i class="fas fa-download"></i> Plantilla Excel
+    </button>
+    <button id="btnImportarEquipos" class="btn btn-outline" style="display: none;">
+        <i class="fas fa-file-import"></i> Importar equipos
+    </button>
+    <input type="file" id="inputArchivoEquipos" accept=".xlsx" style="display: none;">
+
+    <button id="btnCrearEquipo" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Crear equipo
+    </button>
+</div>
                 </div>
 
                 <!-- Mensajes -->
@@ -120,7 +128,25 @@
             </div>
         </main>
     </div>
-
+<!-- ============================================ -->
+<!-- MODAL: RESULTADO DE IMPORTACIÓN DE EQUIPOS    -->
+<!-- ============================================ -->
+<div id="modalResultadoImportacion" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-file-import"></i> Resultado de la importación</h2>
+            <button class="modal-close" onclick="cerrarModalImportacion()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalResultadoBody">
+            <!-- Se llena dinámicamente -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="cerrarModalImportacion()">Cerrar</button>
+        </div>
+    </div>
+</div>
     <!-- ============================================ -->
     <!-- SCRIPTS                                       -->
     <!-- ============================================ -->

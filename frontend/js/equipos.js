@@ -374,3 +374,157 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+// ============================================
+// IMPORTAR EQUIPOS DESDE EXCEL
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 🔒 Solo maestros ven las opciones de importar
+    const usuarioGuardado = localStorage.getItem('usuario') || localStorage.getItem('user');
+    const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : {};
+    const esMaestro = usuario.rol === 'maestro';
+
+    const btnPlantilla = document.getElementById('btnDescargarPlantillaEquipos');
+    const btnImportar = document.getElementById('btnImportarEquipos');
+    const inputArchivo = document.getElementById('inputArchivoEquipos');
+
+    if (!esMaestro) return; // Si es alumno, se detiene aquí
+
+    // Mostrar botones
+    if (btnPlantilla) btnPlantilla.style.display = '';
+    if (btnImportar) btnImportar.style.display = '';
+
+    // Evento para descargar plantilla
+    if (btnPlantilla) {
+        btnPlantilla.addEventListener('click', () => {
+            window.open('http://localhost:5000/api/equipos/importar/plantilla', '_blank');
+        });
+    }
+
+    // Evento para seleccionar archivo
+    if (btnImportar && inputArchivo) {
+        btnImportar.addEventListener('click', () => inputArchivo.click());
+
+        inputArchivo.addEventListener('change', async (e) => {
+            const archivo = e.target.files[0];
+            if (!archivo) return;
+
+            if (!archivo.name.toLowerCase().endsWith('.xlsx')) {
+                alert('Solo se aceptan archivos .xlsx');
+                inputArchivo.value = '';
+                return;
+            }
+
+            // Llamamos a la función
+            await importarEquipos(archivo);
+            inputArchivo.value = '';
+        });
+    }
+});
+
+// ---------------------------------------------------
+// FUNCIÓN PRINCIPAL DE IMPORTACIÓN (Debe estar afuera)
+// ---------------------------------------------------
+async function importarEquipos(archivo) {
+    const btnImportar = document.getElementById('btnImportarEquipos');
+    const textoOriginal = btnImportar.innerHTML;
+
+    btnImportar.disabled = true;
+    btnImportar.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Importando...';
+
+    try {
+        const usuarioGuardado = localStorage.getItem('usuario') || localStorage.getItem('user');
+        const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : {};
+
+        if (!usuario || (!usuario._id && !usuario.id)) {
+            alert('❌ Error: No se encontró tu sesión. Recarga la página.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('usuario_id', usuario._id || usuario.id);
+        formData.append('archivo', archivo);
+
+        const res = await fetch('http://localhost:5000/api/equipos/importar', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (!data.exito) {
+            alert(`⚠️ Error al importar: ${data.mensaje}`);
+            console.error("Detalle del error:", data);
+            return;
+        }
+
+        mostrarModalResultado(data.resumen);
+
+        if (data.resumen.exitosos > 0 && typeof cargarEquipos === 'function') {
+            cargarEquipos(); // Recargar la lista de equipos
+        }
+
+    } catch (error) {
+        console.error('❌ Error grave:', error);
+        alert('❌ Error de conexión al importar. Revisa la consola.');
+    } finally {
+        btnImportar.disabled = false;
+        btnImportar.innerHTML = textoOriginal;
+    }
+}
+
+// ---------------------------------------------------
+// FUNCIONES DEL MODAL (También afuera)
+// ---------------------------------------------------
+function mostrarModalResultado(resumen) {
+    const body = document.getElementById('modalResultadoBody');
+    const modal = document.getElementById('modalResultadoImportacion');
+
+    let html = `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <div style="padding: 12px; background: #f1f5f9; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: 700; color: #1e293b;">${resumen.total}</div>
+                <div style="font-size: 12px; color: #64748b;">Total filas</div>
+            </div>
+            <div style="padding: 12px; background: #dcfce7; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: 700; color: #166534;">${resumen.exitosos}</div>
+                <div style="font-size: 12px; color: #166534;">Creados</div>
+            </div>
+            <div style="padding: 12px; background: #fee2e2; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: 700; color: #991b1b;">${resumen.con_error}</div>
+                <div style="font-size: 12px; color: #991b1b;">Con error</div>
+            </div>
+            <div style="padding: 12px; background: #fef3c7; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: 700; color: #92400e;">${resumen.advertencias}</div>
+                <div style="font-size: 12px; color: #92400e;">Advertencias</div>
+            </div>
+        </div>
+    `;
+
+    if (resumen.errores && resumen.errores.length > 0) {
+        html += '<h4 style="color: #991b1b; margin-bottom: 8px;"><i class="fas fa-times-circle"></i> Errores</h4><ul style="margin: 0 0 16px 20px; font-size: 13px; color: #7f1d1d;">';
+        resumen.errores.forEach(err => {
+            html += `<li>Fila ${err.fila}: ${err.motivo}</li>`;
+        });
+        html += '</ul>';
+    }
+
+    if (resumen.avisos && resumen.avisos.length > 0) {
+        html += '<h4 style="color: #92400e; margin-bottom: 8px;"><i class="fas fa-exclamation-triangle"></i> Advertencias</h4><ul style="margin: 0 0 16px 20px; font-size: 13px; color: #78350f;">';
+        resumen.avisos.forEach(av => {
+            html += `<li>Fila ${av.fila}: ${av.motivo}</li>`;
+        });
+        html += '</ul>';
+    }
+
+    if (resumen.exitosos > 0 && (!resumen.errores || resumen.errores.length === 0)) {
+        html += '<p style="color: #166534; font-weight: 600; text-align: center;"><i class="fas fa-check-circle"></i> ¡Todos los equipos se crearon correctamente!</p>';
+    }
+
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function cerrarModalImportacion() {
+    document.getElementById('modalResultadoImportacion').style.display = 'none';
+}
