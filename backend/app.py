@@ -856,6 +856,244 @@ def salir_del_equipo(equipo_id):
         return jsonify({"exito": False, "mensaje": f"Error: {str(error)}"}), 400
 
 # ============================================
+# IMPORTAR EQUIPOS DESDE EXCEL
+# ============================================
+COLUMNAS_EQUIPOS_EXCEL = [
+    ("nombre",           True,  "Equipo Alpha"),
+    ("descripcion",      False, "Equipo de desarrollo móvil"),
+    ("emails_miembros",  False, "alumno1@correo.com|alumno2@correo.com"),
+    ("estado",           False, "activo o archivado"),
+]
+MAX_FILAS_IMPORTAR_EQUIPOS = 500
+MAX_TAMANO_EXCEL_EQUIPOS = 5 * 1024 * 1024  # 5 MB
+
+@app.route('/api/equipos/importar/plantilla', methods=['GET'])
+def descargar_plantilla_equipos():
+    """Descarga el formato Excel para importar equipos."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        libro = Workbook()
+        hoja = libro.active
+        hoja.title = "Equipos"
+
+        relleno_obligatorio = PatternFill("solid", fgColor="1F4E78")
+        relleno_opcional = PatternFill("solid", fgColor="7F7F7F")
+
+        for col, (nombre, obligatoria, ejemplo) in enumerate(COLUMNAS_EQUIPOS_EXCEL, start=1):
+            celda = hoja.cell(row=1, column=col, value=nombre)
+            celda.font = Font(bold=True, color="FFFFFF")
+            celda.fill = relleno_obligatorio if obligatoria else relleno_opcional
+            celda.alignment = Alignment(horizontal="center")
+            hoja.cell(row=2, column=col, value=ejemplo)
+            hoja.column_dimensions[celda.column_letter].width = max(len(nombre), len(str(ejemplo))) + 4
+
+        ayuda = libro.create_sheet("Instrucciones")
+        instrucciones = [
+            "INSTRUCCIONES PARA IMPORTAR EQUIPOS",
+            "1. Llena la hoja 'Equipos' a partir de la fila 2 (la fila 2 es un ejemplo, bórrala o reemplázala).",
+            "2. No cambies los nombres de las columnas de la fila 1.",
+            "3. La única columna OBLIGATORIA es: nombre.",
+            "4. El LÍDER del equipo será automáticamente el maestro que sube el archivo.",
+            "   No hace falta indicarlo en el Excel.",
+            "5. emails_miembros: separa cada correo con | (pipe). Solo se aceptan alumnos registrados.",
+            "   Ejemplo: alumno1@correo.com|alumno2@correo.com",
+            "6. estado: 'activo' (por defecto) o 'archivado'.",
+            f"7. Máximo {MAX_FILAS_IMPORTAR_EQUIPOS} filas por archivo.",
+        ]
+        for i, linea in enumerate(instrucciones, start=1):
+            ayuda.cell(row=i, column=1, value=linea)
+        ayuda["A1"].font = Font(bold=True, size=13)
+        ayuda.column_dimensions["A"].width = 100
+
+        salida = BytesIO()
+        libro.save(salida)
+        salida.seek(0)
+
+        return Response(
+            salida.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=plantilla_equipos.xlsx"}
+        )
+    except Exception as error:
+        print(f"Error en descargar_plantilla_equipos: {error}")
+        return jsonify({"exito": False, "mensaje": str(error)}), 500
+
+@app.route('/api/equipos/importar', methods=['POST'])
+def importar_equipos_excel():
+    """Importa equipos en masa desde un Excel (.xlsx).
+    El líder SIEMPRE es el maestro que sube el archivo (usuario_id).
+    """
+    try:
+        from openpyxl import load_workbook
+
+        usuario_id = request.form.get('usuario_id')
+        archivo = request.files.get('archivo')
+
+        # --- 1. Validar quién sube el archivo ---
+        if not usuario_id:
+            return jsonify({"exito": False, "mensaje": "Usuario no identificado"}), 400
+
+        maestro = db.usuarios.find_one({"_id": ObjectId(usuario_id), "rol": "maestro"})
+        if not maestro:
+            return jsonify({
+                "exito": False,
+                "mensaje": "Solo los maestros pueden importar equipos. El líder se asigna automáticamente."
+            }), 403
+
+        lider_id = maestro["_id"]  # ← se usa para todos los equipos del Excel
+
+        # --- 2. Validar el archivo ---
+        if not archivo or not archivo.filename:
+            return jsonify({"exito": False, "mensaje": "Selecciona un archivo Excel"}), 400
+
+        if not archivo.filename.lower().endswith('.xlsx'):
+            return jsonify({"exito": False, "mensaje": "El archivo debe ser .xlsx (usa la plantilla)"}), 400
+
+        contenido = archivo.read()
+        if len(contenido) > MAX_TAMANO_EXCEL_EQUIPOS:
+            return jsonify({"exito": False, "mensaje": "El archivo supera 5 MB"}), 400
+
+        try:
+            libro = load_workbook(BytesIO(contenido), read_only=True, data_only=True)
+        except Exception:
+            return jsonify({"exito": False, "mensaje": "No se pudo leer el Excel; verifica que no esté dañado"}), 400
+
+        hoja = libro["Equipos"] if "Equipos" in libro.sheetnames else libro.worksheets[0]
+        filas = list(hoja.iter_rows(values_only=True))
+        libro.close()
+
+        # --- 3. Validar columnas ---
+        if not filas:
+            return jsonify({"exito": False, "mensaje": "El archivo está vacío"}), 400
+
+        encabezados = [_texto_celda(c).lower() for c in filas[0]]
+        obligatorias = [n for n, obl, _ in COLUMNAS_EQUIPOS_EXCEL if obl]
+        faltantes = [n for n in obligatorias if n not in encabezados]
+
+        if faltantes:
+            return jsonify({
+                "exito": False,
+                "mensaje": "Faltan columnas obligatorias: " + ", ".join(faltantes) + ". Descarga la plantilla."
+            }), 400
+
+        indice = {nombre: pos for pos, nombre in enumerate(encabezados) if nombre}
+
+        def valor(fila, columna):
+            pos = indice.get(columna)
+            return fila[pos] if pos is not None and pos < len(fila) else None
+
+        datos_filas = [(n, f) for n, f in enumerate(filas[1:], start=2)
+                       if any(_texto_celda(c) for c in f)]
+
+        if not datos_filas:
+            return jsonify({"exito": False, "mensaje": "No hay filas con datos para importar"}), 400
+
+        if len(datos_filas) > MAX_FILAS_IMPORTAR_EQUIPOS:
+            return jsonify({
+                "exito": False,
+                "mensaje": f"El archivo tiene {len(datos_filas)} filas; el máximo es {MAX_FILAS_IMPORTAR_EQUIPOS}"
+            }), 400
+
+        # --- 4. Procesar fila por fila ---
+        exitosos = 0
+        errores = []
+        advertencias = []
+
+        for num_fila, fila in datos_filas:
+            try:
+                nombre = _texto_celda(valor(fila, "nombre"))
+                descripcion = _texto_celda(valor(fila, "descripcion"))
+                emails_miembros_str = _texto_celda(valor(fila, "emails_miembros"))
+
+                # Validaciones de la fila
+                if not nombre:
+                    raise ValueError("nombre es obligatorio")
+
+                estado_raw = _texto_celda(valor(fila, "estado")).strip().lower()
+                if "archivado" in estado_raw:
+                    estado = "archivado"
+                else:
+                    estado = "activo" 
+                # Evitar duplicados: mismo nombre + mismo líder
+                if db.equipos.find_one({"nombre": nombre, "lider_id": lider_id}):
+                    raise ValueError("ya tienes un equipo con este nombre")
+
+                # Procesar miembros
+                miembros_ids = []
+                no_encontrados = []
+                no_alumnos = []
+
+                if emails_miembros_str:
+                    for correo in emails_miembros_str.split("|"):
+                        correo = correo.strip().lower()
+                        if not correo:
+                            continue
+
+                        miembro = db.usuarios.find_one({"email": correo})
+                        if not miembro:
+                            no_encontrados.append(correo)
+                            continue
+
+                        if miembro.get("rol") != "alumno":
+                            no_alumnos.append(correo)
+                            continue
+
+                        if miembro["_id"] not in miembros_ids:
+                            miembros_ids.append(miembro["_id"])
+
+                # Crear el equipo
+                ahora = datetime.now()
+                db.equipos.insert_one({
+                    "nombre": nombre,
+                    "descripcion": descripcion,
+                    "lider_id": lider_id,          # ← siempre el maestro que sube
+                    "fecha_creacion": ahora,
+                    "fecha_actualizacion": ahora,
+                    "estado": estado,
+                    "miembros": miembros_ids
+                })
+
+                exitosos += 1
+
+                # Avisos que NO bloquean la fila
+                if no_encontrados:
+                    advertencias.append({
+                        "fila": num_fila,
+                        "motivo": f"Equipo '{nombre}' creado, pero no se encontraron estos correos: {', '.join(no_encontrados)}"
+                    })
+                if no_alumnos:
+                    advertencias.append({
+                        "fila": num_fila,
+                        "motivo": f"Equipo '{nombre}' creado, pero estos usuarios no son alumnos: {', '.join(no_alumnos)}"
+                    })
+
+            except Exception as error_fila:
+                errores.append({"fila": num_fila, "motivo": str(error_fila)})
+
+        # --- 5. Resumen ---
+        return jsonify({
+            "exito": True,
+            "mensaje": f"Importación terminada: {exitosos} equipos creados, {len(errores)} con error, {len(advertencias)} advertencias",
+            "resumen": {
+                "total": len(datos_filas),
+                "exitosos": exitosos,
+                "con_error": len(errores),
+                "advertencias": len(advertencias),
+                "errores": errores,
+                "avisos": advertencias
+            }
+        })
+
+    except Exception as error:
+        print(f"Error en importar_equipos_excel: {error}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"exito": False, "mensaje": str(error)}), 400
+    
+
+# ============================================
 # 3. GESTIÓN DE TAREAS
 # ============================================
 
